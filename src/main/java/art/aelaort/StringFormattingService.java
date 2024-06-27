@@ -3,7 +3,6 @@ package art.aelaort;
 import art.aelaort.models.PhysicalServer;
 import art.aelaort.models.PhysicalServerLength;
 import art.aelaort.models.Service;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -11,25 +10,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.String.join;
+import static org.apache.commons.lang3.StringUtils.*;
+
 @Component
 public class StringFormattingService {
-	public String serversServicesFullListString(List<PhysicalServer> servers) {
+	public String servicesByServerFullTreeString(List<PhysicalServer> servers) {
 		StringBuilder sb = new StringBuilder();
-		servers.forEach(server -> {
-			String str = serverServicesString(server);
-			if (!str.isEmpty()) {
-				sb.append(str).append("\n");
+		for (PhysicalServer server : servers) {
+			if (server.getServices().isEmpty()) {
+				continue;
 			}
-		});
-		return sb.toString();
-	}
-
-	private String serverServicesString(PhysicalServer server) {
-		if (server.getServices().isEmpty()) {
-			return "";
+			sb.append(server.getName())
+					.append("\n")
+					.append(servicesString(server.getServices()))
+					.append("\n");
 		}
-
-		return server.getName() + "\n" + servicesString(server.getServices());
+		return sb.toString();
 	}
 
 	private String servicesString(List<Service> services) {
@@ -38,7 +35,7 @@ public class StringFormattingService {
 		}
 
 		StringBuilder sb = new StringBuilder();
-		for (Map.Entry<String, List<String>> servicesByYml : servicesListMap(services).entrySet()) {
+		for (Map.Entry<String, List<String>> servicesByYml : servicesMapList(services).entrySet()) {
 			sb.append("\t")
 					.append(servicesByYml.getKey())
 					.append("\n\t\t");
@@ -51,7 +48,7 @@ public class StringFormattingService {
 		return sb.toString();
 	}
 
-	private Map<String, List<String>> servicesListMap(List<Service> services) {
+	private Map<String, List<String>> servicesMapList(List<Service> services) {
 		Map<String, List<String>> servicesMap = new HashMap<>();
 		for (Service service : services) {
 			String ymlName = service.getYmlName();
@@ -71,37 +68,33 @@ public class StringFormattingService {
 	 * ======================================================
 	 */
 
-	public String physicalServersTableString(List<PhysicalServer> servers) {
+	public String serversTableString(List<PhysicalServer> servers) {
 		PhysicalServerLength lengths = getLengths(servers);
-		String nameHeader = StringUtils.center("name", lengths.nameLength());
-		String ipHeader = StringUtils.center("ip", lengths.ipLength());
-		String monitoringHeader = StringUtils.center("monitoring", lengths.monitoringLength());
-		String sshKeyHeader = StringUtils.center("sshKey", lengths.sshKeyLength());
+		String nameHeader = center("name", lengths.nameLength());
+		String ipHeader = center("ip", lengths.ipLength());
+		String monitoringHeader = center("monitoring", lengths.monitoringLength());
+		String sshKeyHeader = center("sshKey", lengths.sshKeyLength());
 
 		StringBuilder sb = new StringBuilder();
 		sb.append(nameHeader).append(ipHeader).append(monitoringHeader).append(sshKeyHeader).append("\n");
-		sb.append(StringUtils.repeat('-', lengths.sum())).append("\n");
+		sb.append(repeat('-', lengths.sum())).append("\n");
 		servers.forEach(server -> sb.append(toStr(server, lengths)).append("\n"));
 
 		return sb.toString().replaceAll(" +$", "");
 	}
 
 	private String toStr(PhysicalServer obj, PhysicalServerLength lengths) {
-		String nameStr = StringUtils.rightPad(obj.getName(), lengths.nameLength());
-		String ipStr = StringUtils.rightPad(obj.getIp(), lengths.ipLength());
-		String monitoringStr = StringUtils.rightPad(String.valueOf(obj.isMonitoring()), lengths.monitoringLength());
-		String sshKeyStr = StringUtils.rightPad(obj.getSshKey(), lengths.sshKeyLength());
+		String nameStr = rightPad(obj.getName(), lengths.nameLength());
+		String ipStr = rightPad(obj.getIp(), lengths.ipLength());
+		String monitoringStr = rightPad(String.valueOf(obj.isMonitoring()), lengths.monitoringLength());
+		String sshKeyStr = rightPad(obj.getSshKey(), lengths.sshKeyLength());
 
 		String data = "%s %s %s %s".formatted(nameStr, ipStr, monitoringStr, sshKeyStr);
 
-		return data + servicesShortString(obj.getServices());
+		return data + join(", ", servicesMapJoin(obj.getServices()).values());
 	}
 
-	private String servicesShortString(List<Service> services) {
-		return String.join(", ", servicesJoinMap(services).values());
-	}
-
-	private Map<String, String> servicesJoinMap(List<Service> services) {
+	private Map<String, String> servicesMapJoin(List<Service> services) {
 		Map<String, String> servicesMap = new HashMap<>();
 
 		for (Service service : services) {
