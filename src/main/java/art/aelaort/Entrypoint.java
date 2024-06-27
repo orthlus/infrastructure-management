@@ -24,6 +24,8 @@ public class Entrypoint implements CommandLineRunner {
 		List<Server> servers = serversManagementService.getServers();
 		List<TabbyHost> tabbyHosts = tabbyService.parseLocalFile();
 		List<PhysicalServer> physicalServers = dataService.join(servers, tabbyHosts);
-		System.out.println(stringFormattingService.physicalServersTable(physicalServers));
+		System.out.println(stringFormattingService.physicalServersTableString(physicalServers));
+		System.out.println();
+		System.out.println(stringFormattingService.serversServicesFullListString(physicalServers));
 	}
 }

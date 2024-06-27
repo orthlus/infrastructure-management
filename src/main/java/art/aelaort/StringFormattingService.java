@@ -25,10 +25,23 @@ public class StringFormattingService {
 			lengths.nameLength(Math.max(lengths.nameLength(), server.getName().length()));
 			lengths.sshKeyLength(Math.max(lengths.sshKeyLength(), server.getSshKey().length()));
 		}
+		lengths.nameLength(lengths.nameLength() + 1);
+		lengths.sshKeyLength(lengths.sshKeyLength() + 1);
 		return lengths;
 	}
 
-	public String physicalServersTable(List<PhysicalServer> servers) {
+	public String serversServicesFullListString(List<PhysicalServer> servers) {
+		StringBuilder sb = new StringBuilder();
+		servers.forEach(server -> {
+			String str = serverServicesString(server);
+			if (!str.isEmpty()) {
+				sb.append(str).append("\n");
+			}
+		});
+		return sb.toString();
+	}
+
+	public String physicalServersTableString(List<PhysicalServer> servers) {
 		PhysicalServerLength lengths = getLengths(servers);
 		String nameHeader = StringUtils.center("name", lengths.nameLength());
 		String ipHeader = StringUtils.center("ip", lengths.ipLength());
@@ -39,14 +52,6 @@ public class StringFormattingService {
 		sb.append(nameHeader).append(ipHeader).append(monitoringHeader).append(sshKeyHeader).append("\n");
 		sb.append(StringUtils.repeat('-', lengths.sum())).append("\n");
 		servers.forEach(server -> sb.append(toStr(server, lengths)).append("\n"));
-
-		sb.append("\n\n");
-		servers.forEach(server -> {
-			String str = serverServicesString(server);
-			if (!str.isEmpty()) {
-				sb.append(str).append("\n");
-			}
-		});
 
 		return sb.toString().replaceAll(" +$", "");
 	}
@@ -110,7 +115,9 @@ public class StringFormattingService {
 
 		StringBuilder sb = new StringBuilder();
 		for (Map.Entry<String, List<String>> servicesByYml : servicesListMap(services).entrySet()) {
-			sb.append(servicesByYml.getKey()).append("\n\t\t");
+			sb.append("\t")
+					.append(servicesByYml.getKey())
+					.append("\n\t\t");
 			for (String serviceName : servicesByYml.getValue()) {
 				sb.append(serviceName).append("\n\t\t");
 			}
