@@ -13,23 +13,6 @@ import java.util.Map;
 
 @Component
 public class StringFormattingService {
-	private String name(Service obj) {
-		return obj.getDockerName() != null ? obj.getDockerName() : obj.getService();
-	}
-
-	private PhysicalServerLength getLengths(List<PhysicalServer> servers) {
-		PhysicalServerLength lengths = new PhysicalServerLength();
-		lengths.monitoringLength(12);
-		lengths.ipLength(16);
-		for (PhysicalServer server : servers) {
-			lengths.nameLength(Math.max(lengths.nameLength(), server.getName().length()));
-			lengths.sshKeyLength(Math.max(lengths.sshKeyLength(), server.getSshKey().length()));
-		}
-		lengths.nameLength(lengths.nameLength() + 1);
-		lengths.sshKeyLength(lengths.sshKeyLength() + 1);
-		return lengths;
-	}
-
 	public String serversServicesFullListString(List<PhysicalServer> servers) {
 		StringBuilder sb = new StringBuilder();
 		servers.forEach(server -> {
@@ -40,6 +23,53 @@ public class StringFormattingService {
 		});
 		return sb.toString();
 	}
+
+	private String serverServicesString(PhysicalServer server) {
+		if (server.getServices().isEmpty()) {
+			return "";
+		}
+
+		return server.getName() + "\n" + servicesString(server.getServices());
+	}
+
+	private String servicesString(List<Service> services) {
+		if (services.isEmpty()) {
+			return "";
+		}
+
+		StringBuilder sb = new StringBuilder();
+		for (Map.Entry<String, List<String>> servicesByYml : servicesListMap(services).entrySet()) {
+			sb.append("\t")
+					.append(servicesByYml.getKey())
+					.append("\n\t\t");
+			for (String serviceName : servicesByYml.getValue()) {
+				sb.append(serviceName).append("\n\t\t");
+			}
+			sb.deleteCharAt(sb.length() - 1);
+		}
+		sb.deleteCharAt(sb.length() - 1);
+		return sb.toString();
+	}
+
+	private Map<String, List<String>> servicesListMap(List<Service> services) {
+		Map<String, List<String>> servicesMap = new HashMap<>();
+		for (Service service : services) {
+			String ymlName = service.getYmlName();
+			if (servicesMap.containsKey(ymlName)) {
+				servicesMap.get(ymlName).add(name(service));
+			} else {
+				servicesMap.put(ymlName, new ArrayList<>() {{
+					add(name(service));
+				}});
+			}
+		}
+		return servicesMap;
+	}
+
+	/*
+	 * ======================================================
+	 * ======================================================
+	 */
 
 	public String physicalServersTableString(List<PhysicalServer> servers) {
 		PhysicalServerLength lengths = getLengths(servers);
@@ -67,20 +97,8 @@ public class StringFormattingService {
 		return data + servicesShortString(obj.getServices());
 	}
 
-	private Map<String, List<String>> servicesListMap(List<Service> services) {
-		Map<String, List<String>> servicesMap = new HashMap<>();
-		for (Service service : services) {
-			String ymlName = service.getYmlName();
-			if (servicesMap.containsKey(ymlName)) {
-				servicesMap.get(ymlName).add(name(service));
-//				servicesMap.put(ymlName, list);
-			} else {
-				servicesMap.put(ymlName, new ArrayList<>() {{
-					add(name(service));
-				}});
-			}
-		}
-		return servicesMap;
+	private String servicesShortString(List<Service> services) {
+		return String.join(", ", servicesJoinMap(services).values());
 	}
 
 	private Map<String, String> servicesJoinMap(List<Service> services) {
@@ -98,32 +116,25 @@ public class StringFormattingService {
 		return servicesMap;
 	}
 
-	private String servicesShortString(List<Service> services) {
-		return String.join(", ", servicesJoinMap(services).values());
+	/*
+	 * ======================================================
+	 * ======================================================
+	 */
+
+	private String name(Service obj) {
+		return obj.getDockerName() != null ? obj.getDockerName() : obj.getService();
 	}
 
-	private String serverServicesString(PhysicalServer server) {
-		if (server.getServices().isEmpty()) return "";
-
-		return server.getName() + "\n" + servicesString(server.getServices());
-	}
-
-	private String servicesString(List<Service> services) {
-		if (services.isEmpty()) {
-			return "";
+	private PhysicalServerLength getLengths(List<PhysicalServer> servers) {
+		PhysicalServerLength lengths = new PhysicalServerLength();
+		lengths.monitoringLength(12);
+		lengths.ipLength(16);
+		for (PhysicalServer server : servers) {
+			lengths.nameLength(Math.max(lengths.nameLength(), server.getName().length()));
+			lengths.sshKeyLength(Math.max(lengths.sshKeyLength(), server.getSshKey().length()));
 		}
-
-		StringBuilder sb = new StringBuilder();
-		for (Map.Entry<String, List<String>> servicesByYml : servicesListMap(services).entrySet()) {
-			sb.append("\t")
-					.append(servicesByYml.getKey())
-					.append("\n\t\t");
-			for (String serviceName : servicesByYml.getValue()) {
-				sb.append(serviceName).append("\n\t\t");
-			}
-			sb.deleteCharAt(sb.length() - 1);
-		}
-		sb.deleteCharAt(sb.length() - 1);
-		return sb.toString();
+		lengths.nameLength(lengths.nameLength() + 1);
+		lengths.sshKeyLength(lengths.sshKeyLength() + 1);
+		return lengths;
 	}
 }
