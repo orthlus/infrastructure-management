@@ -1,6 +1,6 @@
 package art.aelaort;
 
-import art.aelaort.models.TabbyHost;
+import art.aelaort.models.TabbyServer;
 import art.aelaort.system.SystemProcess;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,7 @@ public class TabbyService {
 
 	private final Yaml yaml;
 
-	public List<TabbyHost> parseLocalFile() {
+	public List<TabbyServer> parseLocalFile() {
 		try {
 			String content = Files.readString(Path.of(tabbyConfigPath));
 			return parse(content);
@@ -50,11 +50,11 @@ public class TabbyService {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<TabbyHost> parse(String content) {
+	private List<TabbyServer> parse(String content) {
 		Map<String, Object> obj = yaml.load(content);
 		List<Map<String, Object>> profiles = (ArrayList<Map<String, Object>>) obj.get("profiles");
 
-		List<TabbyHost> result = new ArrayList<>(profiles.size());
+		List<TabbyServer> result = new ArrayList<>(profiles.size());
 
 		for (Map<String, Object> profile : profiles) {
 			String type = (String) profile.get("type");
@@ -66,7 +66,7 @@ public class TabbyService {
 			String host = (String) ((Map<String, Object>) profile.get("options")).get("host");
 			String keyPath = ((List<String>) ((Map<String, Object>) profile.get("options")).get("privateKeys")).get(0)
 					.replace(tabbyConfigRsaFilePrefix, "");
-			result.add(new TabbyHost(name, host, keyPath));
+			result.add(new TabbyServer(name, host, keyPath));
 		}
 
 		return result;
