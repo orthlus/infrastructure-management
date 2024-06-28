@@ -38,7 +38,7 @@ public class ServersManagementService {
 				String file = ymlFile.getFileName().toString();
 				if (file.contains("docker")) {
 					result.add(parseDockerYmlFile(ymlFile));
-				} else if (file.equals(projectsYmlFileName)){
+				} else if (file.equals(projectsYmlFileName)) {
 					result.add(parseCustomYmlFile(ymlFile));
 				}
 			}
