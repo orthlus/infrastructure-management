@@ -1,11 +1,13 @@
 package art.aelaort.models;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 public class Service {
-	private final String service;
-	private final String ymlName;
+	private String service;
+	private String ymlName;
 	private String dockerName;
 
 	public Service(String service, String ymlName, String dockerName) {

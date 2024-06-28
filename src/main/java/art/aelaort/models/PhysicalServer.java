@@ -1,20 +1,27 @@
 package art.aelaort.models;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 import static java.lang.String.join;
 
 @Getter
-@AllArgsConstructor
+@NoArgsConstructor
 public class PhysicalServer {
+	@JsonProperty
 	private String name;
+	@JsonProperty
 	private String ip;
+	@JsonProperty
 	private String sshKey;
+	@JsonProperty
 	private boolean monitoring;
+	@JsonProperty
 	private List<Service> services;
+	@JsonProperty
 	private String servicesStr;
 
 	public PhysicalServer(String name, String ip, String sshKey, boolean monitoring, List<Service> services) {

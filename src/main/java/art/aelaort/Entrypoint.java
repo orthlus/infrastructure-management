@@ -18,14 +18,17 @@ public class Entrypoint implements CommandLineRunner {
 	private final ServersManagementService serversManagementService;
 	private final DataService dataService;
 	private final StringFormattingService stringFormattingService;
+	private final SerializeService serializeService;
 
 	@Override
 	public void run(String... args) throws Exception {
 		List<Server> servers = serversManagementService.getServers();
 		List<TabbyHost> tabbyHosts = tabbyService.parseLocalFile();
 		List<PhysicalServer> physicalServers = dataService.join(servers, tabbyHosts);
-		System.out.println(stringFormattingService.serversTableString(physicalServers));
-		System.out.println();
+		String json = serializeService.toJson(physicalServers);
+		System.out.println(json);
+		List<PhysicalServer> physicalServers1 = serializeService.serversParse(json);
+		System.out.println(stringFormattingService.serversTableString(physicalServers1));
 //		System.out.println(stringFormattingService.servicesByServerFullTreeString(physicalServers));
 	}
 }
