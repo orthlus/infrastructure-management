@@ -75,6 +75,7 @@ public class StringFormattingService {
 		String servicesHeader = center("services", lengths.servicesLength());
 
 		StringBuilder sb = new StringBuilder();
+		sb.append(repeat('-', lengths.sum())).append("\n");
 		sb.append(nameHeader)
 				.append(ipHeader)
 				.append(monitoringHeader)

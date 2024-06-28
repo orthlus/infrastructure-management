@@ -19,6 +19,7 @@ public class PhysicalServerLength {
 	private int servicesLength;
 
 	public int sum() {
-		return nameLength + ipLength + sshKeyLength + monitoringLength + servicesLength;
+		// TODO wtf '+ 5'
+		return nameLength + ipLength + sshKeyLength + monitoringLength + servicesLength + 5;
 	}
 }
