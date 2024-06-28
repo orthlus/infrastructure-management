@@ -25,6 +25,13 @@ public class DataService {
 			}
 		}
 
+		Map<String, TabbyHost> mapTabbyHosts = toMapTabby(hosts);
+		for (Server server : servers) {
+			if (!mapTabbyHosts.containsKey(server.name())) {
+				result.add(new PhysicalServer(server.name(), "null", "null", server.monitoring(), server.services()));
+			}
+		}
+
 		return result;
 	}
 
