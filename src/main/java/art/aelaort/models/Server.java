@@ -10,7 +10,7 @@ import static java.lang.String.join;
 
 @Getter
 @NoArgsConstructor
-public class PhysicalServer {
+public class Server {
 	@JsonProperty
 	private String name;
 	@JsonProperty
@@ -24,7 +24,7 @@ public class PhysicalServer {
 	@JsonProperty
 	private String servicesStr;
 
-	public PhysicalServer(String name, String ip, String sshKey, boolean monitoring, List<Service> services) {
+	public Server(String name, String ip, String sshKey, boolean monitoring, List<Service> services) {
 		this.name = name;
 		this.ip = ip;
 		this.sshKey = sshKey;

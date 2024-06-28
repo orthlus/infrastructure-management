@@ -1,7 +1,7 @@
 package art.aelaort;
 
-import art.aelaort.models.PhysicalServer;
-import art.aelaort.models.PhysicalServerLength;
+import art.aelaort.models.Server;
+import art.aelaort.models.ServerDataLength;
 import art.aelaort.models.Service;
 import org.springframework.stereotype.Component;
 
@@ -14,9 +14,9 @@ import static org.apache.commons.lang3.StringUtils.*;
 
 @Component
 public class StringFormattingService {
-	public String servicesByServerFullTreeString(List<PhysicalServer> servers) {
+	public String servicesByServerFullTreeString(List<Server> servers) {
 		StringBuilder sb = new StringBuilder();
-		for (PhysicalServer server : servers) {
+		for (Server server : servers) {
 			if (server.getServices().isEmpty()) {
 				continue;
 			}
@@ -66,8 +66,8 @@ public class StringFormattingService {
 	 * ======================================================
 	 */
 
-	public String serversTableString(List<PhysicalServer> servers) {
-		PhysicalServerLength lengths = getLengths(servers);
+	public String serversTableString(List<Server> servers) {
+		ServerDataLength lengths = getLengths(servers);
 		String nameHeader = center("name", lengths.nameLength());
 		String ipHeader = center("ip", lengths.ipLength());
 		String monitoringHeader = center("monitoring", lengths.monitoringLength());
@@ -88,7 +88,7 @@ public class StringFormattingService {
 		return sb.toString().replaceAll(" +$", "");
 	}
 
-	private String toStr(PhysicalServer obj, PhysicalServerLength lengths) {
+	private String toStr(Server obj, ServerDataLength lengths) {
 		String nameStr = rightPad(obj.getName(), lengths.nameLength());
 		String ipStr = rightPad(obj.getIp(), lengths.ipLength());
 		String monitoringStr = rightPad(String.valueOf(obj.isMonitoring()), lengths.monitoringLength());
@@ -98,11 +98,11 @@ public class StringFormattingService {
 		return "%s %s %s %s %s".formatted(nameStr, ipStr, monitoringStr, sshKeyStr, servicesStr);
 	}
 
-	private PhysicalServerLength getLengths(List<PhysicalServer> servers) {
-		PhysicalServerLength lengths = new PhysicalServerLength();
+	private ServerDataLength getLengths(List<Server> servers) {
+		ServerDataLength lengths = new ServerDataLength();
 		lengths.monitoringLength(12);
 		lengths.ipLength(16);
-		for (PhysicalServer server : servers) {
+		for (Server server : servers) {
 			lengths.nameLength(Math.max(lengths.nameLength(), server.getName().length()));
 			lengths.sshKeyLength(Math.max(lengths.sshKeyLength(), server.getSshKey().length()));
 			lengths.servicesLength(Math.max(lengths.servicesLength(), server.getServicesStr().length()));

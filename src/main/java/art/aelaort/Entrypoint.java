@@ -1,7 +1,7 @@
 package art.aelaort;
 
 import art.aelaort.models.DirServer;
-import art.aelaort.models.PhysicalServer;
+import art.aelaort.models.Server;
 import art.aelaort.models.TabbyServer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,11 +24,11 @@ public class Entrypoint implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		List<DirServer> dirServers = serversManagementService.getDirServers();
 		List<TabbyServer> tabbyServers = tabbyService.parseLocalFile();
-		List<PhysicalServer> physicalServers = dataService.join(dirServers, tabbyServers);
-		String json = serializeService.toJson(physicalServers);
+		List<Server> servers = dataService.join(dirServers, tabbyServers);
+		String json = serializeService.toJson(servers);
 		System.out.println(json);
-		List<PhysicalServer> physicalServers1 = serializeService.serversParse(json);
-		System.out.println(stringFormattingService.serversTableString(physicalServers1));
+		List<Server> servers1 = serializeService.serversParse(json);
+		System.out.println(stringFormattingService.serversTableString(servers1));
 //		System.out.println(stringFormattingService.servicesByServerFullTreeString(physicalServers));
 	}
 }

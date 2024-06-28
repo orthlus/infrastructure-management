@@ -11,7 +11,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(fluent = true)
-public class PhysicalServerLength {
+public class ServerDataLength {
 	private int nameLength;
 	private int ipLength;
 	private int sshKeyLength;
