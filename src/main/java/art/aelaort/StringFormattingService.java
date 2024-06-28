@@ -52,13 +52,12 @@ public class StringFormattingService {
 		Map<String, List<String>> servicesMap = new HashMap<>();
 		for (Service service : services) {
 			String ymlName = service.getYmlName();
-			if (servicesMap.containsKey(ymlName)) {
-				servicesMap.get(ymlName).add(name(service));
-			} else {
-				servicesMap.put(ymlName, new ArrayList<>() {{
-					add(name(service));
-				}});
-			}
+			String name = service.getDockerName() == null ?
+					service.getService() :
+					service.getDockerName() + " - " + service.getService();
+			servicesMap
+					.computeIfAbsent(ymlName, k -> new ArrayList<>())
+					.add(name);
 		}
 		return servicesMap;
 	}
