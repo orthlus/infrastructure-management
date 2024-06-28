@@ -1,7 +1,7 @@
 package art.aelaort;
 
+import art.aelaort.models.DirServer;
 import art.aelaort.models.PhysicalServer;
-import art.aelaort.models.Server;
 import art.aelaort.models.TabbyServer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,9 +22,9 @@ public class Entrypoint implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		List<Server> servers = serversManagementService.getServers();
+		List<DirServer> dirServers = serversManagementService.getDirServers();
 		List<TabbyServer> tabbyServers = tabbyService.parseLocalFile();
-		List<PhysicalServer> physicalServers = dataService.join(servers, tabbyServers);
+		List<PhysicalServer> physicalServers = dataService.join(dirServers, tabbyServers);
 		String json = serializeService.toJson(physicalServers);
 		System.out.println(json);
 		List<PhysicalServer> physicalServers1 = serializeService.serversParse(json);

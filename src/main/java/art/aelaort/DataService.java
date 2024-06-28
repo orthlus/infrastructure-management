@@ -1,7 +1,7 @@
 package art.aelaort;
 
+import art.aelaort.models.DirServer;
 import art.aelaort.models.PhysicalServer;
-import art.aelaort.models.Server;
 import art.aelaort.models.TabbyServer;
 import org.springframework.stereotype.Component;
 
@@ -12,33 +12,33 @@ import java.util.Map;
 
 @Component
 public class DataService {
-	public List<PhysicalServer> join(List<Server> servers, List<TabbyServer> tabbyServers) {
-		Map<String, Server> mapServers = toMapServers(servers);
+	public List<PhysicalServer> join(List<DirServer> dirServers, List<TabbyServer> tabbyServers) {
+		Map<String, DirServer> mapServers = toMapServers(dirServers);
 		List<PhysicalServer> result = new ArrayList<>(tabbyServers.size());
 
 		for (TabbyServer tabbyServer : tabbyServers) {
-			Server server = mapServers.get(tabbyServer.name());
+			DirServer dirServer = mapServers.get(tabbyServer.name());
 			String sshKey = tabbyServer.keyPath().replace("\\", "/");
-			if (server == null) {
+			if (dirServer == null) {
 				result.add(new PhysicalServer(tabbyServer.name(), tabbyServer.host(), sshKey, false, List.of()));
 			} else {
-				result.add(new PhysicalServer(tabbyServer.name(), tabbyServer.host(), sshKey, server.monitoring(), server.services()));
+				result.add(new PhysicalServer(tabbyServer.name(), tabbyServer.host(), sshKey, dirServer.monitoring(), dirServer.services()));
 			}
 		}
 
 		Map<String, TabbyServer> mapTabbyServers = toMapTabby(tabbyServers);
-		for (Server server : servers) {
-			if (!mapTabbyServers.containsKey(server.name())) {
-				result.add(new PhysicalServer(server.name(), "null", "null", server.monitoring(), server.services()));
+		for (DirServer dirServer : dirServers) {
+			if (!mapTabbyServers.containsKey(dirServer.name())) {
+				result.add(new PhysicalServer(dirServer.name(), "null", "null", dirServer.monitoring(), dirServer.services()));
 			}
 		}
 
 		return result;
 	}
 
-	public Map<String, Server> toMapServers(List<Server> servers) {
-		Map<String, Server> result = new HashMap<>();
-		servers.forEach(server -> result.put(server.name(), server));
+	public Map<String, DirServer> toMapServers(List<DirServer> dirServers) {
+		Map<String, DirServer> result = new HashMap<>();
+		dirServers.forEach(dirServer -> result.put(dirServer.name(), dirServer));
 		return result;
 	}
 

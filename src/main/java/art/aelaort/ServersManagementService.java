@@ -1,6 +1,6 @@
 package art.aelaort;
 
-import art.aelaort.models.Server;
+import art.aelaort.models.DirServer;
 import art.aelaort.models.Service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -29,9 +29,9 @@ public class ServersManagementService {
 		this.yaml = yaml;
 	}
 
-	public List<Server> getServers() {
+	public List<DirServer> getDirServers() {
 		List<Path> serversDirs = getServersDirs();
-		List<Server> result = new ArrayList<>(serversDirs.size() * 2);
+		List<DirServer> result = new ArrayList<>(serversDirs.size() * 2);
 
 		for (Path serverDir : serversDirs) {
 			for (Path ymlFile : findYmlFiles(serverDir)) {
@@ -48,7 +48,7 @@ public class ServersManagementService {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Server parseCustomYmlFile(Path ymlFile) {
+	private DirServer parseCustomYmlFile(Path ymlFile) {
 		Path serverDir = ymlFile.getParent();
 		boolean monitoring = serverDir.resolve(monitoringFile).toFile().exists();
 		String content = readFile(ymlFile);
@@ -59,11 +59,11 @@ public class ServersManagementService {
 		for (String project : projects) {
 			services.add(new Service(project, ymlFile.getFileName().toString()));
 		}
-		return new Server(serverDir.getFileName().toString(), monitoring, services);
+		return new DirServer(serverDir.getFileName().toString(), monitoring, services);
 	}
 
 	@SuppressWarnings("unchecked")
-	private Server parseDockerYmlFile(Path ymlFile) {
+	private DirServer parseDockerYmlFile(Path ymlFile) {
 		Path serverDir = ymlFile.getParent();
 		boolean monitoring = serverDir.resolve(monitoringFile).toFile().exists();
 		String content = readFile(ymlFile);
@@ -81,7 +81,7 @@ public class ServersManagementService {
 				resultServices.add(new Service(serviceName, ymlFile.getFileName().toString()));
 			}
 		}
-		return new Server(serverDir.getFileName().toString(), monitoring, resultServices);
+		return new DirServer(serverDir.getFileName().toString(), monitoring, resultServices);
 	}
 
 	private String readFile(Path ymlFile) {
