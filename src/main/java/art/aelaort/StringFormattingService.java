@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.String.join;
 import static org.apache.commons.lang3.StringUtils.*;
 
 @Component
@@ -73,9 +72,15 @@ public class StringFormattingService {
 		String ipHeader = center("ip", lengths.ipLength());
 		String monitoringHeader = center("monitoring", lengths.monitoringLength());
 		String sshKeyHeader = center("sshKey", lengths.sshKeyLength());
+		String servicesHeader = center("services", lengths.servicesLength());
 
 		StringBuilder sb = new StringBuilder();
-		sb.append(nameHeader).append(ipHeader).append(monitoringHeader).append(sshKeyHeader).append("\n");
+		sb.append(nameHeader)
+				.append(ipHeader)
+				.append(monitoringHeader)
+				.append(sshKeyHeader)
+				.append(servicesHeader)
+				.append("\n");
 		sb.append(repeat('-', lengths.sum())).append("\n");
 		servers.forEach(server -> sb.append(toStr(server, lengths)).append("\n"));
 
@@ -87,34 +92,9 @@ public class StringFormattingService {
 		String ipStr = rightPad(obj.getIp(), lengths.ipLength());
 		String monitoringStr = rightPad(String.valueOf(obj.isMonitoring()), lengths.monitoringLength());
 		String sshKeyStr = rightPad(obj.getSshKey(), lengths.sshKeyLength());
+		String servicesStr = rightPad(obj.getServicesStr(), lengths.servicesLength());
 
-		String data = "%s %s %s %s".formatted(nameStr, ipStr, monitoringStr, sshKeyStr);
-
-		return data + join(", ", servicesMapJoin(obj.getServices()).values());
-	}
-
-	private Map<String, String> servicesMapJoin(List<Service> services) {
-		Map<String, String> servicesMap = new HashMap<>();
-
-		for (Service service : services) {
-			String ymlName = service.getYmlName();
-			if (servicesMap.containsKey(ymlName)) {
-				String newValue = servicesMap.get(ymlName) + ", " + name(service);
-				servicesMap.put(ymlName, newValue);
-			} else {
-				servicesMap.put(ymlName, name(service));
-			}
-		}
-		return servicesMap;
-	}
-
-	/*
-	 * ======================================================
-	 * ======================================================
-	 */
-
-	private String name(Service obj) {
-		return obj.getDockerName() != null ? obj.getDockerName() : obj.getService();
+		return "%s %s %s %s %s".formatted(nameStr, ipStr, monitoringStr, sshKeyStr, servicesStr);
 	}
 
 	private PhysicalServerLength getLengths(List<PhysicalServer> servers) {
@@ -124,6 +104,7 @@ public class StringFormattingService {
 		for (PhysicalServer server : servers) {
 			lengths.nameLength(Math.max(lengths.nameLength(), server.getName().length()));
 			lengths.sshKeyLength(Math.max(lengths.sshKeyLength(), server.getSshKey().length()));
+			lengths.servicesLength(Math.max(lengths.servicesLength(), server.getServicesStr().length()));
 		}
 		lengths.nameLength(lengths.nameLength() + 1);
 		lengths.sshKeyLength(lengths.sshKeyLength() + 1);

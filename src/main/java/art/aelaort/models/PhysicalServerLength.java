@@ -16,8 +16,9 @@ public class PhysicalServerLength {
 	private int ipLength;
 	private int sshKeyLength;
 	private int monitoringLength;
+	private int servicesLength;
 
 	public int sum() {
-		return nameLength + ipLength + sshKeyLength + monitoringLength;
+		return nameLength + ipLength + sshKeyLength + monitoringLength + servicesLength;
 	}
 }
