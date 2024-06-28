@@ -25,7 +25,7 @@ public class StringFormattingService {
 					.append(servicesString(server.getServices()))
 					.append("\n");
 		}
-		return sb.toString();
+		return sb.toString().trim();
 	}
 
 	private String servicesString(List<Service> services) {
