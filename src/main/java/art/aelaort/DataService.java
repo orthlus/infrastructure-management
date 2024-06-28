@@ -18,10 +18,11 @@ public class DataService {
 
 		for (TabbyHost host : hosts) {
 			Server server = mapServers.get(host.name());
+			String sshKey = host.keyPath().replace("\\", "/");
 			if (server == null) {
-				result.add(new PhysicalServer(host.name(), host.host(), host.keyPath(), false, List.of()));
+				result.add(new PhysicalServer(host.name(), host.host(), sshKey, false, List.of()));
 			} else {
-				result.add(new PhysicalServer(host.name(), host.host(), host.keyPath(), server.monitoring(), server.services()));
+				result.add(new PhysicalServer(host.name(), host.host(), sshKey, server.monitoring(), server.services()));
 			}
 		}
 
