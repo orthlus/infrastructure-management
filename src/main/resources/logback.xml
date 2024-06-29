@@ -8,7 +8,7 @@
 
 <!--    <logger name="art.aelaort." level="INFO"/>-->
 
-    <root level="INFO">
+    <root level="OFF">
         <appender-ref ref="STDOUT"/>
     </root>
 </configuration>

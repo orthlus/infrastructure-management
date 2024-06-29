@@ -3,7 +3,6 @@ package art.aelaort;
 import art.aelaort.models.TabbyServer;
 import art.aelaort.system.SystemProcess;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
@@ -16,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class TabbyService {

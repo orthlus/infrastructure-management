@@ -4,13 +4,11 @@ import art.aelaort.models.DirServer;
 import art.aelaort.models.Server;
 import art.aelaort.models.TabbyServer;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class Entrypoint implements CommandLineRunner {
@@ -22,6 +20,17 @@ public class Entrypoint implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
+		System.out.println(args.length);
+		if (args.length == 1) {
+			switch (args[0]) {
+				case "show" -> show();
+				case "sync" -> sync();
+			}
+		} else {
+			System.out.println("at least one arg required");
+			System.exit(1);
+		}
+
 		List<DirServer> dirServers = serversManagementService.getDirServers();
 		List<TabbyServer> tabbyServers = tabbyService.parseLocalFile();
 		List<Server> servers = dataService.join(dirServers, tabbyServers);
@@ -30,5 +39,13 @@ public class Entrypoint implements CommandLineRunner {
 		List<Server> servers1 = serializeService.serversParse(json);
 		System.out.println(stringFormattingService.serversTableString(servers1));
 //		System.out.println(stringFormattingService.servicesByServerFullTreeString(physicalServers));
+	}
+
+	private void sync() {
+
+	}
+
+	private void show() {
+
 	}
 }
