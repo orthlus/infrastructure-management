@@ -5,18 +5,18 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class Service {
+public class ServiceDto {
 	private String service;
 	private String ymlName;
 	private String dockerName;
 
-	public Service(String service, String ymlName, String dockerName) {
+	public ServiceDto(String service, String ymlName, String dockerName) {
 		this.service = service;
 		this.ymlName = ymlName;
 		this.dockerName = dockerName;
 	}
 
-	public Service(String service, String ymlName) {
+	public ServiceDto(String service, String ymlName) {
 		this.service = service;
 		this.ymlName = ymlName;
 	}

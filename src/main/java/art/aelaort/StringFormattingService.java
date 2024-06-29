@@ -2,7 +2,7 @@ package art.aelaort;
 
 import art.aelaort.models.Server;
 import art.aelaort.models.ServerDataLength;
-import art.aelaort.models.Service;
+import art.aelaort.models.ServiceDto;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ public class StringFormattingService {
 		return sb.toString().trim();
 	}
 
-	private String servicesString(List<Service> services) {
+	private String servicesString(List<ServiceDto> services) {
 		if (services.isEmpty()) {
 			return "";
 		}
@@ -47,9 +47,9 @@ public class StringFormattingService {
 		return sb.toString();
 	}
 
-	private Map<String, List<String>> servicesMapList(List<Service> services) {
+	private Map<String, List<String>> servicesMapList(List<ServiceDto> services) {
 		Map<String, List<String>> servicesMap = new HashMap<>();
-		for (Service service : services) {
+		for (ServiceDto service : services) {
 			String ymlName = service.getYmlName();
 			String name = service.getDockerName() == null ?
 					service.getService() :

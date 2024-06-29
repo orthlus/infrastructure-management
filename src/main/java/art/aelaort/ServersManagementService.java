@@ -1,7 +1,7 @@
 package art.aelaort;
 
 import art.aelaort.models.DirServer;
-import art.aelaort.models.Service;
+import art.aelaort.models.ServiceDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
@@ -55,9 +55,9 @@ public class ServersManagementService {
 
 		Map<String, Object> load = yaml.load(content);
 		List<String> projects = (List<String>) load.get("projects");
-		List<Service> services = new ArrayList<>();
+		List<ServiceDto> services = new ArrayList<>();
 		for (String project : projects) {
-			services.add(new Service(project, ymlFile.getFileName().toString()));
+			services.add(new ServiceDto(project, ymlFile.getFileName().toString()));
 		}
 		return new DirServer(serverDir.getFileName().toString(), monitoring, services);
 	}
@@ -70,15 +70,15 @@ public class ServersManagementService {
 
 		Map<String, Object> load = yaml.load(content);
 		Map<String, Object> services = (Map<String, Object>) load.get("services");
-		List<Service> resultServices = new ArrayList<>();
+		List<ServiceDto> resultServices = new ArrayList<>();
 		for (Map.Entry<String, Object> service : services.entrySet()) {
 			String serviceName = service.getKey();
 			Map<String, Object> params = (Map<String, Object>) service.getValue();
 			if (params.containsKey("container_name")) {
 				String containerName = (String) params.get("container_name");
-				resultServices.add(new Service(containerName, ymlFile.getFileName().toString(), serviceName));
+				resultServices.add(new ServiceDto(containerName, ymlFile.getFileName().toString(), serviceName));
 			} else {
-				resultServices.add(new Service(serviceName, ymlFile.getFileName().toString()));
+				resultServices.add(new ServiceDto(serviceName, ymlFile.getFileName().toString()));
 			}
 		}
 		return new DirServer(serverDir.getFileName().toString(), monitoring, resultServices);

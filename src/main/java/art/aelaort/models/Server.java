@@ -20,11 +20,11 @@ public class Server {
 	@JsonProperty
 	private boolean monitoring;
 	@JsonProperty
-	private List<Service> services;
+	private List<ServiceDto> services;
 	@JsonProperty
 	private String servicesStr;
 
-	public Server(String name, String ip, String sshKey, boolean monitoring, List<Service> services) {
+	public Server(String name, String ip, String sshKey, boolean monitoring, List<ServiceDto> services) {
 		this.name = name;
 		this.ip = ip;
 		this.sshKey = sshKey;
@@ -33,7 +33,7 @@ public class Server {
 		this.servicesStr = servicesStr(services);
 	}
 
-	private static String servicesStr(List<Service> services) {
+	private static String servicesStr(List<ServiceDto> services) {
 		return join(", ", services.stream()
 				.map(s -> s.getDockerName() != null ? s.getDockerName() : s.getService())
 				.toList());
