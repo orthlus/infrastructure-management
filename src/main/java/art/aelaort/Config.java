@@ -33,4 +33,20 @@ public class Config {
 				.forcePathStyle(true)
 				.build();
 	}
+
+	@Bean
+	public S3Client serversManagement(
+			@Value("${servers.management.s3.id}") String id,
+			@Value("${servers.management.s3.key}") String key,
+			@Value("${tabby.s3.endpoint}") String url,
+			@Value("${tabby.s3.region}") String region
+	) {
+		AwsBasicCredentials credentials = AwsBasicCredentials.create(id, key);
+		return S3Client.builder()
+				.region(Region.of(region))
+				.endpointOverride(URI.create(url))
+				.credentialsProvider(StaticCredentialsProvider.create(credentials))
+				.forcePathStyle(true)
+				.build();
+	}
 }

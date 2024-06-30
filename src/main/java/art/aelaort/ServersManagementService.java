@@ -18,6 +18,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ServersManagementService {
 	private final Yaml yaml;
+	private final ServersManagementS3 serversManagementS3;
 	@Value("${servers.management.dir}")
 	private String serversDir;
 	@Value("${servers.management.files.monitoring}")
@@ -28,6 +29,10 @@ public class ServersManagementService {
 	private String projectsYmlFileName;
 	@Value("${servers.management.json_path}")
 	private String jsonDataPath;
+
+	public void uploadDataToS3(String json) {
+		serversManagementS3.uploadData(json);
+	}
 
 	public String readJsonDataLocal() {
 		try {
