@@ -1,6 +1,7 @@
 package art.aelaort;
 
 import art.aelaort.models.DirServer;
+import art.aelaort.models.Server;
 import art.aelaort.models.ServiceDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +20,7 @@ import java.util.Map;
 public class ServersManagementService {
 	private final Yaml yaml;
 	private final ServersManagementS3 serversManagementS3;
+	private final SerializeService serializeService;
 	@Value("${servers.management.dir}")
 	private String serversDir;
 	@Value("${servers.management.files.monitoring}")
@@ -30,13 +32,26 @@ public class ServersManagementService {
 	@Value("${servers.management.json_path}")
 	private String jsonDataPath;
 
+	public void saveData(List<Server> servers) {
+		try {
+			String json = serializeService.toJson(servers);
+			Files.writeString(Path.of(jsonDataPath), json);
+			System.out.println("saved to local");
+			serversManagementS3.uploadData(json);
+			System.out.println("saved to s3");
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public void uploadDataToS3(String json) {
 		serversManagementS3.uploadData(json);
 	}
 
-	public String readJsonDataLocal() {
+	public List<Server> readLocalJsonData() {
 		try {
-			return Files.readString(Path.of(jsonDataPath));
+			String json = Files.readString(Path.of(jsonDataPath));
+			return serializeService.serversParse(json);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

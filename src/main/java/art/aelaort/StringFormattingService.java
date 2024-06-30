@@ -15,7 +15,7 @@ import static org.apache.commons.lang3.StringUtils.*;
 @Component
 public class StringFormattingService {
 	public String servicesByServerFullTreeString(List<Server> servers) {
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder("services:\n");
 		for (Server server : servers) {
 			if (server.getServices().isEmpty()) {
 				continue;
@@ -74,7 +74,7 @@ public class StringFormattingService {
 		String sshKeyHeader = center("sshKey", lengths.sshKeyLength());
 		String servicesHeader = center("services", lengths.servicesLength());
 
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder("servers:\n");
 		sb.append(repeat('-', lengths.sum())).append("\n");
 		sb.append(nameHeader)
 				.append(ipHeader)

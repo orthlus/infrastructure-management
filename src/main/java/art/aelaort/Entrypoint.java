@@ -16,15 +16,18 @@ public class Entrypoint implements CommandLineRunner {
 	private final ServersManagementService serversManagementService;
 	private final DataService dataService;
 	private final StringFormattingService stringFormattingService;
-	private final SerializeService serializeService;
+	private final ExternalUtilities externalUtilities;
 
 	@Override
 	public void run(String... args) {
-		System.out.println(args.length);
+//		args = new String[]{"show"};
 		if (args.length == 1) {
 			switch (args[0]) {
 				case "show" -> show();
+				case "show-table" -> showTable();
+				case "show-tree" -> showTree();
 				case "sync" -> sync();
+				case "sync-all" -> syncAll();
 			}
 		} else {
 			System.out.println("at least one arg required");
@@ -32,18 +35,22 @@ public class Entrypoint implements CommandLineRunner {
 		}
 	}
 
+	private void syncAll() {
+		sync();
+		externalUtilities.ydSync();
+	}
+
 	/*
 	* generate json
 	* save to local
-	* upload json to s3
+	* save to s3
 	*/
 	private void sync() {
 		List<DirServer> dirServers = serversManagementService.getDirServers();
 		List<TabbyServer> tabbyServers = tabbyService.parseLocalFile();
 		List<Server> servers = dataService.join(dirServers, tabbyServers);
-		String json = serializeService.toJson(servers);
-		serversManagementService.saveJsonToLocal(json);
-		serversManagementService.uploadDataToS3(json);
+		serversManagementService.saveData(servers);
+		System.out.println("sync done");
 	}
 
 	/*
@@ -51,10 +58,18 @@ public class Entrypoint implements CommandLineRunner {
 	* print table and tree
 	*/
 	private void show() {
-		String jsonStr = serversManagementService.readJsonDataLocal();
-		List<Server> servers = serializeService.serversParse(jsonStr);
+		List<Server> servers = serversManagementService.readLocalJsonData();
 		System.out.println(stringFormattingService.serversTableString(servers));
-		System.out.println();
 		System.out.println(stringFormattingService.servicesByServerFullTreeString(servers));
+	}
+
+	private void showTree() {
+		List<Server> servers = serversManagementService.readLocalJsonData();
+		System.out.println(stringFormattingService.servicesByServerFullTreeString(servers));
+	}
+
+	private void showTable() {
+		List<Server> servers = serversManagementService.readLocalJsonData();
+		System.out.println(stringFormattingService.serversTableString(servers));
 	}
 }
