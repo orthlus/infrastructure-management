@@ -2,6 +2,7 @@ package art.aelaort;
 
 import art.aelaort.models.DirServer;
 import art.aelaort.models.ServiceDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class ServersManagementService {
 	private final Yaml yaml;
 	@Value("${servers.management.dir}")
@@ -24,9 +26,23 @@ public class ServersManagementService {
 	private String notScanFile;
 	@Value("${servers.management.custom_projects_file}")
 	private String projectsYmlFileName;
+	@Value("${servers.management.json_path}")
+	private String jsonDataPath;
 
-	public ServersManagementService(Yaml yaml) {
-		this.yaml = yaml;
+	public String readJsonDataLocal() {
+		try {
+			return Files.readString(Path.of(jsonDataPath));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public void saveJsonToLocal(String jsonStr) {
+		try {
+			Files.writeString(Path.of(jsonDataPath), jsonStr);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public List<DirServer> getDirServers() {

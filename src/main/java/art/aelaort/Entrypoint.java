@@ -42,10 +42,23 @@ public class Entrypoint implements CommandLineRunner {
 	}
 
 	private void sync() {
-
+		List<DirServer> dirServers = serversManagementService.getDirServers();
+		List<TabbyServer> tabbyServers = tabbyService.parseLocalFile();
+		List<Server> servers = dataService.join(dirServers, tabbyServers);
+		String json = serializeService.toJson(servers);
+		serversManagementService.saveJsonToLocal(json);
+		// generate json - done
+		// save to local - done
+		// upload json to s3
 	}
 
 	private void show() {
-
+		String jsonStr = serversManagementService.readJsonDataLocal();
+		List<Server> servers = serializeService.serversParse(jsonStr);
+		System.out.println(stringFormattingService.serversTableString(servers));
+		System.out.println();
+		System.out.println(stringFormattingService.servicesByServerFullTreeString(servers));
+		// read local json - done
+		// print table and tree - done
 	}
 }
