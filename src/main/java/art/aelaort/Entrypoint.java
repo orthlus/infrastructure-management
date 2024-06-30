@@ -19,7 +19,7 @@ public class Entrypoint implements CommandLineRunner {
 	private final SerializeService serializeService;
 
 	@Override
-	public void run(String... args) throws Exception {
+	public void run(String... args) {
 		System.out.println(args.length);
 		if (args.length == 1) {
 			switch (args[0]) {
@@ -30,15 +30,6 @@ public class Entrypoint implements CommandLineRunner {
 			System.out.println("at least one arg required");
 			System.exit(1);
 		}
-
-		List<DirServer> dirServers = serversManagementService.getDirServers();
-		List<TabbyServer> tabbyServers = tabbyService.parseLocalFile();
-		List<Server> servers = dataService.join(dirServers, tabbyServers);
-		String json = serializeService.toJson(servers);
-		System.out.println(json);
-		List<Server> servers1 = serializeService.serversParse(json);
-		System.out.println(stringFormattingService.serversTableString(servers1));
-//		System.out.println(stringFormattingService.servicesByServerFullTreeString(physicalServers));
 	}
 
 	private void sync() {
