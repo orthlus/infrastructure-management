@@ -20,16 +20,16 @@ public class DataService {
 			DirServer dirServer = mapServers.get(tabbyServer.name());
 			String sshKey = tabbyServer.keyPath().replace("\\", "/");
 			if (dirServer == null) {
-				result.add(new Server(tabbyServer.name(), tabbyServer.host(), sshKey, false, List.of()));
+				result.add(new Server(tabbyServer.name(), tabbyServer.host(), sshKey, tabbyServer.port(), false, List.of()));
 			} else {
-				result.add(new Server(tabbyServer.name(), tabbyServer.host(), sshKey, dirServer.monitoring(), dirServer.services()));
+				result.add(new Server(tabbyServer.name(), tabbyServer.host(), sshKey, tabbyServer.port(), dirServer.monitoring(), dirServer.services()));
 			}
 		}
 
 		Map<String, TabbyServer> mapTabbyServers = toMapTabby(tabbyServers);
 		for (DirServer dirServer : dirServers) {
 			if (!mapTabbyServers.containsKey(dirServer.name())) {
-				result.add(new Server(dirServer.name(), "null", "null", dirServer.monitoring(), dirServer.services()));
+				result.add(new Server(dirServer.name(), "null", "null", 22, dirServer.monitoring(), dirServer.services()));
 			}
 		}
 

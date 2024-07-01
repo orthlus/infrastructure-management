@@ -66,10 +66,17 @@ public class TabbyService {
 			}
 
 			String name = (String) profile.get("name");
-			String host = (String) ((Map<String, Object>) profile.get("options")).get("host");
-			String keyPath = ((List<String>) ((Map<String, Object>) profile.get("options")).get("privateKeys")).get(0)
-					.replace(tabbyConfigRsaFilePrefix, "");
-			result.add(new TabbyServer(name, host, keyPath));
+			Map<String, Object> options = (Map<String, Object>) profile.get("options");
+			String host = (String) options.get("host");
+			List<String> keys = (List<String>) options.get("privateKeys");
+			String keyPath = keys.get(0).replace(tabbyConfigRsaFilePrefix, "");
+			int port;
+			if (options.containsKey("port")) {
+				port = (int) options.get("port");
+			} else {
+				port = 22;
+			}
+			result.add(new TabbyServer(name, host, keyPath, port));
 		}
 
 		return result;
