@@ -37,6 +37,16 @@ public class TabbyService {
 		}
 	}
 
+	public void downloadFileToLocal() {
+		try {
+			String remoteFileContent = getRemoteFileContent();
+			Files.writeString(Path.of(tabbyConfigPath), remoteFileContent);
+			System.out.println("tabby config downloaded");
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public String getRemoteFileContent() {
 		String downloaded = tabbyS3.download().split("\n")[1];
 		return decode(downloaded);

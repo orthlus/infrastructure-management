@@ -41,6 +41,7 @@ public class Entrypoint implements CommandLineRunner {
 	*/
 	private void sync() {
 		List<DirServer> dirServers = serversManagementService.getDirServers();
+		tabbyService.downloadFileToLocal();
 		List<TabbyServer> tabbyServers = tabbyService.parseLocalFile();
 		List<Server> servers = dataService.join(dirServers, tabbyServers);
 		serversManagementService.saveData(servers);
