@@ -22,6 +22,7 @@ public class ExternalUtilities {
 		if (response.exitCode() != 0) {
 			throw new RuntimeException("ydSync error \n%s\n%s".formatted(response.stderr(), response.stdout()));
 		}
+		System.out.println("yd sync done");
 	}
 
 	public void tabbyDecode(Path cipherFile, Path decodedFile) {

@@ -35,9 +35,11 @@ public class Entrypoint implements CommandLineRunner {
 	}
 
 	/*
+	* download tabby
 	* generate json
-	* save to local
-	* save to s3
+	* save data to local
+	* save data to s3
+	* save ips to s3
 	*/
 	private void sync() {
 		List<DirServer> dirServers = serversManagementService.getDirServers();
@@ -56,7 +58,8 @@ public class Entrypoint implements CommandLineRunner {
 
 	/*
 	* read local json
-	* print table and tree
+	* print table
+	* print tree
 	*/
 	private void show() {
 		List<Server> servers = serversManagementService.readLocalJsonData();
