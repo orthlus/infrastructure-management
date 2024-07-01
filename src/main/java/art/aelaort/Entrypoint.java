@@ -34,11 +34,6 @@ public class Entrypoint implements CommandLineRunner {
 		}
 	}
 
-	private void syncAll() {
-		sync();
-		externalUtilities.ydSync();
-	}
-
 	/*
 	* generate json
 	* save to local
@@ -51,6 +46,11 @@ public class Entrypoint implements CommandLineRunner {
 		serversManagementService.saveData(servers);
 		serversManagementService.saveIps(servers);
 		System.out.println("sync done");
+	}
+
+	private void syncAll() {
+		sync();
+		externalUtilities.ydSync();
 	}
 
 	/*
