@@ -16,6 +16,14 @@ public class ServersManagementS3 {
 	@Value("${servers.management.s3.bucket}")
 	private String bucket;
 
+	public void uploadIps(String ipsText) {
+		RequestBody requestBody = RequestBody.fromString(ipsText);
+		client.putObject(PutObjectRequest.builder()
+				.bucket(bucket)
+				.key("ips.txt")
+				.build(), requestBody);
+	}
+
 	public String downloadData() {
 		return client.getObjectAsBytes(builder -> builder
 						.bucket(bucket)

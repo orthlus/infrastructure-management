@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -31,6 +32,17 @@ public class ServersManagementService {
 	private String projectsYmlFileName;
 	@Value("${servers.management.json_path}")
 	private String jsonDataPath;
+
+	public void saveIps(List<Server> servers) {
+		String text = servers.stream()
+				.filter(Server::isMonitoring)
+				// ip + ssh port
+				.map(Server::getIp)
+				.collect(Collectors.joining("\n"))
+				+ "\n";
+		serversManagementS3.uploadIps(text);
+		System.out.println("ips uploaded");
+	}
 
 	public void saveData(List<Server> servers) {
 		try {
