@@ -23,7 +23,7 @@ public class SerializeService {
 
 	public String toJson(List<Server> server) {
 		try {
-			return mapper.writeValueAsString(server);
+			return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(server);
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
