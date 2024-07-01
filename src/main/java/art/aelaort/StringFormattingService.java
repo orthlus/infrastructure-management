@@ -3,6 +3,7 @@ package art.aelaort;
 import art.aelaort.models.Server;
 import art.aelaort.models.ServerDataLength;
 import art.aelaort.models.ServiceDto;
+import dnl.utils.text.table.TextTable;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -66,6 +67,37 @@ public class StringFormattingService {
 	 * ======================================================
 	 * ======================================================
 	 */
+
+	public void printServersTableString(List<Server> servers) {
+		String[] columnNames = {
+				"name",
+				"ip",
+				"port",
+				"monitoring",
+				"sshKey",
+				"services"
+		};
+
+		Object[][] data = convertServersToArrays(servers);
+		TextTable tt = new TextTable(columnNames, data);
+		tt.setAddRowNumbering(true);
+		tt.printTable();
+	}
+
+	private Object[][] convertServersToArrays(List<Server> servers) {
+		Object[][] result = new Object[servers.size()][6];
+		for (int i = 0; i < servers.size(); i++) {
+			Server server = servers.get(i);
+			result[i][0] = server.getName();
+			result[i][1] = server.getIp();
+			result[i][2] = server.getPort();
+			result[i][3] = server.isMonitoring();
+			result[i][4] = server.getSshKey();
+			result[i][5] = server.getServicesStr();
+		}
+
+		return result;
+	}
 
 	public String serversTableString(List<Server> servers) {
 		ServerDataLength lengths = getLengths(servers);

@@ -63,7 +63,7 @@ public class Entrypoint implements CommandLineRunner {
 	*/
 	private void show() {
 		List<Server> servers = serversManagementService.readLocalJsonData();
-		System.out.println(stringFormattingService.serversTableString(servers));
+		stringFormattingService.printServersTableString(servers);
 		System.out.println(stringFormattingService.servicesByServerFullTreeString(servers));
 	}
 
@@ -74,6 +74,6 @@ public class Entrypoint implements CommandLineRunner {
 
 	private void showTable() {
 		List<Server> servers = serversManagementService.readLocalJsonData();
-		System.out.println(stringFormattingService.serversTableString(servers));
+		stringFormattingService.printServersTableString(servers);
 	}
 }
