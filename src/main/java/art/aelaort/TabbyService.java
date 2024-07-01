@@ -1,7 +1,6 @@
 package art.aelaort;
 
 import art.aelaort.models.TabbyServer;
-import art.aelaort.system.SystemProcess;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -18,16 +17,12 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class TabbyService {
-	private final SystemProcess systemProcess;
 	private final TabbyS3 tabbyS3;
+	private final ExternalUtilities externalUtilities;
 	@Value("${tabby.config.rsa_file_prefix}")
 	private String tabbyConfigRsaFilePrefix;
 	@Value("${tabby.config.path}")
 	private String tabbyConfigPath;
-	@Value("${tabby.decode.script.bin}")
-	private String decodeScriptBin;
-	@Value("${tabby.decode.script.file}")
-	private String decodeScriptFile;
 	@Value("${tmp.dir}")
 	private String tmpDir;
 
@@ -76,7 +71,7 @@ public class TabbyService {
 			Path decodedFile = Path.of(tmpDir + UUID.randomUUID());
 
 			Files.writeString(cipherFile, encrypted);
-			systemProcess.callProcess("%s %s %s %s".formatted(decodeScriptBin, decodeScriptFile, cipherFile, decodedFile));
+			externalUtilities.tabbyDecode(cipherFile, decodedFile);
 			String result = Files.readString(decodedFile);
 
 			Files.deleteIfExists(cipherFile);
