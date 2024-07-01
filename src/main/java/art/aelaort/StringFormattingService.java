@@ -69,6 +69,7 @@ public class StringFormattingService {
 	 */
 
 	public void printServersTableString(List<Server> servers) {
+		System.out.println("servers:");
 		String[] columnNames = {
 				"name",
 				"ip",
