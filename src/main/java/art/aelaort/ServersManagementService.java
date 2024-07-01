@@ -48,9 +48,9 @@ public class ServersManagementService {
 		try {
 			String json = serializeService.toJson(servers);
 			Files.writeString(Path.of(jsonDataPath), json);
-			System.out.println("saved to local");
+			System.out.println("saved data to local");
 			serversManagementS3.uploadData(json);
-			System.out.println("saved to s3");
+			System.out.println("saved data to s3");
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
