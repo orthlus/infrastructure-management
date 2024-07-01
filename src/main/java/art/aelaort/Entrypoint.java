@@ -20,7 +20,6 @@ public class Entrypoint implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
-//		args = new String[]{"show"};
 		if (args.length == 1) {
 			switch (args[0]) {
 				case "show" -> show();
