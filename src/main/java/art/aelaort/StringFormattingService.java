@@ -35,11 +35,11 @@ public class StringFormattingService {
 
 		StringBuilder sb = new StringBuilder();
 		for (Map.Entry<String, List<String>> servicesByYml : servicesMapList(services).entrySet()) {
-			sb.append("\t")
+			sb.append("  ")
 					.append(servicesByYml.getKey())
-					.append("\n\t\t");
+					.append("\n    ");
 			for (String serviceName : servicesByYml.getValue()) {
-				sb.append(serviceName).append("\n\t\t");
+				sb.append(serviceName).append("\n    ");
 			}
 			sb.deleteCharAt(sb.length() - 1);
 		}
