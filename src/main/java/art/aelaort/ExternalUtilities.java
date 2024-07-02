@@ -18,6 +18,7 @@ public class ExternalUtilities {
 	private String tabbyDecodeScriptFile;
 
 	public void ydSync() {
+		System.out.println("yd sync started...");
 		Response response = systemProcess.callProcess("wsl yandex-disk sync");
 		if (response.exitCode() != 0) {
 			throw new RuntimeException("ydSync error \n%s\n%s".formatted(response.stderr(), response.stdout()));
