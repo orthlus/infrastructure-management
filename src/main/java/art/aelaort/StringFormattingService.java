@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.String.join;
 import static java.lang.String.valueOf;
 import static org.apache.commons.lang3.StringUtils.*;
 
@@ -24,8 +25,7 @@ public class StringFormattingService {
 			}
 			sb.append(server.getName())
 					.append("\n")
-					.append(servicesString(server.getServices()))
-					.append("\n");
+					.append(servicesString(server.getServices()));
 		}
 		return sb.toString().trim();
 	}
@@ -37,16 +37,14 @@ public class StringFormattingService {
 
 		StringBuilder sb = new StringBuilder();
 		for (Map.Entry<String, List<String>> servicesByYml : servicesMapList(services).entrySet()) {
-			sb.append("  ")
+			String join = join("\n      ", servicesByYml.getValue());
+//			sb.append("   %s\n      %s".formatted(servicesByYml.getKey(), join));
+			sb.append("   ")
 					.append(servicesByYml.getKey())
-					.append("\n    ");
-			for (String serviceName : servicesByYml.getValue()) {
-				sb.append(serviceName).append("\n    ");
-			}
-			sb.deleteCharAt(sb.length() - 1);
+					.append("\n      ")
+					.append(join);
 		}
-		sb.deleteCharAt(sb.length() - 1);
-		return sb.toString();
+		return sb.append("\n").toString();
 	}
 
 	private Map<String, List<String>> servicesMapList(List<ServiceDto> services) {
