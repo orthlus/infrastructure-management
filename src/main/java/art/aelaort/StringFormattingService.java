@@ -38,7 +38,6 @@ public class StringFormattingService {
 		StringBuilder sb = new StringBuilder();
 		for (Map.Entry<String, List<String>> servicesByYml : servicesMapList(services).entrySet()) {
 			String join = join("\n      ", servicesByYml.getValue());
-//			sb.append("   %s\n      %s".formatted(servicesByYml.getKey(), join));
 			sb.append("   ")
 					.append(servicesByYml.getKey())
 					.append("\n      ")
