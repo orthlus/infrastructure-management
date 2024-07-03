@@ -37,11 +37,13 @@ public class TabbyService {
 		}
 	}
 
-	public void downloadFileToLocal() {
+	public void downloadFileToLocal(boolean logging) {
 		try {
 			String remoteFileContent = getRemoteFileContent();
 			Files.writeString(Path.of(tabbyConfigPath), remoteFileContent);
-			System.out.println("tabby config downloaded");
+			if (logging) {
+				System.out.println("tabby config downloaded");
+			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

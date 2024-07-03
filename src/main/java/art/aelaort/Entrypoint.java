@@ -23,27 +23,80 @@ public class Entrypoint implements CommandLineRunner {
 		if (args.length == 1) {
 			switch (args[0]) {
 				case "show" -> show();
-				case "show-table" -> showTable();
-				case "show-tree" -> showTree();
+				case "tbl-sh" -> showTable();
+				case "tr-sh" -> showTree();
 				case "sync" -> sync();
 				case "sync-all" -> syncAll();
+				case "scan" -> scan();
+				case "tbl-sc" -> scanTable();
+				case "tr-sc" -> scanTree();
+				default -> System.out.println("unknown args\n" + usage());
 			}
 		} else {
 			System.out.println("at least one arg required");
+			System.out.println(usage());
 			System.exit(1);
 		}
 	}
 
+	private String usage() {
+		return """
+				usage:
+					sync - quick sync
+					sync-all - long sync all data
+					show - show all
+					tbl-sh - show table
+					tr-sh - show tree
+					scan - show with generate (for actual data)
+					tbl-sc - show table with generate (for actual data)
+					tr-sc - show tree with generate (for actual data)""";
+	}
+
 	/*
-	* download tabby
-	* generate json
-	* save data to local
-	* save data to s3
-	* save ips to s3
-	*/
+	 * scan dirs
+	 * download tabby
+	 * scan tabby
+	 * print
+	 */
+	private void scan() {
+		List<DirServer> dirServers = serversManagementService.getDirServers();
+		tabbyService.downloadFileToLocal(false);
+		List<TabbyServer> tabbyServers = tabbyService.parseLocalFile();
+		List<Server> servers = dataService.join(dirServers, tabbyServers);
+
+		stringFormattingService.printServersTableString(servers);
+		System.out.println();
+		System.out.println(stringFormattingService.servicesByServerFullTreeString(servers));
+	}
+
+	private void scanTable() {
+		List<DirServer> dirServers = serversManagementService.getDirServers();
+		tabbyService.downloadFileToLocal(false);
+		List<TabbyServer> tabbyServers = tabbyService.parseLocalFile();
+		List<Server> servers = dataService.join(dirServers, tabbyServers);
+
+		stringFormattingService.printServersTableString(servers);
+	}
+
+	private void scanTree() {
+		List<DirServer> dirServers = serversManagementService.getDirServers();
+		tabbyService.downloadFileToLocal(false);
+		List<TabbyServer> tabbyServers = tabbyService.parseLocalFile();
+		List<Server> servers = dataService.join(dirServers, tabbyServers);
+
+		System.out.println(stringFormattingService.servicesByServerFullTreeString(servers));
+	}
+
+	/*
+	 * download tabby
+	 * generate json
+	 * save data to local
+	 * save data to s3
+	 * save ips to s3
+	 */
 	private void sync() {
 		List<DirServer> dirServers = serversManagementService.getDirServers();
-		tabbyService.downloadFileToLocal();
+		tabbyService.downloadFileToLocal(true);
 		List<TabbyServer> tabbyServers = tabbyService.parseLocalFile();
 		List<Server> servers = dataService.join(dirServers, tabbyServers);
 		serversManagementService.saveData(servers);
@@ -57,10 +110,10 @@ public class Entrypoint implements CommandLineRunner {
 	}
 
 	/*
-	* read local json
-	* print table
-	* print tree
-	*/
+	 * read local json
+	 * print table
+	 * print tree
+	 */
 	private void show() {
 		List<Server> servers = serversManagementService.readLocalJsonData();
 		stringFormattingService.printServersTableString(servers);
