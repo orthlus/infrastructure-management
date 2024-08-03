@@ -23,13 +23,13 @@ public class Entrypoint implements CommandLineRunner {
 		if (args.length == 1) {
 			switch (args[0]) {
 				case "show" -> show();
-				case "tbl-sh" -> showTable();
-				case "tr-sh" -> showTree();
+				case "tbl-show" -> showTable();
+				case "tr-show" -> showTree();
 				case "sync" -> sync();
 				case "sync-all" -> syncAll();
 				case "scan" -> scan();
-				case "tbl-sc" -> scanTable();
-				case "tr-sc" -> scanTree();
+				case "tbl-scan" -> scanTable();
+				case "tr-scan" -> scanTree();
 				default -> System.out.println("unknown args\n" + usage());
 			}
 		} else {
@@ -45,11 +45,11 @@ public class Entrypoint implements CommandLineRunner {
 					sync - quick sync
 					sync-all - long sync all data
 					show - show all
-					tbl-sh - show table
-					tr-sh - show tree
+					tbl-show - show table
+					tr-show - show tree
 					scan - show with generate (for actual data)
-					tbl-sc - show table with generate (for actual data)
-					tr-sc - show tree with generate (for actual data)""";
+					tbl-scan - show table with generate (for actual data)
+					tr-scan - show tree with generate (for actual data)""";
 	}
 
 	/*
