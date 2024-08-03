@@ -44,9 +44,9 @@ public class Entrypoint implements CommandLineRunner {
 				usage:
 					sync - quick sync
 					sync-all - long sync all data
-					show - show all
-					tbl-show - show table
-					yml-show - show tree
+					show - show all (tbl and yml)
+					tbl-show - show table with servers
+					yml-show - show list of services from yml files
 					scan - show with generate (for actual data)
 					tbl-scan - show table with generate (for actual data)
 					yml-scan - show tree with generate (for actual data)""";
