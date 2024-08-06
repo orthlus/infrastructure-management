@@ -28,6 +28,13 @@ public class TabbyService {
 
 	private final Yaml yaml;
 
+	public String getKeyFullPath(TabbyServer tabbyServer) {
+		return tabbyConfigRsaFilePrefix
+				.replace("file://", "")
+				.replaceAll("\\\\", "/")
+				+ tabbyServer.keyPath();
+	}
+
 	public List<TabbyServer> parseLocalFile() {
 		try {
 			String content = Files.readString(Path.of(tabbyConfigPath));
