@@ -29,7 +29,7 @@ public class DataService {
 		Map<String, TabbyServer> mapTabbyServers = toMapTabby(tabbyServers);
 		for (DirServer dirServer : dirServers) {
 			if (!mapTabbyServers.containsKey(dirServer.name())) {
-				result.add(new Server(dirServer.name(), "null", "null", -1, dirServer.monitoring(), dirServer.services()));
+				result.add(new Server(dirServer.name(), "-", "-", -1, dirServer.monitoring(), dirServer.services()));
 			}
 		}
 
