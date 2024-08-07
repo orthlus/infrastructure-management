@@ -42,10 +42,11 @@ public class DockerService {
 				sshClient.downloadFile(linuxResolve(defaultRemoteDir, defaultRemoteFilename), oldFilePath, server);
 
 				String coloredFilesDiff = fileDiffService.getColoredFilesDiff(oldFilePath, newFileLocalPath);
-				System.out.println(coloredFilesDiff);
+				System.out.println("new docker compose file diff:\n" + coloredFilesDiff);
 
 				if (isApproved("replace file?: ")) {
 					sshClient.uploadFile(newFileLocalPath, of(defaultRemoteDir), server);
+					System.out.println("new file uploaded!");
 				}
 
 				Files.deleteIfExists(oldFilePath);
@@ -53,6 +54,7 @@ public class DockerService {
 				System.out.println("remote file doesn't exists");
 				if (isApproved("create remote file?: ")) {
 					sshClient.uploadFile(newFileLocalPath, of(defaultRemoteDir), server);
+					System.out.println("remote file updated!");
 				}
 			} catch (IOException e) {
 				throw new RuntimeException(e);
