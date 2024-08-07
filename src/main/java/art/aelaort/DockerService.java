@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
+import static art.aelaort.Utils.linuxResolve;
 import static java.nio.file.Path.of;
 
 @Component
@@ -45,7 +46,7 @@ public class DockerService {
 				System.out.println("new docker compose file diff:\n" + coloredFilesDiff);
 
 				if (isApproved("replace file?: ")) {
-					sshClient.uploadFile(newFileLocalPath, of(defaultRemoteDir), server);
+					sshClient.uploadFile(newFileLocalPath, defaultRemoteDir, server);
 					System.out.println("new file uploaded!");
 				}
 
@@ -53,7 +54,7 @@ public class DockerService {
 			} catch (SshNotFountFileException e) {
 				System.out.println("remote file doesn't exists");
 				if (isApproved("create remote file?: ")) {
-					sshClient.uploadFile(newFileLocalPath, of(defaultRemoteDir), server);
+					sshClient.uploadFile(newFileLocalPath, defaultRemoteDir, server);
 					System.out.println("remote file updated!");
 				}
 			} catch (IOException e) {
@@ -85,10 +86,6 @@ public class DockerService {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	private String linuxResolve(String root, String path) {
-		return root + "/" + path;
 	}
 
 	private Path resolveDockerFileLocalPath(TabbyServer tabbyServer) {

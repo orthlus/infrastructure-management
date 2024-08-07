@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 
+import static art.aelaort.Utils.linuxResolve;
 import static com.jcraft.jsch.ChannelSftp.SSH_FX_NO_SUCH_FILE;
 
 @Component
@@ -25,11 +26,11 @@ public class SshClient {
 		}
 	}
 
-	public void uploadFile(Path fileToUpload, Path remoteDir, TabbyServer tabbyServer) {
+	public void uploadFile(Path fileToUpload, String remoteDir, TabbyServer tabbyServer) {
 		try (JschConnection jsch = jsch(tabbyServer)) {
 			jsch.sftp().put(
 					fileToUpload.toString(),
-					remoteDir.resolve(fileToUpload.getFileName()).toString());
+					linuxResolve(remoteDir, fileToUpload.getFileName()));
 		} catch (SftpException e) {
 			throw new RuntimeException(e);
 		}
