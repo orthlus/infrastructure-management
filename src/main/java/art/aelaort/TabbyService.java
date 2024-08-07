@@ -1,5 +1,7 @@
 package art.aelaort;
 
+import art.aelaort.exceptions.TabbyServerByPortTooManyServersException;
+import art.aelaort.exceptions.TabbyServerNotFoundException;
 import art.aelaort.models.TabbyServer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

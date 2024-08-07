@@ -1,5 +1,7 @@
 package art.aelaort;
 
+import art.aelaort.exceptions.TabbyServerByPortTooManyServersException;
+import art.aelaort.exceptions.TabbyServerNotFoundException;
 import art.aelaort.models.DirServer;
 import art.aelaort.models.Server;
 import art.aelaort.models.TabbyServer;

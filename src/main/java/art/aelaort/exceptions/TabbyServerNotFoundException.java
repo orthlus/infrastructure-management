@@ -1,4 +1,4 @@
-package art.aelaort;
+package art.aelaort.exceptions;
 
 public class TabbyServerNotFoundException extends RuntimeException {
 }

@@ -1,5 +1,6 @@
 package art.aelaort;
 
+import art.aelaort.exceptions.SshNotFountFileException;
 import art.aelaort.models.TabbyServer;
 import com.jcraft.jsch.SftpException;
 import lombok.RequiredArgsConstructor;
