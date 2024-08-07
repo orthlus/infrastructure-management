@@ -46,11 +46,15 @@ public class DockerService {
 				if (isApproved("replace file?: ")) {
 					sshClient.uploadFile(newFileLocalPath, of(defaultRemoteDir), server);
 				}
+
+				Files.deleteIfExists(oldFilePath);
 			} catch (SshNotFountFileException e) {
 				System.out.println("remote file doesn't exists");
 				if (isApproved("create remote file?: ")) {
 					sshClient.uploadFile(newFileLocalPath, of(defaultRemoteDir), server);
 				}
+			} catch (IOException e) {
+				throw new RuntimeException(e);
 			}
 		} catch (TooManyDockerFilesException e) {
 			System.out.println("too many docker files found in local dir");
