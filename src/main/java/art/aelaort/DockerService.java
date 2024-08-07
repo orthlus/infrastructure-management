@@ -38,7 +38,7 @@ public class DockerService {
 			try {
 				Path oldFilePath = createTmpDir().resolve(defaultRemoteFilename);
 
-				sshClient.downloadFile(of(defaultRemoteDir).resolve(defaultRemoteFilename), oldFilePath, server);
+				sshClient.downloadFile(linuxResolve(defaultRemoteDir, defaultRemoteFilename), oldFilePath, server);
 
 				String coloredFilesDiff = fileDiffService.getColoredFilesDiff(oldFilePath, newFileLocalPath);
 				System.out.println(coloredFilesDiff);
@@ -80,6 +80,10 @@ public class DockerService {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private String linuxResolve(String root, String path) {
+		return root + "/" + path;
 	}
 
 	private Path resolveDockerFileLocalPath(TabbyServer tabbyServer) {

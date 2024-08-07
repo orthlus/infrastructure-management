@@ -15,9 +15,9 @@ import static com.jcraft.jsch.ChannelSftp.SSH_FX_NO_SUCH_FILE;
 public class SshClient {
 	private final TabbyService tabbyService;
 
-	public void downloadFile(Path remotePath, Path localFile, TabbyServer tabbyServer) {
+	public void downloadFile(String remotePath, Path localFile, TabbyServer tabbyServer) {
 		try (JschConnection jsch = jsch(tabbyServer)) {
-			jsch.sftp().get(remotePath.toString(), localFile.toString());
+			jsch.sftp().get(remotePath, localFile.toString());
 		} catch (SftpException e) {
 			throw e.id == SSH_FX_NO_SUCH_FILE
 					? new SshNotFountFileException()
