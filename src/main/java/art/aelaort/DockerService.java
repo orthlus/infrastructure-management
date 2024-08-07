@@ -42,8 +42,10 @@ public class DockerService {
 
 				sshClient.downloadFile(linuxResolve(defaultRemoteDir, defaultRemoteFilename), oldFilePath, server);
 
+				System.out.printf("uploading docker compose file to server '%s'%n", server.name());
+
 				String coloredFilesDiff = fileDiffService.getColoredFilesDiff(oldFilePath, newFileLocalPath);
-				System.out.println("new docker compose file diff:\n" + coloredFilesDiff);
+				System.out.println("new file changes:\n" + coloredFilesDiff);
 
 				if (isApproved("replace file?: ")) {
 					sshClient.uploadFile(newFileLocalPath, defaultRemoteDir, server);
