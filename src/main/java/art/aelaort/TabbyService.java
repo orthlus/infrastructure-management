@@ -35,6 +35,14 @@ public class TabbyService {
 				+ tabbyServer.keyPath();
 	}
 
+	public TabbyServer findTabbyServer(String nameOrPort) {
+		try {
+			return getServerByPortNumber(Integer.parseInt(nameOrPort));
+		} catch (NumberFormatException e) {
+			return getServerByName(nameOrPort);
+		}
+	}
+
 	public TabbyServer getServerByPortNumber(int port) {
 		List<TabbyServer> list = parseLocalFile().stream()
 				.filter(s -> s.port() == port)

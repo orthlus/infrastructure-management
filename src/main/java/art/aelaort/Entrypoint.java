@@ -17,10 +17,11 @@ public class Entrypoint implements CommandLineRunner {
 	private final DataService dataService;
 	private final StringFormattingService stringFormattingService;
 	private final ExternalUtilities externalUtilities;
+	private final DockerService dockerService;
 
 	@Override
 	public void run(String... args) {
-		if (args.length == 1) {
+		if (args.length >= 1) {
 			switch (args[0]) {
 				case "show" -> show();
 				case "tbl-show" -> showTable();
@@ -30,10 +31,22 @@ public class Entrypoint implements CommandLineRunner {
 				case "scan" -> scan();
 				case "tbl-scan" -> scanTable();
 				case "yml-scan" -> scanTree();
+				case "docker" -> dockerUpload(args);
 				default -> System.out.println("unknown args\n" + usage());
 			}
 		} else {
 			System.out.println("at least one arg required");
+			System.out.println(usage());
+			System.exit(1);
+		}
+	}
+
+	private void dockerUpload(String[] args) {
+		if (args.length >= 2) {
+			TabbyServer server = tabbyService.findTabbyServer(args[1]);
+			dockerService.uploadDockerFile(server);
+		} else {
+			System.out.println("at least 2 args required");
 			System.out.println(usage());
 			System.exit(1);
 		}
@@ -49,7 +62,9 @@ public class Entrypoint implements CommandLineRunner {
 					yml-show - show list of services from yml files
 					scan - show with generate (for actual data)
 					tbl-scan - show table with generate (for actual data)
-					yml-scan - show tree with generate (for actual data)""";
+					yml-scan - show tree with generate (for actual data)
+					docker - upload docker-compose file by server name (by default in /root)
+						server_name (required)""";
 	}
 
 	/*

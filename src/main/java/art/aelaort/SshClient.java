@@ -1,60 +1,45 @@
 package art.aelaort;
 
 import art.aelaort.models.TabbyServer;
-import com.jcraft.jsch.*;
+import com.jcraft.jsch.SftpException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
+
+import static com.jcraft.jsch.ChannelSftp.SSH_FX_NO_SUCH_FILE;
 
 @Component
 @RequiredArgsConstructor
 public class SshClient {
 	private final TabbyService tabbyService;
 
-	public void downloadFile(String remotePath, Path localDir, TabbyServer tabbyServer) {
-
+	public void downloadFile(Path remotePath, Path localFile, TabbyServer tabbyServer) {
+		try (JschConnection jsch = jsch(tabbyServer)) {
+			jsch.sftp().get(remotePath.toString(), localFile.toString());
+		} catch (SftpException e) {
+			throw e.id == SSH_FX_NO_SUCH_FILE
+					? new SshNotFountFileException()
+					: new RuntimeException(e);
+		}
 	}
 
-	public void uploadFile(Path fileToUpload, TabbyServer tabbyServer) {
-		uploadFile(fileToUpload, "/root", tabbyServer);
-	}
-
-	public void uploadFile(Path fileToUpload, String remoteDir, TabbyServer tabbyServer) {
-		try {
-			ChannelSftp channelSftp = setupJsch(tabbyServer);
-			channelSftp.connect();
-
-			String localFile = fileToUpload.toString();
-			String dir = remoteDir.endsWith("/") ? remoteDir : remoteDir + "/";
-
-			channelSftp.put(localFile, dir + fileToUpload.getFileName().toString());
-
-			channelSftp.exit();
-		} catch (JSchException | SftpException e) {
+	public void uploadFile(Path fileToUpload, Path remoteDir, TabbyServer tabbyServer) {
+		try (JschConnection jsch = jsch(tabbyServer)) {
+			jsch.sftp().put(
+					fileToUpload.toString(),
+					remoteDir.resolve(fileToUpload.getFileName()).toString());
+		} catch (SftpException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private ChannelSftp setupJsch(TabbyServer tabbyServer) {
-		return setupJsch(
+	private JschConnection jsch(TabbyServer tabbyServer) {
+		return new JschConnection(
 				"root",
 				tabbyServer.host(),
 				tabbyServer.port(),
 				tabbyService.getKeyFullPath(tabbyServer)
 		);
-	}
-
-	private ChannelSftp setupJsch(String username, String host, int port, String privateKeyPath) {
-		try {
-			JSch jsch = new JSch();
-	//		jsch.setKnownHosts("/Users/john/.ssh/known_hosts");
-			jsch.addIdentity(privateKeyPath);
-			Session jschSession = jsch.getSession(username, host, port);
-			jschSession.connect();
-			return (ChannelSftp) jschSession.openChannel("sftp");
-		} catch (JSchException e) {
-			throw new RuntimeException(e);
-		}
 	}
 }
