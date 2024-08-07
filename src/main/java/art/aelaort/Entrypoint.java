@@ -6,6 +6,7 @@ import art.aelaort.models.DirServer;
 import art.aelaort.models.Server;
 import art.aelaort.models.TabbyServer;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +21,8 @@ public class Entrypoint implements CommandLineRunner {
 	private final StringFormattingService stringFormattingService;
 	private final ExternalUtilities externalUtilities;
 	private final DockerService dockerService;
+	@Value("${docker.compose.remote.dir.default}")
+	private String dockerDefaultRemoteDir;
 
 	@Override
 	public void run(String... args) {
@@ -71,8 +74,8 @@ public class Entrypoint implements CommandLineRunner {
 					scan - show with generate (for actual data)
 					tbl-scan - show table with generate (for actual data)
 					yml-scan - show tree with generate (for actual data)
-					docker - upload docker-compose file by server name (by default in /root)
-						server_name (required)""";
+					docker - upload docker-compose file by server name (by default in %s)
+						server_name (required)""".formatted(dockerDefaultRemoteDir);
 	}
 
 	/*
