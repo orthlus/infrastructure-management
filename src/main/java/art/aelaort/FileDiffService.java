@@ -1,5 +1,6 @@
 package art.aelaort;
 
+import art.aelaort.exceptions.NoDifferenceInFilesException;
 import com.github.difflib.text.DiffRow;
 import com.github.difflib.text.DiffRowGenerator;
 import org.springframework.stereotype.Component;
@@ -25,10 +26,24 @@ public class FileDiffService {
 					Files.readAllLines(newFile)
 			);
 
-			return getColoredTable(rows);
+			if (existsDifference(rows)) {
+				return getColoredTable(rows);
+			} else {
+				throw new NoDifferenceInFilesException();
+			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private boolean existsDifference(List<DiffRow> rows) {
+		for (DiffRow row : rows) {
+			if (!row.getOldLine().equals(row.getNewLine())) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private DiffRowGenerator getGenerator() {

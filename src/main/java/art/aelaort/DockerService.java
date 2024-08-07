@@ -1,5 +1,6 @@
 package art.aelaort;
 
+import art.aelaort.exceptions.NoDifferenceInFilesException;
 import art.aelaort.exceptions.SshNotFountFileException;
 import art.aelaort.exceptions.TooManyDockerFilesException;
 import art.aelaort.models.TabbyServer;
@@ -56,8 +57,10 @@ public class DockerService {
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
+		} catch (NoDifferenceInFilesException e) {
+			System.out.println("new file has no changes, exit...");
 		} catch (TooManyDockerFilesException e) {
-			System.out.println("too many docker files found in local dir");
+			System.out.println("too many docker files found in local dir, exit...");
 		}
 	}
 
