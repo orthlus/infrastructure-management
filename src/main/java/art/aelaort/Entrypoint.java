@@ -43,8 +43,14 @@ public class Entrypoint implements CommandLineRunner {
 
 	private void dockerUpload(String[] args) {
 		if (args.length >= 2) {
-			TabbyServer server = tabbyService.findTabbyServer(args[1]);
-			dockerService.uploadDockerFile(server);
+			try {
+				TabbyServer server = tabbyService.findTabbyServer(args[1]);
+				dockerService.uploadDockerFile(server);
+			} catch (TabbyServerNotFoundException e) {
+				System.out.println("server don't found");
+			} catch (TabbyServerByPortTooManyServersException e) {
+				System.out.println("too many servers found, need more uniq param or fix data");
+			}
 		} else {
 			System.out.println("at least 2 args required");
 			System.out.println(usage());
