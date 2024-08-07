@@ -35,6 +35,24 @@ public class TabbyService {
 				+ tabbyServer.keyPath();
 	}
 
+	public TabbyServer getServerByPortNumber(int port) {
+		List<TabbyServer> list = parseLocalFile().stream()
+				.filter(s -> s.port() == port)
+				.toList();
+		return switch (list.size()) {
+			case 0 -> throw new TabbyServerNotFoundException();
+			case 1 -> list.get(0);
+			default -> throw new TabbyServerByPortTooManyServersException();
+		};
+	}
+
+	public TabbyServer getServerByName(String name) {
+		return parseLocalFile().stream()
+				.filter(s -> s.name().equals(name))
+				.findFirst()
+				.orElseThrow(TabbyServerNotFoundException::new);
+	}
+
 	public List<TabbyServer> parseLocalFile() {
 		try {
 			String content = Files.readString(Path.of(tabbyConfigPath));
