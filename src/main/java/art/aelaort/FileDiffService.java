@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -37,9 +38,18 @@ public class FileDiffService {
 	}
 
 	private boolean existsDifference(List<DiffRow> rows) {
-		for (DiffRow row : rows) {
-			if (!row.getOldLine().equals(row.getNewLine())) {
-				return true;
+		if (rows instanceof ArrayList<DiffRow>) {
+			for (int i = rows.size() - 1; i >= 0; i--) {
+				DiffRow row = rows.get(i);
+				if (!row.getOldLine().equals(row.getNewLine())) {
+					return true;
+				}
+			}
+		} else {
+			for (DiffRow row : rows) {
+				if (!row.getOldLine().equals(row.getNewLine())) {
+					return true;
+				}
 			}
 		}
 
