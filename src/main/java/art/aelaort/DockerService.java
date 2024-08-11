@@ -1,9 +1,11 @@
 package art.aelaort;
 
+import art.aelaort.exceptions.DockerComposeValidationFailedException;
 import art.aelaort.exceptions.NoDifferenceInFilesException;
 import art.aelaort.exceptions.SshNotFountFileException;
 import art.aelaort.exceptions.TooManyDockerFilesException;
 import art.aelaort.models.TabbyServer;
+import art.aelaort.system.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +26,7 @@ import static java.nio.file.Path.of;
 public class DockerService {
 	private final SshClient sshClient;
 	private final FileDiffService fileDiffService;
+	private final ExternalUtilities externalUtilities;
 	@Value("${docker.compose.remote.dir.default}")
 	private String defaultRemoteDir;
 	@Value("${docker.compose.remote.filename.default}")
@@ -38,6 +41,8 @@ public class DockerService {
 			Path newFileLocalPath = resolveDockerFileLocalPath(server);
 
 			try {
+				validateDockerComposeFile(newFileLocalPath);
+
 				Path oldFilePath = createTmpDir().resolve(defaultRemoteFilename);
 
 				sshClient.downloadFile(linuxResolve(defaultRemoteDir, defaultRemoteFilename), oldFilePath, server);
@@ -53,6 +58,9 @@ public class DockerService {
 				}
 
 				Files.deleteIfExists(oldFilePath);
+			} catch (DockerComposeValidationFailedException e) {
+				Response r = e.getResponse();
+				System.out.printf("docker compose file - failed validation:%n%s", r.stderr());
 			} catch (SshNotFountFileException e) {
 				System.out.println("remote file doesn't exists");
 				if (isApproved("create remote file?: ")) {
@@ -67,6 +75,10 @@ public class DockerService {
 		} catch (TooManyDockerFilesException e) {
 			System.out.println("too many docker files found in local dir, exit...");
 		}
+	}
+
+	private void validateDockerComposeFile(Path newFileLocalPath) throws DockerComposeValidationFailedException {
+		externalUtilities.dockerComposeValidate(newFileLocalPath);
 	}
 
 	private boolean isApproved(String text) {
