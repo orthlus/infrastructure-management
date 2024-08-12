@@ -1,22 +1,50 @@
 package art.aelaort;
 
 import art.aelaort.exceptions.DockerComposeValidationFailedException;
+import art.aelaort.exceptions.ReadingBuildConfigException;
+import art.aelaort.models.build.Job;
 import art.aelaort.system.Response;
 import art.aelaort.system.SystemProcess;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class ExternalUtilities {
 	private final SystemProcess systemProcess;
+	private final ObjectMapper jackson;
 	@Value("${tabby.decode.script.bin}")
 	private String tabbyDecodeScriptBin;
 	@Value("${tabby.decode.script.file}")
 	private String tabbyDecodeScriptFile;
+	@Value("${build.data.config.bin}")
+	private String buildConfigBin;
+	@Value("${build.data.config.path}")
+	private String buildConfigPath;
+
+	public List<Job> readBuildConfig() {
+		String command = buildConfigBin + " " + buildConfigPath;
+		Response response = systemProcess.callProcess(command);
+
+		try {
+			if (response.exitCode() == 0) {
+				String jsonStr = response.stdout();
+				Job[] jobs = jackson.readValue(jsonStr, Job[].class);
+				return Arrays.asList(jobs);
+			} else {
+				throw new ReadingBuildConfigException();
+			}
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	public void dockerComposeValidate(Path file) {
 		String command = "docker compose -f %s config -q".formatted(file.toString());
