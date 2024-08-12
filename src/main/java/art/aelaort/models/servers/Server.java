@@ -1,4 +1,4 @@
-package art.aelaort.models;
+package art.aelaort.models.servers;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

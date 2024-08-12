@@ -1,6 +1,6 @@
 package art.aelaort;
 
-import art.aelaort.models.Server;
+import art.aelaort.models.servers.Server;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

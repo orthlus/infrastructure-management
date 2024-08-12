@@ -1,4 +1,4 @@
-package art.aelaort.models;
+package art.aelaort.models.servers;
 
 import java.util.List;
 

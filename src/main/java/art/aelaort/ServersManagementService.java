@@ -1,8 +1,8 @@
 package art.aelaort;
 
-import art.aelaort.models.DirServer;
-import art.aelaort.models.Server;
-import art.aelaort.models.ServiceDto;
+import art.aelaort.models.servers.DirServer;
+import art.aelaort.models.servers.Server;
+import art.aelaort.models.servers.ServiceDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

@@ -1,4 +1,4 @@
-package art.aelaort.models;
+package art.aelaort.models.servers;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

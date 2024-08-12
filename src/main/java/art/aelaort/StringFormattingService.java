@@ -1,8 +1,8 @@
 package art.aelaort;
 
-import art.aelaort.models.Server;
-import art.aelaort.models.ServerDataLength;
-import art.aelaort.models.ServiceDto;
+import art.aelaort.models.servers.Server;
+import art.aelaort.models.servers.ServerDataLength;
+import art.aelaort.models.servers.ServiceDto;
 import dnl.utils.text.table.TextTable;
 import org.springframework.stereotype.Component;
 

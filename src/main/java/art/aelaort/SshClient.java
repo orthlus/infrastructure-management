@@ -1,7 +1,7 @@
 package art.aelaort;
 
 import art.aelaort.exceptions.SshNotFountFileException;
-import art.aelaort.models.TabbyServer;
+import art.aelaort.models.servers.TabbyServer;
 import com.jcraft.jsch.SftpException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

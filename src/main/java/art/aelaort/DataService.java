@@ -1,8 +1,8 @@
 package art.aelaort;
 
-import art.aelaort.models.DirServer;
-import art.aelaort.models.Server;
-import art.aelaort.models.TabbyServer;
+import art.aelaort.models.servers.DirServer;
+import art.aelaort.models.servers.Server;
+import art.aelaort.models.servers.TabbyServer;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

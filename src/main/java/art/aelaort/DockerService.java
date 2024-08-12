@@ -4,7 +4,7 @@ import art.aelaort.exceptions.DockerComposeValidationFailedException;
 import art.aelaort.exceptions.NoDifferenceInFilesException;
 import art.aelaort.exceptions.SshNotFountFileException;
 import art.aelaort.exceptions.TooManyDockerFilesException;
-import art.aelaort.models.TabbyServer;
+import art.aelaort.models.servers.TabbyServer;
 import art.aelaort.system.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
