@@ -1,17 +1,30 @@
 package art.aelaort.system;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
 @Component
 public class SystemProcess {
+	public void callProcess(String command, Path dir) {
+		try {
+			new ProcessBuilder(StringUtils.split(command))
+					.inheritIO()
+					.directory(dir.toFile())
+					.start();
+		} catch (Exception e) {
+			System.err.println("java system process call error: " + e.getLocalizedMessage());
+		}
+	}
+
 	public Response callProcess(String command) {
 		try {
 			Process p = Runtime.getRuntime().exec(command);
-			p.waitFor(10, TimeUnit.MINUTES);
+			p.waitFor(30, TimeUnit.MINUTES);
 
 			StringBuilder stdout = new StringBuilder();
 			try (BufferedReader b = new BufferedReader(new InputStreamReader(p.getInputStream()))) {

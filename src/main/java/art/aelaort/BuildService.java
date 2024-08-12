@@ -1,7 +1,9 @@
 package art.aelaort;
 
 import art.aelaort.exceptions.BuildJobNotFoundException;
+import art.aelaort.exceptions.TooManyDockerFilesException;
 import art.aelaort.models.build.Job;
+import art.aelaort.system.SystemProcess;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -13,6 +15,7 @@ import org.apache.commons.io.filefilter.OrFileFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,6 +32,7 @@ import static java.util.stream.Collectors.joining;
 public class BuildService {
 	private final ExternalUtilities externalUtilities;
 	private final Utils utils;
+	private final SystemProcess systemProcess;
 	@Value("${build.data.config.path}")
 	private String buildConfigPath;
 	@Value("${build.main.dir.secrets_dir}")
@@ -41,6 +45,8 @@ public class BuildService {
 	private String defaultFilesDir;
 	@Value("${build.main.default_files.java_docker.path}")
 	private String defaultJavaDockerfilePath;
+	@Value("${build.main.docker.registry.url}")
+	private String dockerRegistryUrl;
 
 	private FileFilter excludeDirsFilter;
 	private IOFileFilter dockerLookupFilter;
@@ -72,7 +78,35 @@ public class BuildService {
 	}
 
 	private void build(Job job, Path tmpDir, boolean isBuildDockerNoCache) {
+		switch (job.getBuildType()) {
+			case docker -> dockerBuildPush(job, tmpDir, isBuildDockerNoCache);
+			case java_docker -> {
+				run("mvn clean package", tmpDir);
+				dockerBuildPush(job, tmpDir, isBuildDockerNoCache);
+			}
+			case java_local -> run("mvn clean source:jar install", tmpDir);
+			case frontend_vue -> {
+				run("yarn install", tmpDir);
+				run("yarn run build", tmpDir);
+				dockerBuildPush(job, tmpDir, isBuildDockerNoCache);
+			}
+		}
+	}
 
+	private void dockerBuildPush(Job job, Path tmpDir, boolean isBuildDockerNoCache) {
+		String name = job.getName();
+		Path dockerfile = lookupOneDockerfile(tmpDir);
+		if (isBuildDockerNoCache) {
+			run("docker build --no-cache -t %s:latest -f %s %s".formatted(name, dockerfile, tmpDir), tmpDir);
+		} else {
+			run("docker build -t %s:latest -f %s %s".formatted(name, dockerfile, tmpDir), tmpDir);
+		}
+		run("docker image tag %s:latest %s/%s:latest".formatted(name, dockerRegistryUrl, name), tmpDir);
+		run("docker image push %s/%s:latest".formatted(dockerRegistryUrl, name), tmpDir);
+	}
+
+	private void run(String command, Path tmpDir) {
+		systemProcess.callProcess(command, tmpDir);
 	}
 
 	private void copyDefaultDockerfile(Job job, Path tmpDir) {
@@ -87,6 +121,14 @@ public class BuildService {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private Path lookupOneDockerfile(Path dir) {
+		return FileUtils.listFiles(dir.toFile(), dockerLookupFilter, null)
+				.stream()
+				.findFirst()
+				.map(File::toPath)
+				.orElseThrow(TooManyDockerFilesException::new);
 	}
 
 	private boolean notExistsAnyDockerfile(Path dir) {

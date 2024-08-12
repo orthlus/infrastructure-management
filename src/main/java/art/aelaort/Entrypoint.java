@@ -3,6 +3,7 @@ package art.aelaort;
 import art.aelaort.exceptions.BuildJobNotFoundException;
 import art.aelaort.exceptions.TabbyServerByPortTooManyServersException;
 import art.aelaort.exceptions.TabbyServerNotFoundException;
+import art.aelaort.exceptions.TooManyDockerFilesException;
 import art.aelaort.models.build.Job;
 import art.aelaort.models.servers.DirServer;
 import art.aelaort.models.servers.Server;
@@ -61,6 +62,8 @@ public class Entrypoint implements CommandLineRunner {
 				Job job = buildService.getJobById(parseInt(args[1]));
 				boolean isBuildDockerNoCache = buildService.isBuildDockerNoCache(args);
 				buildService.run(job, isBuildDockerNoCache);
+			} catch (TooManyDockerFilesException e) {
+				System.out.println("too many docker-files");
 			} catch (BuildJobNotFoundException e) {
 				System.out.printf("job %s not found\n", args[1]);
 			}
