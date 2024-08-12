@@ -59,6 +59,8 @@ public class Entrypoint implements CommandLineRunner {
 		} else {
 			try {
 				Job job = buildService.getJobById(parseInt(args[1]));
+				boolean isBuildDockerNoCache = buildService.isBuildDockerNoCache(args);
+				buildService.run(job, isBuildDockerNoCache);
 			} catch (BuildJobNotFoundException e) {
 				System.out.printf("job %s not found\n", args[1]);
 			}
