@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 public class SystemProcess {
-	public void callProcess(String command, Path dir) {
+	public void callProcessForBuild(String command, Path dir) {
 		try {
 			Process p = new ProcessBuilder(StringUtils.split(command))
 					.inheritIO()
@@ -19,6 +19,7 @@ public class SystemProcess {
 			p.waitFor();
 		} catch (Exception e) {
 			System.err.println("java system process call error: " + e.getLocalizedMessage());
+			System.exit(1);
 		}
 	}
 

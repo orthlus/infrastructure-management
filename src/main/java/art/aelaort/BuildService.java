@@ -106,7 +106,7 @@ public class BuildService {
 	}
 
 	private void run(String command, Path tmpDir) {
-		systemProcess.callProcess(command, tmpDir);
+		systemProcess.callProcessForBuild(command, tmpDir);
 	}
 
 	private void copyDefaultDockerfile(Job job, Path tmpDir) {
