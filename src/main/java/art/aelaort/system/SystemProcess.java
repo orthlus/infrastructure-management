@@ -12,10 +12,11 @@ import java.util.concurrent.TimeUnit;
 public class SystemProcess {
 	public void callProcess(String command, Path dir) {
 		try {
-			new ProcessBuilder(StringUtils.split(command))
+			Process p = new ProcessBuilder(StringUtils.split(command))
 					.inheritIO()
 					.directory(dir.toFile())
 					.start();
+			p.waitFor();
 		} catch (Exception e) {
 			System.err.println("java system process call error: " + e.getLocalizedMessage());
 		}
