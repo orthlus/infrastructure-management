@@ -26,11 +26,11 @@ public class ExternalUtilities {
 	private String tabbyDecodeScriptFile;
 	@Value("${build.data.config.bin}")
 	private String buildConfigBin;
-	@Value("${build.data.config.path}")
-	private String buildConfigPath;
+	@Value("${build.data.config.converter.path}")
+	private String buildConfigConverterPath;
 
 	public List<Job> readBuildConfig() {
-		String command = buildConfigBin + " " + buildConfigPath;
+		String command = buildConfigBin + " " + buildConfigConverterPath;
 		Response response = systemProcess.callProcess(command);
 
 		try {
