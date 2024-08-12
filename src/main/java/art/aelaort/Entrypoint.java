@@ -1,7 +1,9 @@
 package art.aelaort;
 
+import art.aelaort.exceptions.BuildJobNotFoundException;
 import art.aelaort.exceptions.TabbyServerByPortTooManyServersException;
 import art.aelaort.exceptions.TabbyServerNotFoundException;
+import art.aelaort.models.build.Job;
 import art.aelaort.models.servers.DirServer;
 import art.aelaort.models.servers.Server;
 import art.aelaort.models.servers.TabbyServer;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import static java.lang.Integer.parseInt;
+
 @Component
 @RequiredArgsConstructor
 public class Entrypoint implements CommandLineRunner {
@@ -21,6 +25,7 @@ public class Entrypoint implements CommandLineRunner {
 	private final StringFormattingService stringFormattingService;
 	private final ExternalUtilities externalUtilities;
 	private final DockerService dockerService;
+	private final BuildService buildService;
 	@Value("${docker.compose.remote.dir.default}")
 	private String dockerDefaultRemoteDir;
 
@@ -37,12 +42,26 @@ public class Entrypoint implements CommandLineRunner {
 				case "tbl-scan" -> scanTable();
 				case "yml-scan" -> scanTree();
 				case "docker" -> dockerUpload(args);
+				case "build" -> build(args);
 				default -> System.out.println("unknown args\n" + usage());
 			}
 		} else {
 			System.out.println("at least one arg required");
 			System.out.println(usage());
 			System.exit(1);
+		}
+	}
+
+	public void build(String[] args) {
+		if (args.length < 2) {
+			buildService.printConfig();
+			System.exit(0);
+		} else {
+			try {
+				Job job = buildService.getJobById(parseInt(args[1]));
+			} catch (BuildJobNotFoundException e) {
+				System.out.printf("job %s not found\n", args[1]);
+			}
 		}
 	}
 
