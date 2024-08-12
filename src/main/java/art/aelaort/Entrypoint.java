@@ -99,7 +99,10 @@ public class Entrypoint implements CommandLineRunner {
 					tbl-scan - show table with generate (for actual data)
 					yml-scan - show tree with generate (for actual data)
 					docker - upload docker-compose file by server name (by default in %s)
-						server_name or port number (required)""".formatted(dockerDefaultRemoteDir);
+						server_name or port number (required)
+					build - build and deploy apps
+						number of app (required for run)
+							without args - printing apps list""".formatted(dockerDefaultRemoteDir);
 	}
 
 	/*
