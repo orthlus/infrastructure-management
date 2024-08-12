@@ -16,7 +16,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Scanner;
-import java.util.UUID;
 
 import static art.aelaort.Utils.linuxResolve;
 import static java.nio.file.Path.of;
@@ -27,12 +26,11 @@ public class DockerService {
 	private final SshClient sshClient;
 	private final FileDiffService fileDiffService;
 	private final ExternalUtilities externalUtilities;
+	private final Utils utils;
 	@Value("${docker.compose.remote.dir.default}")
 	private String defaultRemoteDir;
 	@Value("${docker.compose.remote.filename.default}")
 	private String defaultRemoteFilename;
-	@Value("${tmp.dir}")
-	private String tmpDir;
 	@Value("${servers.management.dir}")
 	private String serversDir;
 
@@ -43,7 +41,7 @@ public class DockerService {
 			try {
 				validateDockerComposeFile(newFileLocalPath);
 
-				Path oldFilePath = createTmpDir().resolve(defaultRemoteFilename);
+				Path oldFilePath = utils.createTmpDir().resolve(defaultRemoteFilename);
 
 				sshClient.downloadFile(linuxResolve(defaultRemoteDir, defaultRemoteFilename), oldFilePath, server);
 
@@ -89,17 +87,6 @@ public class DockerService {
 				.replace("\r", "");
 
 		return answer.equals("y");
-	}
-
-	private Path createTmpDir() {
-		try {
-			Path path = of("%s%s".formatted(tmpDir, UUID.randomUUID()));
-			Files.createDirectory(path);
-
-			return path;
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	private Path resolveDockerFileLocalPath(TabbyServer tabbyServer) {

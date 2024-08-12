@@ -4,6 +4,7 @@ import art.aelaort.exceptions.TabbyServerByPortTooManyServersException;
 import art.aelaort.exceptions.TabbyServerNotFoundException;
 import art.aelaort.models.servers.TabbyServer;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
@@ -21,12 +22,11 @@ import java.util.UUID;
 public class TabbyService {
 	private final TabbyS3 tabbyS3;
 	private final ExternalUtilities externalUtilities;
+	private final Utils utils;
 	@Value("${tabby.config.rsa_file_prefix}")
 	private String tabbyConfigRsaFilePrefix;
 	@Value("${tabby.config.path}")
 	private String tabbyConfigPath;
-	@Value("${tmp.dir}")
-	private String tmpDir;
 
 	private final Yaml yaml;
 
@@ -121,15 +121,15 @@ public class TabbyService {
 
 	private String decode(String encrypted) {
 		try {
-			Path cipherFile = Path.of(tmpDir + UUID.randomUUID());
-			Path decodedFile = Path.of(tmpDir + UUID.randomUUID());
+			Path tmpDir = utils.createTmpDir();
+			Path cipherFile = tmpDir.resolve(UUID.randomUUID().toString());
+			Path decodedFile = tmpDir.resolve(UUID.randomUUID().toString());
 
 			Files.writeString(cipherFile, encrypted);
 			externalUtilities.tabbyDecode(cipherFile, decodedFile);
 			String result = Files.readString(decodedFile);
 
-			Files.deleteIfExists(cipherFile);
-			Files.deleteIfExists(decodedFile);
+			FileUtils.deleteQuietly(tmpDir.toFile());
 
 			return result;
 		} catch (IOException e) {
