@@ -9,6 +9,7 @@ import art.aelaort.models.servers.DirServer;
 import art.aelaort.models.servers.Server;
 import art.aelaort.models.servers.TabbyServer;
 import lombok.RequiredArgsConstructor;
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import java.util.List;
 
 import static java.lang.Integer.parseInt;
 
+@RegisterReflectionForBinding({Job.class, Server.class})
 @Component
 @RequiredArgsConstructor
 public class Entrypoint implements CommandLineRunner {
