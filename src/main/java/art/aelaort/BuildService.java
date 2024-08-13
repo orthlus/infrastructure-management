@@ -2,6 +2,7 @@ package art.aelaort;
 
 import art.aelaort.exceptions.BuildJobNotFoundException;
 import art.aelaort.exceptions.TooManyDockerFilesException;
+import art.aelaort.models.build.BuildType;
 import art.aelaort.models.build.Job;
 import art.aelaort.system.SystemProcess;
 import jakarta.annotation.PostConstruct;
@@ -47,6 +48,10 @@ public class BuildService {
 	private String defaultJavaDockerfilePath;
 	@Value("${build.main.docker.registry.url}")
 	private String dockerRegistryUrl;
+	@Value("${build.graalvm.artifact.name}")
+	private String graalvmArtifactName;
+	@Value("${build.main.bin.directory}")
+	private String binDirectory;
 
 	private FileFilter excludeDirsFilter;
 	private IOFileFilter dockerLookupFilter;
@@ -89,6 +94,23 @@ public class BuildService {
 				run("yarn install", tmpDir);
 				run("yarn run build", tmpDir);
 				dockerBuildPush(job, tmpDir, isBuildDockerNoCache);
+			}
+			case java_graal_local -> {
+				run("mvn clean native:compile -P native", tmpDir);
+				copyArtifactToBinDirectory(java_graal_local, tmpDir);
+			}
+		}
+	}
+
+//	@SneakyThrows
+	private void copyArtifactToBinDirectory(BuildType type, Path tmpDir) {
+		if (type == java_graal_local) {
+			Path srcFile = tmpDir.resolve("target").resolve(graalvmArtifactName);
+			Path destFile = of(binDirectory).resolve("new-" + graalvmArtifactName);
+			try {
+				FileUtils.copyFile(srcFile.toFile(), destFile.toFile(), false);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
 			}
 		}
 	}

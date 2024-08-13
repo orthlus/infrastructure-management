@@ -4,5 +4,6 @@ public enum BuildType {
 	java_docker,
 	frontend_vue,
 	java_local,
-	docker
+	docker,
+	java_graal_local
 }
