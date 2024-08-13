@@ -53,10 +53,9 @@ public class Entrypoint implements CommandLineRunner {
 		}
 	}
 
-	public void build(String[] args) {
+	private void build(String[] args) {
 		if (args.length < 2) {
 			buildService.printConfig();
-			System.exit(0);
 		} else {
 			try {
 				Job job = buildService.getJobById(parseInt(args[1]));
