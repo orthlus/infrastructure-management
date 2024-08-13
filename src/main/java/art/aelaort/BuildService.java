@@ -109,6 +109,8 @@ public class BuildService {
 			Path destFile = of(binDirectory).resolve("new-" + graalvmArtifactName);
 			try {
 				FileUtils.copyFile(srcFile.toFile(), destFile.toFile(), false);
+
+				externalUtilities.graalvmPostProcessing();
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}

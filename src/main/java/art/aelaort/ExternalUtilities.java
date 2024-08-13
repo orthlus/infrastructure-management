@@ -29,9 +29,17 @@ public class ExternalUtilities {
 	@Value("${build.data.config.converter.path}")
 	private String buildConfigConverterPath;
 
+	@Value("${build.graalvm.post_processing.bin}")
+	private String graalmvPostProcessingBin;
+	@Value("${build.graalvm.post_processing.script}")
+	private String graalmvPostProcessingScript;
+
+	public void graalvmPostProcessing() {
+		systemProcess.callProcessNotBlocking(graalmvPostProcessingBin, graalmvPostProcessingScript);
+	}
+
 	public List<Job> readBuildConfig() {
-		String command = buildConfigBin + " " + buildConfigConverterPath;
-		Response response = systemProcess.callProcess(command);
+		Response response = systemProcess.callProcess(buildConfigBin, buildConfigConverterPath);
 
 		try {
 			if (response.exitCode() == 0) {
@@ -67,8 +75,11 @@ public class ExternalUtilities {
 	}
 
 	public void tabbyDecode(Path cipherFile, Path decodedFile) {
-		String formatted = "%s %s %s %s".formatted(tabbyDecodeScriptBin, tabbyDecodeScriptFile, cipherFile, decodedFile);
-		Response response = systemProcess.callProcess(formatted);
+		Response response = systemProcess.callProcess(
+				tabbyDecodeScriptBin,
+				tabbyDecodeScriptFile,
+				cipherFile.toString(),
+				decodedFile.toString());
 
 		if (response.exitCode() != 0) {
 			throw new RuntimeException("tabbyDecode \n%s\n%s".formatted(response.stderr(), response.stdout()));
