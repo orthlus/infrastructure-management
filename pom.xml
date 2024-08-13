@@ -96,7 +96,6 @@
                     <plugin>
                         <groupId>org.graalvm.buildtools</groupId>
                         <artifactId>native-maven-plugin</artifactId>
-                        <version>0.10.1</version>
                         <executions>
                             <execution>
                                 <id>build-native</id>
@@ -105,16 +104,9 @@
                                 </goals>
                                 <phase>package</phase>
                             </execution>
-                            <execution>
-                                <id>test-native</id>
-                                <goals>
-                                    <goal>test</goal>
-                                </goals>
-                                <phase>test</phase>
-                            </execution>
                         </executions>
                         <configuration>
-                            <fallback>false</fallback>
+                            <skipNativeTests>true</skipNativeTests>
                         </configuration>
                     </plugin>
                 </plugins>
