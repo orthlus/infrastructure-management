@@ -55,6 +55,24 @@ public class Entrypoint implements CommandLineRunner {
 		}
 	}
 
+	private String usage() {
+		return """
+				usage:
+					sync - quick sync
+					sync-all - long sync all data
+					show - show all (tbl and yml)
+					tbl-show - show table with servers
+					yml-show - show list of services from yml files
+					scan - show with generate (for actual data)
+					tbl-scan - show table with generate (for actual data)
+					yml-scan - show tree with generate (for actual data)
+					docker - upload docker-compose file by server name (by default in %s)
+						server_name or port number (required)
+					build - build and deploy apps
+						number of app (required for run)
+							without args - printing apps list""".formatted(dockerDefaultRemoteDir);
+	}
+
 	private void build(String[] args) {
 		if (args.length < 2) {
 			buildService.printConfig();
@@ -86,24 +104,6 @@ public class Entrypoint implements CommandLineRunner {
 			System.out.println(usage());
 			System.exit(1);
 		}
-	}
-
-	private String usage() {
-		return """
-				usage:
-					sync - quick sync
-					sync-all - long sync all data
-					show - show all (tbl and yml)
-					tbl-show - show table with servers
-					yml-show - show list of services from yml files
-					scan - show with generate (for actual data)
-					tbl-scan - show table with generate (for actual data)
-					yml-scan - show tree with generate (for actual data)
-					docker - upload docker-compose file by server name (by default in %s)
-						server_name or port number (required)
-					build - build and deploy apps
-						number of app (required for run)
-							without args - printing apps list""".formatted(dockerDefaultRemoteDir);
 	}
 
 	/*
