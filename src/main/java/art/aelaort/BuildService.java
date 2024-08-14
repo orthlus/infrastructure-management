@@ -24,7 +24,8 @@ import java.nio.file.Path;
 import java.util.Scanner;
 import java.util.stream.Stream;
 
-import static art.aelaort.models.build.BuildType.*;
+import static art.aelaort.models.build.BuildType.java_docker;
+import static art.aelaort.models.build.BuildType.java_graal_local;
 import static java.nio.file.Path.of;
 import static java.util.stream.Collectors.joining;
 
@@ -102,18 +103,12 @@ public class BuildService {
 		}
 	}
 
-//	@SneakyThrows
+	@SneakyThrows
 	private void copyArtifactToBinDirectory(BuildType type, Path tmpDir) {
 		if (type == java_graal_local) {
 			Path srcFile = tmpDir.resolve("target").resolve(graalvmArtifactName);
 			Path destFile = of(binDirectory).resolve("new-" + graalvmArtifactName);
-			try {
-				FileUtils.copyFile(srcFile.toFile(), destFile.toFile(), false);
-
-				externalUtilities.graalvmPostProcessing();
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+			FileUtils.copyFile(srcFile.toFile(), destFile.toFile(), false);
 		}
 	}
 

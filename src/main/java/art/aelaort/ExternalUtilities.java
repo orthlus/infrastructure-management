@@ -29,15 +29,6 @@ public class ExternalUtilities {
 	@Value("${build.data.config.converter.path}")
 	private String buildConfigConverterPath;
 
-	@Value("${build.graalvm.post_processing.bin}")
-	private String graalmvPostProcessingBin;
-	@Value("${build.graalvm.post_processing.script}")
-	private String graalmvPostProcessingScript;
-
-	public void graalvmPostProcessing() {
-		systemProcess.callProcessNotBlocking(graalmvPostProcessingBin, graalmvPostProcessingScript);
-	}
-
 	public List<Job> readBuildConfig() {
 		Response response = systemProcess.callProcess(buildConfigBin, buildConfigConverterPath);
 
