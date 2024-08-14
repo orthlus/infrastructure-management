@@ -28,6 +28,7 @@ import static art.aelaort.models.build.BuildType.java_docker;
 import static art.aelaort.models.build.BuildType.java_graal_local;
 import static java.nio.file.Path.of;
 import static java.util.stream.Collectors.joining;
+import static org.apache.commons.lang3.StringUtils.chop;
 
 @Component
 @RequiredArgsConstructor
@@ -90,7 +91,7 @@ public class BuildService {
 				run("mvn clean package", tmpDir);
 				dockerBuildPush(job, tmpDir, isBuildDockerNoCache);
 			}
-			case java_local -> run("mvn clean source:jar install", tmpDir);
+			case java_local -> run("mvn clean install", tmpDir);
 			case frontend_vue -> {
 				run("yarn install", tmpDir);
 				run("yarn run build", tmpDir);
@@ -217,9 +218,11 @@ public class BuildService {
 
 	@SneakyThrows
 	public String getConfigString() {
-		return Files.readAllLines(of(buildConfigPath))
-				.stream()
-				.skip(2)
-				.collect(joining("\n"));
+		return chop(chop(
+				Files.readAllLines(of(buildConfigPath))
+						.stream()
+						.skip(3)
+						.collect(joining("\n"))
+		));
 	}
 }
