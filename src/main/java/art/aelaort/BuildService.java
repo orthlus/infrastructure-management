@@ -104,12 +104,22 @@ public class BuildService {
 		}
 	}
 
-	@SneakyThrows
 	private void copyArtifactToBinDirectory(BuildType type, Path tmpDir) {
 		if (type == java_graal_local) {
 			Path srcFile = tmpDir.resolve("target").resolve(graalvmArtifactName);
-			Path destFile = of(binDirectory).resolve("new-" + graalvmArtifactName);
-			FileUtils.copyFile(srcFile.toFile(), destFile.toFile(), false);
+			Path destFile = of(binDirectory).resolve(graalvmArtifactName);
+
+			try {
+				FileUtils.copyFile(srcFile.toFile(), destFile.toFile(), false);
+			} catch (Exception e) {
+				System.out.printf("error copy %s to %s, trying new name\n", srcFile, destFile);
+				Path newDestFile = of(binDirectory).resolve("new-" + graalvmArtifactName);
+				try {
+					FileUtils.copyFile(srcFile.toFile(), newDestFile.toFile(), false);
+				} catch (IOException ex) {
+					throw new RuntimeException(ex);
+				}
+			}
 		}
 	}
 
