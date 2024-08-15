@@ -2,10 +2,12 @@ package art.aelaort;
 
 import art.aelaort.system.SystemProcess;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
 
 import static java.nio.file.Path.of;
 
@@ -63,6 +65,7 @@ public class DatabaseManageService {
 		systemProcess.callProcessInheritIO("docker compose -f %s up -d --build".formatted(dbLocalDockerComposePath));
 		System.out.println("PostgreSQL (5433) - started");
 
+		sleep();
 		Path dir = of(dbLocalMigrationsDir);
 		for (String script : dbLocalMigrationsScripts) {
 			systemProcess.callProcessInheritIO(dir.resolve(script).toString(), dir);
@@ -73,5 +76,10 @@ public class DatabaseManageService {
 	public void localDown() {
 		systemProcess.callProcessInheritIO("docker compose -f %s down".formatted(dbLocalDockerComposePath));
 		System.out.println("PostgreSQL (5433) - stopped");
+	}
+
+	@SneakyThrows
+	private void sleep() {
+		TimeUnit.SECONDS.sleep(1);
 	}
 }
