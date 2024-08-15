@@ -30,7 +30,7 @@ public class Job {
 
 	@JsonProperty("secrets_directory")
 	public void setSecretsDirectory(String secretsDirectory) {
-		this.projectDir = secretsDirectory.equals("None") ? null : secretsDirectory;
+		this.secretsDirectory = secretsDirectory.equals("None") ? null : secretsDirectory;
 	}
 
 	@Override
