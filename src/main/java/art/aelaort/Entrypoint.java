@@ -50,6 +50,8 @@ public class Entrypoint implements CommandLineRunner {
 				case "dblcl" -> databaseManageService.localUp();
 				case "dblcl-down" -> databaseManageService.localDown();
 				case "dps" -> externalUtilities.dockerPs();
+				case "db-prod-status" -> databaseManageService.remoteStatus();
+				case "db-prod-update" -> databaseManageService.remoteUpdate();
 				default -> System.out.println("unknown args\n" + usage());
 			}
 		} else {
@@ -77,7 +79,9 @@ public class Entrypoint implements CommandLineRunner {
 							without args - printing apps list
 					dblcl - start local postgres and run migrations
 					dblcl-down - down local postgres
-					dps - alias for 'docker ps -a'"""
+					dps - alias for 'docker ps -a'
+					db-prod-status - prod migrations status
+					db-prod-update - execute prod migrations"""
 				.formatted(dockerDefaultRemoteDir);
 	}
 
