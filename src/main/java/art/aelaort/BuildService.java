@@ -166,7 +166,7 @@ public class BuildService {
 	}
 
 	private boolean isApproved(Job job) {
-		return isApproved("do you want build app '%s'? ".formatted(job.getName()));
+		return isApproved("do you want build app '%s' as '%s'? ".formatted(job.getName(), job.getBuildType()));
 	}
 
 	private boolean isApproved(String text) {
