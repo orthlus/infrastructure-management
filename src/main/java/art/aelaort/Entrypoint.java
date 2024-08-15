@@ -29,6 +29,7 @@ public class Entrypoint implements CommandLineRunner {
 	private final ExternalUtilities externalUtilities;
 	private final DockerService dockerService;
 	private final BuildService buildService;
+	private final DatabaseManageService databaseManageService;
 	@Value("${docker.compose.remote.dir.default}")
 	private String dockerDefaultRemoteDir;
 
@@ -46,6 +47,9 @@ public class Entrypoint implements CommandLineRunner {
 				case "yml-scan" -> scanTree();
 				case "docker" -> dockerUpload(args);
 				case "build" -> build(args);
+				case "dblcl" -> databaseManageService.localUp();
+				case "dblcl-down" -> databaseManageService.localDown();
+				case "dps" -> externalUtilities.dockerPs();
 				default -> System.out.println("unknown args\n" + usage());
 			}
 		} else {
@@ -70,7 +74,11 @@ public class Entrypoint implements CommandLineRunner {
 						server_name or port number (required)
 					build - build and deploy apps
 						number of app (required for run)
-							without args - printing apps list""".formatted(dockerDefaultRemoteDir);
+							without args - printing apps list
+					dblcl - start local postgres and run migrations
+					dblcl-down - down local postgres
+					dps - alias for 'docker ps -a'"""
+				.formatted(dockerDefaultRemoteDir);
 	}
 
 	private void build(String[] args) {

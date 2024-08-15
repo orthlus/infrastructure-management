@@ -56,6 +56,33 @@ public class SystemProcess {
 		}
 	}
 
+	public void callProcessInheritIO(String command, Path dir) {
+		try {
+			String[] commandArray = StringUtils.split(command);
+			Process p = new ProcessBuilder(commandArray)
+					.inheritIO()
+					.directory(dir.toFile())
+					.start();
+			p.waitFor();
+		} catch (Exception e) {
+			System.err.println("java system process call error: " + e.getLocalizedMessage());
+			System.exit(1);
+		}
+	}
+
+	public void callProcessInheritIO(String command) {
+		try {
+			String[] commandArray = StringUtils.split(command);
+			Process p = new ProcessBuilder(commandArray)
+					.inheritIO()
+					.start();
+			p.waitFor();
+		} catch (Exception e) {
+			System.err.println("java system process call error: " + e.getLocalizedMessage());
+			System.exit(1);
+		}
+	}
+
 	public void callProcessNotBlocking(String... command) {
 		callProcess(true, command);
 	}
