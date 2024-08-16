@@ -83,26 +83,26 @@ public class SystemProcess {
 		}
 	}
 
-	public void callProcessNotBlocking(String... command) {
-		callProcess(true, command);
-	}
-
 	public Response callProcess(String... command) {
-		return callProcess(false, command);
+		return callProcess(null, command);
 	}
 
-	public Response callProcess(boolean isBlock, String... command) {
+	public Response callProcess(Path dir, String... command) {
 		try {
-			Process p;
+			ProcessBuilder pb;
 			if (command.length == 1) {
-				p = Runtime.getRuntime().exec(command[0]);
+				String[] split = StringUtils.split(command[0]);
+				pb = new ProcessBuilder(split);
 			} else {
-				p = Runtime.getRuntime().exec(command);
+				pb = new ProcessBuilder(command);
 			}
 
-			if (isBlock) {
-				p.waitFor(30, TimeUnit.MINUTES);
+			if (dir != null) {
+				pb.directory(dir.toFile());
 			}
+
+			Process p = pb.start();
+			p.waitFor(30, TimeUnit.MINUTES);
 
 			StringBuilder stdout = new StringBuilder();
 			try (BufferedReader b = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
