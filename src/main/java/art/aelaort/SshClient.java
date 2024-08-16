@@ -1,7 +1,7 @@
 package art.aelaort;
 
 import art.aelaort.exceptions.SshNotFountFileException;
-import art.aelaort.models.servers.TabbyServer;
+import art.aelaort.models.ssh.SshServer;
 import com.jcraft.jsch.SftpException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -14,10 +14,8 @@ import static com.jcraft.jsch.ChannelSftp.SSH_FX_NO_SUCH_FILE;
 @Component
 @RequiredArgsConstructor
 public class SshClient {
-	private final TabbyService tabbyService;
-
-	public void downloadFile(String remotePath, Path localFile, TabbyServer tabbyServer) {
-		try (JschConnection jsch = jsch(tabbyServer)) {
+	public void downloadFile(String remotePath, Path localFile, SshServer server) {
+		try (JschConnection jsch = jsch(server)) {
 			jsch.sftp().get(remotePath, localFile.toString());
 		} catch (SftpException e) {
 			throw e.id == SSH_FX_NO_SUCH_FILE
@@ -26,8 +24,8 @@ public class SshClient {
 		}
 	}
 
-	public void uploadFile(Path fileToUpload, String remoteDir, TabbyServer tabbyServer) {
-		try (JschConnection jsch = jsch(tabbyServer)) {
+	public void uploadFile(Path fileToUpload, String remoteDir, SshServer server) {
+		try (JschConnection jsch = jsch(server)) {
 			jsch.sftp().put(
 					fileToUpload.toString(),
 					linuxResolve(remoteDir, fileToUpload.getFileName()));
@@ -36,12 +34,7 @@ public class SshClient {
 		}
 	}
 
-	private JschConnection jsch(TabbyServer tabbyServer) {
-		return new JschConnection(
-				"root",
-				tabbyServer.host(),
-				tabbyServer.port(),
-				tabbyService.getKeyFullPath(tabbyServer)
-		);
+	private JschConnection jsch(SshServer server) {
+		return new JschConnection("root", server);
 	}
 }

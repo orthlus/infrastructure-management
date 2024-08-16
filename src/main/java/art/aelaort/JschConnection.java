@@ -1,5 +1,6 @@
 package art.aelaort;
 
+import art.aelaort.models.ssh.SshServer;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
@@ -17,6 +18,10 @@ public class JschConnection implements AutoCloseable {
 	private final String host;
 	private final int port;
 	private final String privateKeyPath;
+
+	public JschConnection(String username, SshServer server) {
+		this(username, server.host(), server.port(), server.fullKeyPath());
+	}
 
 	public ChannelSftp sftp() {
 		JSch jsch = jsch(privateKeyPath);

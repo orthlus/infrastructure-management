@@ -4,7 +4,9 @@ import art.aelaort.exceptions.DockerComposeValidationFailedException;
 import art.aelaort.exceptions.NoDifferenceInFilesException;
 import art.aelaort.exceptions.SshNotFountFileException;
 import art.aelaort.exceptions.TooManyDockerFilesException;
+import art.aelaort.mappers.DockerMapper;
 import art.aelaort.models.servers.TabbyServer;
+import art.aelaort.models.ssh.SshServer;
 import art.aelaort.system.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -27,6 +29,7 @@ public class DockerService {
 	private final FileDiffService fileDiffService;
 	private final ExternalUtilities externalUtilities;
 	private final Utils utils;
+	private final DockerMapper dockerMapper;
 	@Value("${docker.compose.remote.dir.default}")
 	private String defaultRemoteDir;
 	@Value("${docker.compose.remote.filename.default}")
@@ -37,13 +40,14 @@ public class DockerService {
 	public void uploadDockerFile(TabbyServer server) {
 		try {
 			Path newFileLocalPath = resolveDockerFileLocalPath(server);
+			SshServer sshServer = dockerMapper.map(server);
 
 			try {
 				validateDockerComposeFile(newFileLocalPath);
 
 				Path oldFilePath = utils.createTmpDir().resolve(defaultRemoteFilename);
 
-				sshClient.downloadFile(linuxResolve(defaultRemoteDir, defaultRemoteFilename), oldFilePath, server);
+				sshClient.downloadFile(linuxResolve(defaultRemoteDir, defaultRemoteFilename), oldFilePath, sshServer);
 
 				System.out.printf("processing update docker compose on server '%s'%n", server.name());
 
@@ -51,7 +55,7 @@ public class DockerService {
 				System.out.println("new file changes:\n" + coloredFilesDiff);
 
 				if (isApproved("replace file?: ")) {
-					sshClient.uploadFile(newFileLocalPath, defaultRemoteDir, server);
+					sshClient.uploadFile(newFileLocalPath, defaultRemoteDir, sshServer);
 					System.out.println("new file uploaded!");
 				}
 
@@ -62,7 +66,7 @@ public class DockerService {
 			} catch (SshNotFountFileException e) {
 				System.out.println("remote file doesn't exists");
 				if (isApproved("create remote file?: ")) {
-					sshClient.uploadFile(newFileLocalPath, defaultRemoteDir, server);
+					sshClient.uploadFile(newFileLocalPath, defaultRemoteDir, sshServer);
 					System.out.println("remote file updated!");
 				}
 			} catch (IOException e) {
