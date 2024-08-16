@@ -21,7 +21,10 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static art.aelaort.models.build.BuildType.java_docker;
@@ -212,6 +215,12 @@ public class BuildService {
 			}
 		}
 		return false;
+	}
+
+	public Map<Integer, Job> getJobs() {
+		return externalUtilities.readBuildConfig()
+				.stream()
+				.collect(Collectors.toMap(Job::getId, Function.identity()));
 	}
 
 	public Job getJobById(int id) {
