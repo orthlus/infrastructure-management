@@ -32,6 +32,8 @@ public class ServersManagementService {
 	private String projectsYmlFileName;
 	@Value("${servers.management.json_path}")
 	private String jsonDataPath;
+	@Value("${servers.management.docker.image.pattern}")
+	private String dockerImagePattern;
 
 	public void saveIps(List<Server> servers) {
 		String text = servers.stream()
@@ -117,18 +119,37 @@ public class ServersManagementService {
 
 		Map<String, Object> load = yaml.load(content);
 		Map<String, Object> services = (Map<String, Object>) load.get("services");
-		List<ServiceDto> resultServices = new ArrayList<>();
-		for (Map.Entry<String, Object> service : services.entrySet()) {
-			String serviceName = service.getKey();
-			Map<String, Object> params = (Map<String, Object>) service.getValue();
-			if (params.containsKey("container_name")) {
-				String containerName = (String) params.get("container_name");
-				resultServices.add(new ServiceDto(containerName, ymlFile.getFileName().toString(), serviceName));
-			} else {
-				resultServices.add(new ServiceDto(serviceName, ymlFile.getFileName().toString()));
-			}
-		}
+
+		List<ServiceDto> resultServices = services.entrySet()
+				.stream()
+				.map(service -> getServiceDto(ymlFile, service))
+				.toList();
+
 		return new DirServer(serverDir.getFileName().toString(), monitoring, resultServices);
+	}
+
+	@SuppressWarnings("unchecked")
+	private ServiceDto getServiceDto(Path ymlFile, Map.Entry<String, Object> service) {
+		String serviceName = service.getKey();
+		Map<String, Object> params = (Map<String, Object>) service.getValue();
+
+		ServiceDto serviceDto;
+		if (params.containsKey("container_name")) {
+			String containerName = (String) params.get("container_name");
+			serviceDto = new ServiceDto(containerName, ymlFile.getFileName().toString(), serviceName);
+		} else {
+			serviceDto = new ServiceDto(serviceName, ymlFile.getFileName().toString());
+		}
+
+		if (params.containsKey("image")) {
+			String[] split = dockerImagePattern.split("%%");
+			String image = ((String) params.get("image"))
+					.replace(split[0], "")
+					.replace(split[1], "");
+			serviceDto.setDockerImageName(image);
+		}
+
+		return serviceDto;
 	}
 
 	private String readFile(Path ymlFile) {
