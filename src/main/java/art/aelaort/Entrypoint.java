@@ -24,7 +24,7 @@ import static java.lang.Integer.parseInt;
 public class Entrypoint implements CommandLineRunner {
 	private final TabbyService tabbyService;
 	private final ServersManagementService serversManagementService;
-	private final DataService dataService;
+	private final JoinDataService joinDataService;
 	private final StringFormattingService stringFormattingService;
 	private final ExternalUtilities externalUtilities;
 	private final DockerService dockerService;
@@ -140,7 +140,7 @@ public class Entrypoint implements CommandLineRunner {
 		List<DirServer> dirServers = serversManagementService.getDirServers();
 		tabbyService.downloadFileToLocal(false);
 		List<TabbyServer> tabbyServers = tabbyService.parseLocalFile();
-		List<Server> servers = dataService.join(dirServers, tabbyServers);
+		List<Server> servers = joinDataService.join(dirServers, tabbyServers);
 
 		stringFormattingService.printServersTableString(servers);
 		System.out.println();
@@ -151,7 +151,7 @@ public class Entrypoint implements CommandLineRunner {
 		List<DirServer> dirServers = serversManagementService.getDirServers();
 		tabbyService.downloadFileToLocal(false);
 		List<TabbyServer> tabbyServers = tabbyService.parseLocalFile();
-		List<Server> servers = dataService.join(dirServers, tabbyServers);
+		List<Server> servers = joinDataService.join(dirServers, tabbyServers);
 
 		stringFormattingService.printServersTableString(servers);
 	}
@@ -160,7 +160,7 @@ public class Entrypoint implements CommandLineRunner {
 		List<DirServer> dirServers = serversManagementService.getDirServers();
 		tabbyService.downloadFileToLocal(false);
 		List<TabbyServer> tabbyServers = tabbyService.parseLocalFile();
-		List<Server> servers = dataService.join(dirServers, tabbyServers);
+		List<Server> servers = joinDataService.join(dirServers, tabbyServers);
 
 		System.out.println(stringFormattingService.servicesByServerFullTreeString(servers));
 	}
@@ -176,7 +176,7 @@ public class Entrypoint implements CommandLineRunner {
 		List<DirServer> dirServers = serversManagementService.getDirServers();
 		tabbyService.downloadFileToLocal(true);
 		List<TabbyServer> tabbyServers = tabbyService.parseLocalFile();
-		List<Server> servers = dataService.join(dirServers, tabbyServers);
+		List<Server> servers = joinDataService.join(dirServers, tabbyServers);
 		serversManagementService.saveData(servers);
 		serversManagementService.saveIps(servers);
 		System.out.println("sync done");

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class DataService {
+public class JoinDataService {
 	public List<Server> join(List<DirServer> dirServers, List<TabbyServer> tabbyServers) {
 		Map<String, DirServer> mapServers = toMapServers(dirServers);
 		List<Server> result = new ArrayList<>(tabbyServers.size());
