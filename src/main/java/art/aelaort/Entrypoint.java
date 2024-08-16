@@ -30,6 +30,7 @@ public class Entrypoint implements CommandLineRunner {
 	private final DockerService dockerService;
 	private final BuildService buildService;
 	private final DatabaseManageService databaseManageService;
+	private final GitStatService gitStatService;
 	@Value("${docker.compose.remote.dir.default}")
 	private String dockerDefaultRemoteDir;
 
@@ -52,6 +53,7 @@ public class Entrypoint implements CommandLineRunner {
 				case "dps" -> externalUtilities.dockerPs();
 				case "db-prod-status" -> databaseManageService.remoteStatus();
 				case "db-prod-update" -> databaseManageService.remoteUpdate();
+				case "git-stat" -> gitStat(args);
 				default -> System.out.println("unknown args\n" + usage());
 			}
 		} else {
@@ -81,8 +83,18 @@ public class Entrypoint implements CommandLineRunner {
 					dblcl-down - down local postgres
 					dps - alias for 'docker ps -a'
 					db-prod-status - prod migrations status
-					db-prod-update - execute prod migrations"""
+					db-prod-update - execute prod migrations
+					git-stat - print git stat for all local repo
+						optional args: day, week, month"""
 				.formatted(dockerDefaultRemoteDir);
+	}
+
+	private void gitStat(String[] args) {
+		if (args.length < 2) {
+			System.out.println(gitStatService.readStatForDay());
+		} else {
+			System.out.println(gitStatService.readStatWithInterval(args[1]));
+		}
 	}
 
 	private void build(String[] args) {
