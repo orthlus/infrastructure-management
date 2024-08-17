@@ -18,8 +18,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
-import static java.nio.file.Path.of;
-
 @Component
 @RequiredArgsConstructor
 public class TabbyService {
@@ -29,11 +27,11 @@ public class TabbyService {
 	private final ObjectMapper yamlMapper;
 	private final TabbyMapper tabbyMapper;
 	@Value("${tabby.config.path}")
-	private String tabbyConfigPath;
+	private Path tabbyConfigPath;
 
 	public List<TabbyServer> getServersFromLocalFile() {
 		try {
-			TabbyFile tabbyFile = yamlMapper.readValue(of(tabbyConfigPath).toFile(), TabbyFile.class);
+			TabbyFile tabbyFile = yamlMapper.readValue(tabbyConfigPath.toFile(), TabbyFile.class);
 			return tabbyMapper.map(tabbyFile);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -43,7 +41,7 @@ public class TabbyService {
 	public void downloadFileToLocal(boolean logging) {
 		try {
 			String remoteFileContent = getRemoteFileContent();
-			Files.writeString(of(tabbyConfigPath), remoteFileContent);
+			Files.writeString(tabbyConfigPath, remoteFileContent);
 			if (logging) {
 				System.out.println("tabby config downloaded");
 			}
