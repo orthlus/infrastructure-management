@@ -45,11 +45,9 @@ public class DockerService {
 	public SshServer findServer(String nameOrPortOrAppNumber) {
 		try {
 			int appNumberOrPort = Integer.parseInt(nameOrPortOrAppNumber);
-			if (appNumberOrPort > 9999) {
-				return getServerByPortNumber(appNumberOrPort);
-			} else {
-				return getServerByAppNumber(appNumberOrPort);
-			}
+			return appNumberOrPort > 9999 ?
+					getServerByPortNumber(appNumberOrPort) :
+					getServerByAppNumber(appNumberOrPort);
 		} catch (NumberFormatException e) {
 			return getServerByName(nameOrPortOrAppNumber);
 		}
