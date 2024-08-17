@@ -1,7 +1,7 @@
 package art.aelaort;
 
-import art.aelaort.system.Response;
-import art.aelaort.system.SystemProcess;
+import art.aelaort.utils.system.Response;
+import art.aelaort.utils.system.SystemProcess;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

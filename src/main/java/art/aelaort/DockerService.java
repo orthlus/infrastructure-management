@@ -7,6 +7,8 @@ import art.aelaort.models.servers.ServiceDto;
 import art.aelaort.models.servers.TabbyServer;
 import art.aelaort.models.ssh.SshServer;
 import art.aelaort.ssh.SshClient;
+import art.aelaort.utils.ExternalUtilities;
+import art.aelaort.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
-import static art.aelaort.Utils.linuxResolve;
+import static art.aelaort.utils.Utils.linuxResolve;
 import static java.nio.file.Path.of;
 
 @Component

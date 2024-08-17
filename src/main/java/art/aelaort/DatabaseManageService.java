@@ -1,6 +1,6 @@
 package art.aelaort;
 
-import art.aelaort.system.SystemProcess;
+import art.aelaort.utils.system.SystemProcess;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;

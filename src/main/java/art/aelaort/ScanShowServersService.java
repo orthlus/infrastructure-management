@@ -1,6 +1,7 @@
 package art.aelaort;
 
 import art.aelaort.models.servers.Server;
+import art.aelaort.utils.ExternalUtilities;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

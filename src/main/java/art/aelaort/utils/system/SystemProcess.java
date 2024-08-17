@@ -1,4 +1,4 @@
-package art.aelaort.system;
+package art.aelaort.utils.system;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;

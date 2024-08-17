@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 
-import static art.aelaort.Utils.linuxResolve;
+import static art.aelaort.utils.Utils.linuxResolve;
 import static com.jcraft.jsch.ChannelSftp.SSH_FX_NO_SUCH_FILE;
 
 @Component
