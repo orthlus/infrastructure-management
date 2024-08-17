@@ -6,6 +6,8 @@ import art.aelaort.models.servers.ServiceDto;
 import dnl.utils.text.table.TextTable;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,7 +67,7 @@ public class StringFormattingService {
 	 * ======================================================
 	 */
 
-	public void printServersTableString(List<Server> servers) {
+	public String getServersTableString(List<Server> servers) {
 		System.out.println("servers:");
 		String[] columnNames = {
 				"name",
@@ -79,7 +81,14 @@ public class StringFormattingService {
 		Object[][] data = convertServersToArrays(servers);
 		TextTable tt = new TextTable(columnNames, data);
 		tt.setAddRowNumbering(true);
-		tt.printTable();
+		return getTableString(tt);
+	}
+
+	private String getTableString(TextTable textTable) {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		PrintStream printStream = new PrintStream(outputStream);
+		textTable.printTable(printStream, 0);
+		return outputStream.toString();
 	}
 
 	private Object[][] convertServersToArrays(List<Server> servers) {

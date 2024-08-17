@@ -142,7 +142,7 @@ public class Entrypoint implements CommandLineRunner {
 		List<TabbyServer> tabbyServers = tabbyService.parseLocalFile();
 		List<Server> servers = joinDataService.join(dirServers, tabbyServers);
 
-		stringFormattingService.printServersTableString(servers);
+		System.out.println(stringFormattingService.getServersTableString(servers));
 		System.out.println();
 		System.out.println(stringFormattingService.servicesByServerFullTreeString(servers));
 	}
@@ -153,7 +153,7 @@ public class Entrypoint implements CommandLineRunner {
 		List<TabbyServer> tabbyServers = tabbyService.parseLocalFile();
 		List<Server> servers = joinDataService.join(dirServers, tabbyServers);
 
-		stringFormattingService.printServersTableString(servers);
+		System.out.println(stringFormattingService.getServersTableString(servers));
 	}
 
 	private void scanTree() {
@@ -194,7 +194,7 @@ public class Entrypoint implements CommandLineRunner {
 	 */
 	private void show() {
 		List<Server> servers = serversManagementService.readLocalJsonData();
-		stringFormattingService.printServersTableString(servers);
+		System.out.println(stringFormattingService.getServersTableString(servers));
 		System.out.println();
 		System.out.println(stringFormattingService.servicesByServerFullTreeString(servers));
 	}
@@ -206,6 +206,6 @@ public class Entrypoint implements CommandLineRunner {
 
 	private void showTable() {
 		List<Server> servers = serversManagementService.readLocalJsonData();
-		stringFormattingService.printServersTableString(servers);
+		System.out.println(stringFormattingService.getServersTableString(servers));
 	}
 }
