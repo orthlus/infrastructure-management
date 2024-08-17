@@ -39,8 +39,7 @@ public class DockerService {
 
 	public void uploadDockerFile(TabbyServer server) {
 		try {
-			Path newFileLocalPath = resolveDockerFileLocalPath(server);
-			SshServer sshServer = dockerMapper.map(server);
+			Path newFileLocalPath = resolveDockerFileLocalPath(sshServer.serverDirName());
 
 			try {
 				validateDockerComposeFile(newFileLocalPath);
@@ -49,7 +48,7 @@ public class DockerService {
 
 				sshClient.downloadFile(linuxResolve(defaultRemoteDir, defaultRemoteFilename), oldFilePath, sshServer);
 
-				System.out.printf("processing update docker compose on server '%s'%n", server.name());
+				System.out.printf("processing update docker compose on server '%s'%n", sshServer.serverDirName());
 
 				String coloredFilesDiff = fileDiffService.getColoredFilesDiff(oldFilePath, newFileLocalPath);
 				System.out.println("new file changes:\n" + coloredFilesDiff);
@@ -93,8 +92,8 @@ public class DockerService {
 		return answer.equals("y");
 	}
 
-	private Path resolveDockerFileLocalPath(TabbyServer tabbyServer) {
-		Path dir = of(serversDir).resolve(tabbyServer.name());
+	private Path resolveDockerFileLocalPath(String dirName) {
+		Path dir = of(serversDir).resolve(dirName);
 		Path defaultFile = dir.resolve(defaultRemoteFilename);
 
 		if (Files.notExists(defaultFile)) {
