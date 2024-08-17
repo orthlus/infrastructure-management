@@ -14,8 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 import static java.lang.Integer.parseInt;
 
 @RegisterReflectionForBinding({Job.class, Server.class})
@@ -31,6 +29,7 @@ public class Entrypoint implements CommandLineRunner {
 	private final BuildService buildService;
 	private final DatabaseManageService databaseManageService;
 	private final GitStatService gitStatService;
+	private final ScanShowServersService scanShow;
 	@Value("${docker.compose.remote.dir.default}")
 	private String dockerDefaultRemoteDir;
 
@@ -38,14 +37,14 @@ public class Entrypoint implements CommandLineRunner {
 	public void run(String... args) {
 		if (args.length >= 1) {
 			switch (args[0]) {
-				case "show" -> show();
-				case "tbl-show" -> showTable();
-				case "yml-show" -> showTree();
-				case "sync" -> sync();
-				case "sync-all" -> syncAll();
-				case "scan" -> scan();
-				case "tbl-scan" -> scanTable();
-				case "yml-scan" -> scanTree();
+				case "show" -> scanShow.show();
+				case "tbl-show" -> scanShow.showTable();
+				case "yml-show" -> scanShow.showTree();
+				case "sync" -> scanShow.sync();
+				case "sync-all" -> scanShow.syncAll();
+				case "scan" -> scanShow.scan();
+				case "tbl-scan" -> scanShow.scanTable();
+				case "yml-scan" -> scanShow.scanTree();
 				case "docker" -> dockerUpload(args);
 				case "build" -> build(args);
 				case "dblcl" -> databaseManageService.localUp();
@@ -128,84 +127,5 @@ public class Entrypoint implements CommandLineRunner {
 			System.out.println(usage());
 			System.exit(1);
 		}
-	}
-
-	/*
-	 * scan dirs
-	 * download tabby
-	 * scan tabby
-	 * print
-	 */
-	private void scan() {
-		List<DirServer> dirServers = serversManagementService.getDirServers();
-		tabbyService.downloadFileToLocal(false);
-		List<TabbyServer> tabbyServers = tabbyService.parseLocalFile();
-		List<Server> servers = joinDataService.join(dirServers, tabbyServers);
-
-		System.out.println(stringFormattingService.getServersTableString(servers));
-		System.out.println();
-		System.out.println(stringFormattingService.servicesByServerFullTreeString(servers));
-	}
-
-	private void scanTable() {
-		List<DirServer> dirServers = serversManagementService.getDirServers();
-		tabbyService.downloadFileToLocal(false);
-		List<TabbyServer> tabbyServers = tabbyService.parseLocalFile();
-		List<Server> servers = joinDataService.join(dirServers, tabbyServers);
-
-		System.out.println(stringFormattingService.getServersTableString(servers));
-	}
-
-	private void scanTree() {
-		List<DirServer> dirServers = serversManagementService.getDirServers();
-		tabbyService.downloadFileToLocal(false);
-		List<TabbyServer> tabbyServers = tabbyService.parseLocalFile();
-		List<Server> servers = joinDataService.join(dirServers, tabbyServers);
-
-		System.out.println(stringFormattingService.servicesByServerFullTreeString(servers));
-	}
-
-	/*
-	 * download tabby
-	 * generate json
-	 * save data to local
-	 * save data to s3
-	 * save ips to s3
-	 */
-	private void sync() {
-		List<DirServer> dirServers = serversManagementService.getDirServers();
-		tabbyService.downloadFileToLocal(true);
-		List<TabbyServer> tabbyServers = tabbyService.parseLocalFile();
-		List<Server> servers = joinDataService.join(dirServers, tabbyServers);
-		serversManagementService.saveData(servers);
-		serversManagementService.saveIps(servers);
-		System.out.println("sync done");
-	}
-
-	private void syncAll() {
-		sync();
-		externalUtilities.ydSync();
-	}
-
-	/*
-	 * read local json
-	 * print table
-	 * print tree
-	 */
-	private void show() {
-		List<Server> servers = serversManagementService.readLocalJsonData();
-		System.out.println(stringFormattingService.getServersTableString(servers));
-		System.out.println();
-		System.out.println(stringFormattingService.servicesByServerFullTreeString(servers));
-	}
-
-	private void showTree() {
-		List<Server> servers = serversManagementService.readLocalJsonData();
-		System.out.println(stringFormattingService.servicesByServerFullTreeString(servers));
-	}
-
-	private void showTable() {
-		List<Server> servers = serversManagementService.readLocalJsonData();
-		System.out.println(stringFormattingService.getServersTableString(servers));
 	}
 }
