@@ -4,6 +4,7 @@ import art.aelaort.models.servers.DirServer;
 import art.aelaort.models.servers.Server;
 import art.aelaort.models.servers.ServiceDto;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
@@ -152,34 +153,25 @@ public class ServersManagementService {
 		return serviceDto;
 	}
 
+	@SneakyThrows
 	private String readFile(Path ymlFile) {
-		try {
-			return Files.readString(ymlFile);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		return Files.readString(ymlFile);
 	}
 
+	@SneakyThrows
 	private List<Path> findYmlFiles(Path dir) {
-		try {
-			return Files.walk(dir, 1)
-					.filter(path -> path.getFileName().toString().toLowerCase().endsWith(".yml"))
-					.toList();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		return Files.walk(dir, 1)
+				.filter(path -> path.getFileName().toString().toLowerCase().endsWith(".yml"))
+				.toList();
 	}
 
+	@SneakyThrows
 	public List<Path> getServersDirs() {
-		try {
-			Path dir = Path.of(serversDir);
-			return Files.walk(dir, 1)
-					.filter(path -> !path.equals(dir))
-					.filter(path -> path.toFile().isDirectory())
-					.filter(path -> !path.resolve(notScanFile).toFile().exists())
-					.toList();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		Path dir = Path.of(serversDir);
+		return Files.walk(dir, 1)
+				.filter(path -> !path.equals(dir))
+				.filter(path -> path.toFile().isDirectory())
+				.filter(path -> !path.resolve(notScanFile).toFile().exists())
+				.toList();
 	}
 }
