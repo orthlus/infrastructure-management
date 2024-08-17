@@ -17,7 +17,7 @@ import java.util.Set;
 public class GitStatService {
 	private final SystemProcess systemProcess;
 	@Value("${build.main.src.dir}")
-	private String srcRootDir;
+	private Path srcRootDir;
 
 	public String readStatWithInterval(String interval) {
 		if (Set.of("day", "week", "month", "year").contains(interval)) {
@@ -33,7 +33,7 @@ public class GitStatService {
 
 	private String readStat(String interval) {
 		try {
-			List<Path> dirs = Files.walk(Path.of(srcRootDir), 2)
+			List<Path> dirs = Files.walk(srcRootDir, 2)
 					.filter(path -> path.toFile().isDirectory())
 					.filter(path -> path.resolve(".git").toFile().exists())
 					.toList();
