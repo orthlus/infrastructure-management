@@ -4,13 +4,17 @@ import art.aelaort.models.servers.DirServer;
 import art.aelaort.models.servers.Server;
 import art.aelaort.models.servers.ServiceDto;
 import art.aelaort.models.servers.TabbyServer;
+import art.aelaort.models.servers.yaml.CustomFile;
+import art.aelaort.models.servers.yaml.DockerComposeFile;
 import art.aelaort.s3.ServersManagementS3;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.yaml.snakeyaml.Yaml;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -21,11 +25,11 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class ServersManagementService {
-	private final Yaml yaml;
 	private final ServersManagementS3 serversManagementS3;
 	private final SerializeService serializeService;
 	private final ServerJoiner serverJoiner;
 	private final TabbyService tabbyService;
+	private final ObjectMapper yamlMapper;
 	@Value("${servers.management.dir}")
 	private String serversDir;
 	@Value("${servers.management.files.monitoring}")
@@ -38,6 +42,12 @@ public class ServersManagementService {
 	private String jsonDataPath;
 	@Value("${servers.management.docker.image.pattern}")
 	private String dockerImagePattern;
+	private String[] dockerImagePatternSplit;
+
+	@PostConstruct
+	private void init() {
+		dockerImagePatternSplit = dockerImagePattern.split("%%");
+	}
 
 	public void saveIps(List<Server> servers) {
 		String text = servers.stream()
@@ -95,70 +105,74 @@ public class ServersManagementService {
 		return result;
 	}
 
-	@SuppressWarnings("unchecked")
 	private DirServer parseCustomYmlFile(Path ymlFile) {
-		Path serverDir = ymlFile.getParent();
-		boolean monitoring = serverDir.resolve(monitoringFile).toFile().exists();
-		String content = readFile(ymlFile);
-
-		Map<String, Object> load = yaml.load(content);
-		List<String> projects = (List<String>) load.get("projects");
-		List<ServiceDto> services = new ArrayList<>();
-		for (String project : projects) {
-			services.add(new ServiceDto(project, ymlFile.getFileName().toString()));
+		try {
+			Path serverDir = ymlFile.getParent();
+			boolean monitoring = serverDir.resolve(monitoringFile).toFile().exists();
+			List<String> projects = yamlMapper.readValue(ymlFile.toFile(), CustomFile.class).getProjects();
+			List<ServiceDto> services = new ArrayList<>();
+			for (String project : projects) {
+				services.add(ServiceDto.builder()
+						.service(project)
+						.ymlName(ymlFile.getFileName().toString())
+						.build());
+			}
+			return new DirServer(serverDir.getFileName().toString(), monitoring, services);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
-		return new DirServer(serverDir.getFileName().toString(), monitoring, services);
 	}
 
-	@SuppressWarnings("unchecked")
 	private DirServer parseDockerYmlFile(Path ymlFile) {
-		Path serverDir = ymlFile.getParent();
-		boolean monitoring = serverDir.resolve(monitoringFile).toFile().exists();
-		String content = readFile(ymlFile);
+		try {
+			Path serverDir = ymlFile.getParent();
+			boolean monitoring = serverDir.resolve(monitoringFile).toFile().exists();
 
-		Map<String, Object> load = yaml.load(content);
-		Map<String, Object> services = (Map<String, Object>) load.get("services");
+			DockerComposeFile file = yamlMapper.readValue(ymlFile.toFile(), DockerComposeFile.class);
 
-		List<ServiceDto> resultServices = services.entrySet()
-				.stream()
-				.map(service -> getServiceDto(ymlFile, service))
-				.toList();
+			List<ServiceDto> resultServices = new ArrayList<>();
+			for (Map.Entry<String, DockerComposeFile.Service> entry : file.getServices().entrySet()) {
+				resultServices.add(getServiceDto(ymlFile, entry));
+			}
 
-		return new DirServer(serverDir.getFileName().toString(), monitoring, resultServices);
+			return new DirServer(serverDir.getFileName().toString(), monitoring, resultServices);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private ServiceDto getServiceDto(Path ymlFile, Map.Entry<String, Object> service) {
-		String serviceName = service.getKey();
-		Map<String, Object> params = (Map<String, Object>) service.getValue();
+	private ServiceDto getServiceDto(Path ymlFile, Map.Entry<String, DockerComposeFile.Service> entry) {
+		String serviceName = entry.getKey();
+		DockerComposeFile.Service service = entry.getValue();
+		ServiceDto.ServiceDtoBuilder serviceDtoBuilder = ServiceDto.builder()
+				.ymlName(ymlFile.getFileName().toString());
 
-		ServiceDto serviceDto;
-		if (params.containsKey("container_name")) {
-			String containerName = (String) params.get("container_name");
-			serviceDto = new ServiceDto(containerName, ymlFile.getFileName().toString(), serviceName);
+		String containerName = service.getContainerName();
+		if (containerName != null) {
+			serviceDtoBuilder
+					.service(containerName)
+					.dockerName(serviceName);
 		} else {
-			serviceDto = new ServiceDto(serviceName, ymlFile.getFileName().toString());
+			serviceDtoBuilder.service(serviceName);
 		}
 
-		if (params.containsKey("image")) {
-			String[] split = dockerImagePattern.split("%%");
-			String image = ((String) params.get("image"))
-					.replace(split[0], "")
-					.replace(split[1], "");
-			serviceDto.setDockerImageName(image);
+		String image = service.getImage();
+		if (image != null) {
+			serviceDtoBuilder.dockerImageName(dockerImageClean(image));
 		}
 
-		return serviceDto;
+		return serviceDtoBuilder.build();
+	}
+
+	private String dockerImageClean(String dockerImage) {
+		return dockerImage
+				.replace(dockerImagePatternSplit[0], "")
+				.replace(dockerImagePatternSplit[1], "");
 	}
 
 	@SneakyThrows
 	public void saveJsonToLocal(String jsonStr) {
 		Files.writeString(Path.of(jsonDataPath), jsonStr);
-	}
-
-	@SneakyThrows
-	private String readFile(Path ymlFile) {
-		return Files.readString(ymlFile);
 	}
 
 	@SneakyThrows
