@@ -2,11 +2,11 @@ package art.aelaort;
 
 import art.aelaort.exceptions.*;
 import art.aelaort.mappers.DockerMapper;
-import art.aelaort.models.build.Job;
 import art.aelaort.models.servers.Server;
 import art.aelaort.models.servers.ServiceDto;
 import art.aelaort.models.servers.TabbyServer;
 import art.aelaort.models.ssh.SshServer;
+import art.aelaort.ssh.SshClient;
 import art.aelaort.system.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 import static art.aelaort.Utils.linuxResolve;

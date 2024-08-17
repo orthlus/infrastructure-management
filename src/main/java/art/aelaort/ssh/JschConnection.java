@@ -1,4 +1,4 @@
-package art.aelaort;
+package art.aelaort.ssh;
 
 import art.aelaort.models.ssh.SshServer;
 import com.jcraft.jsch.ChannelSftp;
