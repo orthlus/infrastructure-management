@@ -1,4 +1,4 @@
-package art.aelaort;
+package art.aelaort.s3;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;

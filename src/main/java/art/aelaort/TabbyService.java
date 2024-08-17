@@ -1,6 +1,7 @@
 package art.aelaort;
 
 import art.aelaort.models.servers.TabbyServer;
+import art.aelaort.s3.TabbyS3;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
