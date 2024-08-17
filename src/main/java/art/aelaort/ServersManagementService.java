@@ -50,47 +50,35 @@ public class ServersManagementService {
 	}
 
 	public void saveData(List<Server> servers) {
-		try {
-			String json = serializeService.toJson(servers);
-			Files.writeString(Path.of(jsonDataPath), json);
-			System.out.println("saved data to local");
-			serversManagementS3.uploadData(json);
-			System.out.println("saved data to s3");
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public void uploadDataToS3(String json) {
+		String json = serializeService.toJson(servers);
+		saveJsonToLocal(json);
+		System.out.println("saved data to local");
 		serversManagementS3.uploadData(json);
+		System.out.println("saved data to s3");
 	}
 
+	@SneakyThrows
 	public List<Server> readLocalJsonData() {
-		try {
-			String json = Files.readString(Path.of(jsonDataPath));
-			return serializeService.serversParse(json);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		String json = Files.readString(Path.of(jsonDataPath));
+		return serializeService.serversParse(json);
 	}
 
-	public void saveJsonToLocal(String jsonStr) {
-		try {
-			Files.writeString(Path.of(jsonDataPath), jsonStr);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public List<Server> scanAndJoinData(boolean logging) {
-		List<DirServer> dirServers = getDirServers();
+	public List<Server> syncData(boolean logging) {
+		List<DirServer> dirServers = scanLocalFilesInServersDir();
 		tabbyService.downloadFileToLocal(logging);
 		List<TabbyServer> tabbyServers = tabbyService.getServersFromLocalFile();
 		return serverJoiner.join(dirServers, tabbyServers);
 	}
 
-	public List<DirServer> getDirServers() {
-		List<Path> serversDirs = getServersDirs();
+	public List<Server> scanAndJoinData(boolean logging) {
+		List<DirServer> dirServers = scanLocalFilesInServersDir();
+		tabbyService.downloadFileToLocal(logging);
+		List<TabbyServer> tabbyServers = tabbyService.getServersFromLocalFile();
+		return serverJoiner.join(dirServers, tabbyServers);
+	}
+
+	public List<DirServer> scanLocalFilesInServersDir() {
+		List<Path> serversDirs = scanLocalDirs();
 		List<DirServer> result = new ArrayList<>(serversDirs.size() * 2);
 
 		for (Path serverDir : serversDirs) {
@@ -164,6 +152,11 @@ public class ServersManagementService {
 	}
 
 	@SneakyThrows
+	public void saveJsonToLocal(String jsonStr) {
+		Files.writeString(Path.of(jsonDataPath), jsonStr);
+	}
+
+	@SneakyThrows
 	private String readFile(Path ymlFile) {
 		return Files.readString(ymlFile);
 	}
@@ -176,7 +169,7 @@ public class ServersManagementService {
 	}
 
 	@SneakyThrows
-	public List<Path> getServersDirs() {
+	public List<Path> scanLocalDirs() {
 		Path dir = Path.of(serversDir);
 		return Files.walk(dir, 1)
 				.filter(path -> !path.equals(dir))

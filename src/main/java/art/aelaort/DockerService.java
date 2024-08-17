@@ -55,10 +55,7 @@ public class DockerService {
 	}
 
 	private SshServer getServerByAppNumber(int appNumber) {
-		Map<Integer, Job> jobs = buildService.getJobsById();
-		String jobName = jobs.get(appNumber).getName();
-
-
+		String jobName = buildService.getJobsById().get(appNumber).getName();
 		List<Server> servers = serversManagementService.scanAndJoinData(false);
 		for (Server server : servers) {
 			for (ServiceDto service : server.getServices()) {
@@ -68,12 +65,12 @@ public class DockerService {
 				}
 			}
 		}
-
 		throw new ServerNotFoundException();
 	}
 
 	private SshServer getServerByPortNumber(int port) {
-		List<TabbyServer> list = tabbyService.getServersFromLocalFile().stream()
+		List<TabbyServer> list = tabbyService.getServersFromLocalFile()
+				.stream()
 				.filter(s -> s.port() == port)
 				.toList();
 		return switch (list.size()) {
@@ -84,7 +81,8 @@ public class DockerService {
 	}
 
 	private SshServer getServerByName(String name) {
-		return tabbyService.getServersFromLocalFile().stream()
+		return tabbyService.getServersFromLocalFile()
+				.stream()
 				.filter(s -> s.name().equals(name))
 				.map(dockerMapper::map)
 				.findFirst()
