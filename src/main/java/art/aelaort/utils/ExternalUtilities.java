@@ -21,6 +21,8 @@ public class ExternalUtilities {
 	private String buildConfigBin;
 	@Value("${build.data.config.converter.path}")
 	private String buildConfigConverterPath;
+	@Value("${proxy.socks5.docker_compose.path}")
+	private String proxyDockerCompose;
 
 	public void dockerPs() {
 		systemProcess.callProcessInheritIO("docker ps -a");
@@ -62,5 +64,13 @@ public class ExternalUtilities {
 		if (response.exitCode() != 0) {
 			throw new RuntimeException("tabbyDecode \n%s\n%s".formatted(response.stderr(), response.stdout()));
 		}
+	}
+
+	public void proxyUp() {
+		systemProcess.callProcessInheritIO("docker compose -f %s up -d".formatted(proxyDockerCompose));
+	}
+
+	public void proxyDown() {
+		systemProcess.callProcessInheritIO("docker compose -f %s down".formatted(proxyDockerCompose));
 	}
 }

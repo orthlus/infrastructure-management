@@ -49,6 +49,8 @@ public class Entrypoint implements CommandLineRunner {
 				case "db-prod-status" -> databaseManageService.remoteStatus();
 				case "db-prod-update" -> databaseManageService.remoteUpdate();
 				case "git-stat" -> gitStat(args);
+				case "proxy" -> externalUtilities.proxyUp();
+				case "proxy-d" -> externalUtilities.proxyDown();
 				default -> System.out.println("unknown args\n" + usage());
 			}
 		} else {
@@ -80,7 +82,9 @@ public class Entrypoint implements CommandLineRunner {
 					db-prod-status - prod migrations status
 					db-prod-update - execute prod migrations
 					git-stat - print git stat for all local repo
-						optional args: day, week, month"""
+						optional args: day, week, month
+					prox - start socks5 proxy
+					prox-d - stop socks5 proxy"""
 				.formatted(dockerDefaultRemoteDir);
 	}
 
