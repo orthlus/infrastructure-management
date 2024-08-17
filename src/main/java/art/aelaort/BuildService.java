@@ -5,6 +5,7 @@ import art.aelaort.exceptions.TooManyDockerFilesException;
 import art.aelaort.models.build.BuildType;
 import art.aelaort.models.build.Job;
 import art.aelaort.system.SystemProcess;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -21,6 +22,8 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.function.Function;
@@ -39,6 +42,7 @@ public class BuildService {
 	private final ExternalUtilities externalUtilities;
 	private final Utils utils;
 	private final SystemProcess systemProcess;
+	private final ObjectMapper jackson;
 	@Value("${build.data.config.path}")
 	private String buildConfigPath;
 	@Value("${build.main.dir.secrets_dir}")
@@ -217,18 +221,25 @@ public class BuildService {
 		return false;
 	}
 
-	public Map<Integer, Job> getJobsById() {
-		return externalUtilities.readBuildConfig()
+	public Map<Integer, Job> getJobsMapById() {
+		return readBuildConfig()
 				.stream()
 				.collect(Collectors.toMap(Job::getId, Function.identity()));
 	}
 
 	public Job getJobById(int id) {
-		return externalUtilities.readBuildConfig()
+		return readBuildConfig()
 				.stream()
 				.filter(job -> job.getId() == id)
 				.findFirst()
 				.orElseThrow(BuildJobNotFoundException::new);
+	}
+
+	@SneakyThrows
+	private List<Job> readBuildConfig() {
+		String jobsStr = externalUtilities.readBuildConfig();
+		Job[] jobs = jackson.readValue(jobsStr, Job[].class);
+		return Arrays.asList(jobs);
 	}
 
 	public void printConfig() {

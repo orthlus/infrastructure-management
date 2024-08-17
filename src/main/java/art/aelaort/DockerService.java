@@ -7,7 +7,6 @@ import art.aelaort.models.servers.ServiceDto;
 import art.aelaort.models.servers.TabbyServer;
 import art.aelaort.models.ssh.SshServer;
 import art.aelaort.ssh.SshClient;
-import art.aelaort.system.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 import static art.aelaort.Utils.linuxResolve;
@@ -54,7 +54,7 @@ public class DockerService {
 	}
 
 	private SshServer getServerByAppNumber(int appNumber) {
-		String jobName = buildService.getJobsById().get(appNumber).getName();
+		String jobName = buildService.getJobsMapById().get(appNumber).getName();
 		List<Server> servers = serversManagementService.scanAndJoinData(false);
 		for (Server server : servers) {
 			for (ServiceDto service : server.getServices()) {
@@ -111,8 +111,7 @@ public class DockerService {
 
 				Files.deleteIfExists(oldFilePath);
 			} catch (DockerComposeValidationFailedException e) {
-				Response r = e.getResponse();
-				System.out.printf("docker compose file - failed validation:%n%s", r.stderr());
+				System.out.printf("docker compose file - failed validation:%n%s", e.getStderr());
 			} catch (SshNotFountFileException e) {
 				System.out.println("remote file doesn't exists");
 				if (isApproved("create remote file?: ")) {
@@ -130,7 +129,10 @@ public class DockerService {
 	}
 
 	private void validateDockerComposeFile(Path newFileLocalPath) throws DockerComposeValidationFailedException {
-		externalUtilities.dockerComposeValidate(newFileLocalPath);
+		Optional<String> optionalS = externalUtilities.dockerComposeValidate(newFileLocalPath);
+		if (optionalS.isPresent()) {
+			throw new DockerComposeValidationFailedException(optionalS.get());
+		}
 	}
 
 	private boolean isApproved(String text) {

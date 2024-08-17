@@ -1,25 +1,18 @@
 package art.aelaort;
 
-import art.aelaort.exceptions.DockerComposeValidationFailedException;
-import art.aelaort.exceptions.ReadingBuildConfigException;
-import art.aelaort.models.build.Job;
 import art.aelaort.system.Response;
 import art.aelaort.system.SystemProcess;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class ExternalUtilities {
 	private final SystemProcess systemProcess;
-	private final ObjectMapper jackson;
 	@Value("${tabby.decode.script.bin}")
 	private String tabbyDecodeScriptBin;
 	@Value("${tabby.decode.script.file}")
@@ -33,29 +26,19 @@ public class ExternalUtilities {
 		systemProcess.callProcessInheritIO("docker ps -a");
 	}
 
-	public List<Job> readBuildConfig() {
+	public String readBuildConfig() {
 		Response response = systemProcess.callProcess(buildConfigBin, buildConfigConverterPath);
-
-		try {
-			if (response.exitCode() == 0) {
-				String jsonStr = response.stdout();
-				Job[] jobs = jackson.readValue(jsonStr, Job[].class);
-				return Arrays.asList(jobs);
-			} else {
-				throw new ReadingBuildConfigException();
-			}
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e);
+		if (response.exitCode() == 0) {
+			return response.stdout();
 		}
+		throw new RuntimeException(response.stderr());
 	}
 
-	public void dockerComposeValidate(Path file) {
+	public Optional<String> dockerComposeValidate(Path file) {
 		String command = "docker compose -f %s config -q".formatted(file.toString());
 		Response response = systemProcess.callProcess(command);
 
-		if (response.exitCode() != 0) {
-			throw new DockerComposeValidationFailedException(response);
-		}
+		return response.exitCode() == 0 ? Optional.empty() : Optional.of(response.stderr());
 	}
 
 	public void ydSync() {
