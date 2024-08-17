@@ -1,13 +1,12 @@
 package art.aelaort;
 
 import art.aelaort.exceptions.BuildJobNotFoundException;
-import art.aelaort.exceptions.TabbyServerByPortTooManyServersException;
-import art.aelaort.exceptions.TabbyServerNotFoundException;
+import art.aelaort.exceptions.ServerByPortTooManyServersException;
+import art.aelaort.exceptions.ServerNotFoundException;
 import art.aelaort.exceptions.TooManyDockerFilesException;
 import art.aelaort.models.build.Job;
-import art.aelaort.models.servers.DirServer;
 import art.aelaort.models.servers.Server;
-import art.aelaort.models.servers.TabbyServer;
+import art.aelaort.models.ssh.SshServer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,10 +19,6 @@ import static java.lang.Integer.parseInt;
 @Component
 @RequiredArgsConstructor
 public class Entrypoint implements CommandLineRunner {
-	private final TabbyService tabbyService;
-	private final ServersManagementService serversManagementService;
-	private final JoinDataService joinDataService;
-	private final StringFormattingService stringFormattingService;
 	private final ExternalUtilities externalUtilities;
 	private final DockerService dockerService;
 	private final BuildService buildService;
@@ -115,11 +110,11 @@ public class Entrypoint implements CommandLineRunner {
 	private void dockerUpload(String[] args) {
 		if (args.length >= 2) {
 			try {
-				TabbyServer server = tabbyService.findTabbyServer(args[1]);
-				dockerService.uploadDockerFile(server);
-			} catch (TabbyServerNotFoundException e) {
-				System.out.println("server don't found");
-			} catch (TabbyServerByPortTooManyServersException e) {
+				SshServer sshServer = dockerService.findServer(args[1]);
+				dockerService.uploadDockerFile(sshServer);
+			} catch (ServerNotFoundException e) {
+				System.out.println("server not found");
+			} catch (ServerByPortTooManyServersException e) {
 				System.out.println("too many servers found, need more uniq param or fix data");
 			}
 		} else {

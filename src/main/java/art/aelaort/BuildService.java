@@ -217,7 +217,7 @@ public class BuildService {
 		return false;
 	}
 
-	public Map<Integer, Job> getJobs() {
+	public Map<Integer, Job> getJobsById() {
 		return externalUtilities.readBuildConfig()
 				.stream()
 				.collect(Collectors.toMap(Job::getId, Function.identity()));

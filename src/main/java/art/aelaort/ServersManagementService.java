@@ -3,6 +3,7 @@ package art.aelaort;
 import art.aelaort.models.servers.DirServer;
 import art.aelaort.models.servers.Server;
 import art.aelaort.models.servers.ServiceDto;
+import art.aelaort.models.servers.TabbyServer;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +24,8 @@ public class ServersManagementService {
 	private final Yaml yaml;
 	private final ServersManagementS3 serversManagementS3;
 	private final SerializeService serializeService;
+	private final ServerJoiner serverJoiner;
+	private final TabbyService tabbyService;
 	@Value("${servers.management.dir}")
 	private String serversDir;
 	@Value("${servers.management.files.monitoring}")
@@ -77,6 +80,13 @@ public class ServersManagementService {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public List<Server> scanAndJoinData(boolean logging) {
+		List<DirServer> dirServers = getDirServers();
+		tabbyService.downloadFileToLocal(logging);
+		List<TabbyServer> tabbyServers = tabbyService.getServersFromLocalFile();
+		return serverJoiner.join(dirServers, tabbyServers);
 	}
 
 	public List<DirServer> getDirServers() {

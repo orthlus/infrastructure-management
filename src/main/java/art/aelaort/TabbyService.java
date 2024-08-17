@@ -1,7 +1,5 @@
 package art.aelaort;
 
-import art.aelaort.exceptions.TabbyServerByPortTooManyServersException;
-import art.aelaort.exceptions.TabbyServerNotFoundException;
 import art.aelaort.models.servers.TabbyServer;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
@@ -30,40 +28,7 @@ public class TabbyService {
 
 	private final Yaml yaml;
 
-	public String getKeyFullPath(TabbyServer tabbyServer) {
-		return tabbyConfigRsaFilePrefix
-				.replace("file://", "")
-				.replaceAll("\\\\", "/")
-				+ tabbyServer.keyPath();
-	}
-
-	public TabbyServer findTabbyServer(String nameOrPort) {
-		try {
-			return getServerByPortNumber(Integer.parseInt(nameOrPort));
-		} catch (NumberFormatException e) {
-			return getServerByName(nameOrPort);
-		}
-	}
-
-	public TabbyServer getServerByPortNumber(int port) {
-		List<TabbyServer> list = parseLocalFile().stream()
-				.filter(s -> s.port() == port)
-				.toList();
-		return switch (list.size()) {
-			case 0 -> throw new TabbyServerNotFoundException();
-			case 1 -> list.get(0);
-			default -> throw new TabbyServerByPortTooManyServersException();
-		};
-	}
-
-	public TabbyServer getServerByName(String name) {
-		return parseLocalFile().stream()
-				.filter(s -> s.name().equals(name))
-				.findFirst()
-				.orElseThrow(TabbyServerNotFoundException::new);
-	}
-
-	public List<TabbyServer> parseLocalFile() {
+	public List<TabbyServer> getServersFromLocalFile() {
 		try {
 			String content = Files.readString(Path.of(tabbyConfigPath));
 			return parse(content);
