@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 		art.aelaort.models.servers.yaml.TabbyFile.class,
 		art.aelaort.models.servers.yaml.CustomFile.class,
 		art.aelaort.models.servers.yaml.DockerComposeFile.class,
+		com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.class,
 })
 public class ReflectionConfig {
 }
