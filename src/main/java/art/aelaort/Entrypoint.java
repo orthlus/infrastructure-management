@@ -5,18 +5,15 @@ import art.aelaort.exceptions.ServerByPortTooManyServersException;
 import art.aelaort.exceptions.ServerNotFoundException;
 import art.aelaort.exceptions.TooManyDockerFilesException;
 import art.aelaort.models.build.Job;
-import art.aelaort.models.servers.Server;
 import art.aelaort.models.ssh.SshServer;
 import art.aelaort.utils.ExternalUtilities;
 import lombok.RequiredArgsConstructor;
-import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import static java.lang.Integer.parseInt;
 
-@RegisterReflectionForBinding({Job.class, Server.class})
 @Component
 @RequiredArgsConstructor
 public class Entrypoint implements CommandLineRunner {
