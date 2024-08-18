@@ -8,20 +8,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 
-import static java.nio.file.Path.of;
-
 @Component
 public class Utils {
 	@Value("${tmp.root.dir}")
-	private String tmpRootDir;
+	private Path tmpRootDir;
 
 	public Path createTmpDir() {
 		return createTmpDir(tmpRootDir);
 	}
 
-	public static Path createTmpDir(String tmpRootDir) {
+	public static Path createTmpDir(Path tmpRootDir) {
 		try {
-			Path path = of(tmpRootDir).resolve(UUID.randomUUID().toString());
+			Path path = tmpRootDir.resolve(UUID.randomUUID().toString());
 			Files.createDirectory(path);
 			return path;
 		} catch (IOException e) {

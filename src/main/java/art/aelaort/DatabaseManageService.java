@@ -9,8 +9,6 @@ import org.springframework.stereotype.Component;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
-import static java.nio.file.Path.of;
-
 @Component
 @RequiredArgsConstructor
 public class DatabaseManageService {
@@ -19,7 +17,7 @@ public class DatabaseManageService {
 	@Value("${db.local.docker_compose.path}")
 	private String dbLocalDockerComposePath;
 	@Value("${db.local.migrations.dir}")
-	private String dbLocalMigrationsDir;
+	private Path dbLocalMigrationsDir;
 	@Value("${db.local.migrations.scripts}")
 	private String[] dbLocalMigrationsScripts;
 
@@ -29,7 +27,7 @@ public class DatabaseManageService {
 	private String dbRemoteSshPort;
 
 	@Value("${db.remote.migrations.dir}")
-	private String dbRemoteMigrationsDir;
+	private Path dbRemoteMigrationsDir;
 	@Value("${db.remote.migrations.status}")
 	private String dbRemoteMigrationsStatus;
 	@Value("${db.remote.migrations.scripts}")
@@ -37,16 +35,14 @@ public class DatabaseManageService {
 
 	public void remoteStatus() {
 		sshUp();
-		Path dir = of(dbRemoteMigrationsDir);
-		systemProcess.callProcessInheritIO(dir.resolve(dbRemoteMigrationsStatus).toString(), dir);
+		systemProcess.callProcessInheritIO(dbRemoteMigrationsDir.resolve(dbRemoteMigrationsStatus).toString(), dbRemoteMigrationsDir);
 		sshDown();
 	}
 
 	public void remoteUpdate() {
 		sshUp();
-		Path dir = of(dbRemoteMigrationsDir);
 		for (String script : dbRemoteMigrationsScripts) {
-			systemProcess.callProcessInheritIO(dir.resolve(script).toString(), dir);
+			systemProcess.callProcessInheritIO(dbRemoteMigrationsDir.resolve(script).toString(), dbRemoteMigrationsDir);
 		}
 		sshDown();
 	}
@@ -66,9 +62,8 @@ public class DatabaseManageService {
 		System.out.println("PostgreSQL (5433) - started");
 
 		sleep();
-		Path dir = of(dbLocalMigrationsDir);
 		for (String script : dbLocalMigrationsScripts) {
-			systemProcess.callProcessInheritIO(dir.resolve(script).toString(), dir);
+			systemProcess.callProcessInheritIO(dbLocalMigrationsDir.resolve(script).toString(), dbLocalMigrationsDir);
 		}
 		System.out.println("Migrations - executed");
 	}

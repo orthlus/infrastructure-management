@@ -5,8 +5,8 @@ import art.aelaort.exceptions.TooManyDockerFilesException;
 import art.aelaort.models.build.BuildType;
 import art.aelaort.models.build.Job;
 import art.aelaort.utils.ExternalUtilities;
-import art.aelaort.utils.system.SystemProcess;
 import art.aelaort.utils.Utils;
+import art.aelaort.utils.system.SystemProcess;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,6 @@ import java.util.stream.Stream;
 
 import static art.aelaort.models.build.BuildType.java_docker;
 import static art.aelaort.models.build.BuildType.java_graal_local;
-import static java.nio.file.Path.of;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.chop;
 
@@ -46,15 +45,15 @@ public class BuildService {
 	private final SystemProcess systemProcess;
 	private final ObjectMapper jackson;
 	@Value("${build.data.config.path}")
-	private String buildConfigPath;
+	private Path buildConfigPath;
 	@Value("${build.main.dir.secrets_dir}")
-	private String secretsRootDir;
+	private Path secretsRootDir;
 	@Value("${build.main.src.dir}")
-	private String srcRootDir;
+	private Path srcRootDir;
 	@Value("${build.main.src.exclude.dirs}")
 	private String[] excludeDirs;
 	@Value("${build.main.default_files.dir}")
-	private String defaultFilesDir;
+	private Path defaultFilesDir;
 	@Value("${build.main.default_files.java_docker.path}")
 	private String defaultJavaDockerfilePath;
 	@Value("${build.main.docker.registry.url}")
@@ -62,7 +61,7 @@ public class BuildService {
 	@Value("${build.graalvm.artifact.name}")
 	private String graalvmArtifactName;
 	@Value("${build.main.bin.directory}")
-	private String binDirectory;
+	private Path binDirectory;
 
 	private FileFilter excludeDirsFilter;
 	private IOFileFilter dockerLookupFilter;
@@ -116,13 +115,13 @@ public class BuildService {
 	private void copyArtifactToBinDirectory(BuildType type, Path tmpDir) {
 		if (type == java_graal_local) {
 			Path srcFile = tmpDir.resolve("target").resolve(graalvmArtifactName);
-			Path destFile = of(binDirectory).resolve(graalvmArtifactName);
+			Path destFile = binDirectory.resolve(graalvmArtifactName);
 
 			try {
 				FileUtils.copyFile(srcFile.toFile(), destFile.toFile(), false);
 			} catch (Exception e) {
 				System.out.printf("error copy %s to %s, trying new name\n", srcFile, destFile);
-				Path newDestFile = of(binDirectory).resolve("new-" + graalvmArtifactName);
+				Path newDestFile = binDirectory.resolve("new-" + graalvmArtifactName);
 				try {
 					FileUtils.copyFile(srcFile.toFile(), newDestFile.toFile(), false);
 				} catch (IOException ex) {
@@ -152,7 +151,7 @@ public class BuildService {
 		try {
 			if (job.getBuildType() == java_docker) {
 				if (notExistsAnyDockerfile(tmpDir)) {
-					Path defaultFile = of(defaultFilesDir).resolve(defaultJavaDockerfilePath);
+					Path defaultFile = defaultFilesDir.resolve(defaultJavaDockerfilePath);
 					Path dest = tmpDir.resolve(defaultFile.getFileName());
 					FileUtils.copyFile(defaultFile.toFile(), dest.toFile(), false);
 				}
@@ -199,11 +198,11 @@ public class BuildService {
 
 	public Path getSrcDir(Job job) {
 		String name = job.getProjectDir() == null ? job.getName() : job.getProjectDir();
-		return of(srcRootDir).resolve(job.getSubDirectory()).resolve(name);
+		return srcRootDir.resolve(job.getSubDirectory()).resolve(name);
 	}
 
 	public void fillSecretsToTmpDir(Job job, Path tmpDir) {
-		fillSecretsToTmpDir(job, of(secretsRootDir), tmpDir);
+		fillSecretsToTmpDir(job, secretsRootDir, tmpDir);
 	}
 
 	@SneakyThrows
@@ -251,7 +250,7 @@ public class BuildService {
 	@SneakyThrows
 	public String getConfigString() {
 		return chop(chop(
-				Files.readAllLines(of(buildConfigPath))
+				Files.readAllLines(buildConfigPath)
 						.stream()
 						.skip(3)
 						.collect(joining("\n"))

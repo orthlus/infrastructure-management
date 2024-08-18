@@ -22,7 +22,6 @@ import java.util.Optional;
 import java.util.Scanner;
 
 import static art.aelaort.utils.Utils.linuxResolve;
-import static java.nio.file.Path.of;
 
 @Component
 @RequiredArgsConstructor
@@ -40,7 +39,7 @@ public class DockerService {
 	@Value("${docker.compose.remote.filename.default}")
 	private String defaultRemoteFilename;
 	@Value("${servers.management.dir}")
-	private String serversDir;
+	private Path serversDir;
 
 	public SshServer findServer(String nameOrPortOrAppNumber) {
 		try {
@@ -146,7 +145,7 @@ public class DockerService {
 	}
 
 	private Path resolveDockerFileLocalPath(String dirName) {
-		Path dir = of(serversDir).resolve(dirName);
+		Path dir = serversDir.resolve(dirName);
 		Path defaultFile = dir.resolve(defaultRemoteFilename);
 
 		if (Files.notExists(defaultFile)) {

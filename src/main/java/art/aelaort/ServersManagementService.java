@@ -31,7 +31,7 @@ public class ServersManagementService {
 	private final TabbyService tabbyService;
 	private final ObjectMapper yamlMapper;
 	@Value("${servers.management.dir}")
-	private String serversDir;
+	private Path serversDir;
 	@Value("${servers.management.files.monitoring}")
 	private String monitoringFile;
 	@Value("${servers.management.files.not_scan}")
@@ -39,7 +39,7 @@ public class ServersManagementService {
 	@Value("${servers.management.custom_projects_file}")
 	private String projectsYmlFileName;
 	@Value("${servers.management.json_path}")
-	private String jsonDataPath;
+	private Path jsonDataPath;
 	@Value("${servers.management.docker.image.pattern}")
 	private String dockerImagePattern;
 	private String[] dockerImagePatternSplit;
@@ -69,7 +69,7 @@ public class ServersManagementService {
 
 	@SneakyThrows
 	public List<Server> readLocalJsonData() {
-		String json = Files.readString(Path.of(jsonDataPath));
+		String json = Files.readString(jsonDataPath);
 		return serializeService.serversParse(json);
 	}
 
@@ -172,7 +172,7 @@ public class ServersManagementService {
 
 	@SneakyThrows
 	public void saveJsonToLocal(String jsonStr) {
-		Files.writeString(Path.of(jsonDataPath), jsonStr);
+		Files.writeString(jsonDataPath, jsonStr);
 	}
 
 	@SneakyThrows
@@ -184,9 +184,8 @@ public class ServersManagementService {
 
 	@SneakyThrows
 	public List<Path> scanLocalDirs() {
-		Path dir = Path.of(serversDir);
-		return Files.walk(dir, 1)
-				.filter(path -> !path.equals(dir))
+		return Files.walk(serversDir, 1)
+				.filter(path -> !path.equals(serversDir))
 				.filter(path -> path.toFile().isDirectory())
 				.filter(path -> !path.resolve(notScanFile).toFile().exists())
 				.toList();
