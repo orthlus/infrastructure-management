@@ -83,8 +83,8 @@ public class Entrypoint implements CommandLineRunner {
 					db-prod-update - execute prod migrations
 					git-stat - print git stat for all local repo
 						optional args: day, week, month
-					prox - start socks5 proxy
-					prox-d - stop socks5 proxy"""
+					proxy - start socks5 proxy
+					proxy-d - stop socks5 proxy"""
 				.formatted(dockerDefaultRemoteDir);
 	}
 
