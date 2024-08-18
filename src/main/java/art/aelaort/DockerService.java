@@ -31,7 +31,7 @@ public class DockerService {
 	private final ExternalUtilities externalUtilities;
 	private final Utils utils;
 	private final DockerMapper dockerMapper;
-	private final TabbyService tabbyService;
+	private final TabbyFiles tabbyFiles;
 	private final BuildService buildService;
 	private final ServersManagementService serversManagementService;
 	@Value("${docker.compose.remote.dir.default}")
@@ -67,7 +67,7 @@ public class DockerService {
 	}
 
 	private SshServer getServerByPortNumber(int port) {
-		List<TabbyServer> list = tabbyService.getServersFromLocalFile()
+		List<TabbyServer> list = tabbyFiles.readLocal()
 				.stream()
 				.filter(s -> s.port() == port)
 				.toList();
@@ -79,7 +79,7 @@ public class DockerService {
 	}
 
 	private SshServer getServerByName(String name) {
-		return tabbyService.getServersFromLocalFile()
+		return tabbyFiles.readLocal()
 				.stream()
 				.filter(s -> s.name().equals(name))
 				.map(dockerMapper::map)

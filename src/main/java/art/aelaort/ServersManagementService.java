@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ServersManagementService {
 	private final ServersManagementS3 serversManagementS3;
-	private final TabbyService tabbyService;
+	private final TabbyFiles tabbyFiles;
 	private final DockerComposeParser dockerComposeParser;
 	private final CustomProjectYamlParser customProjectYamlParser;
 	private final ObjectMapper jacksonObjectMapper;
@@ -63,14 +63,13 @@ public class ServersManagementService {
 
 	public List<Server> scanOnlyLocalData() {
 		List<DirServer> dirServers = scanLocalFilesInServersDir();
-		List<TabbyServer> tabbyServers = tabbyService.getServersFromLocalFile();
+		List<TabbyServer> tabbyServers = tabbyFiles.readLocal();
 		return joinDirAndTabbyServers(dirServers, tabbyServers);
 	}
 
-	public List<Server> scanAndJoinData(boolean logging) {
+	public List<Server> scanAndJoinData() {
 		List<DirServer> dirServers = scanLocalFilesInServersDir();
-		tabbyService.downloadFileToLocal(logging);
-		List<TabbyServer> tabbyServers = tabbyService.getServersFromLocalFile();
+		List<TabbyServer> tabbyServers = tabbyFiles.readRemote();
 		return joinDirAndTabbyServers(dirServers, tabbyServers);
 	}
 

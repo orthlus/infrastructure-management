@@ -21,19 +21,19 @@ public class ScanShowServersService {
 	 * print
 	 */
 	public void scan() {
-		List<Server> servers = serversManagementService.scanAndJoinData(false);
+		List<Server> servers = serversManagementService.scanAndJoinData();
 		System.out.println(stringFormattingService.getServersTableString(servers));
 		System.out.println();
 		System.out.println(stringFormattingService.servicesByServerFullTreeString(servers));
 	}
 
 	public void scanTable() {
-		List<Server> servers = serversManagementService.scanAndJoinData(false);
+		List<Server> servers = serversManagementService.scanAndJoinData();
 		System.out.println(stringFormattingService.getServersTableString(servers));
 	}
 
 	public void scanTree() {
-		List<Server> servers = serversManagementService.scanAndJoinData(false);
+		List<Server> servers = serversManagementService.scanAndJoinData();
 		System.out.println(stringFormattingService.servicesByServerFullTreeString(servers));
 	}
 
@@ -45,7 +45,7 @@ public class ScanShowServersService {
 	 * save ips to s3
 	 */
 	public void sync() {
-		List<Server> servers = serversManagementService.scanAndJoinData(true);
+		List<Server> servers = serversManagementService.scanAndJoinData();
 		serversManagementService.saveData(servers);
 		serversManagementService.saveIps(servers);
 		System.out.println("sync done");

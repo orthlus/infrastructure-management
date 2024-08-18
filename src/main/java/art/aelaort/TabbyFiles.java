@@ -8,6 +8,7 @@ import art.aelaort.utils.ExternalUtilities;
 import art.aelaort.utils.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -20,7 +21,7 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class TabbyService {
+public class TabbyFiles {
 	private final TabbyS3 tabbyS3;
 	private final ExternalUtilities externalUtilities;
 	private final Utils utils;
@@ -29,28 +30,35 @@ public class TabbyService {
 	@Value("${tabby.config.path}")
 	private Path tabbyConfigPath;
 
-	public List<TabbyServer> getServersFromLocalFile() {
-		try {
-			TabbyFile tabbyFile = yamlMapper.readValue(tabbyConfigPath.toFile(), TabbyFile.class);
-			return tabbyMapper.map(tabbyFile);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+	public List<TabbyServer> readRemote() {
+		String fileContent = getRemoteFileContent();
+		save(fileContent);
+		TabbyFile tabbyFile = parseFile(fileContent);
+		return tabbyMapper.map(tabbyFile);
 	}
 
-	public void downloadFileToLocal(boolean logging) {
-		try {
-			String remoteFileContent = getRemoteFileContent();
-			Files.writeString(tabbyConfigPath, remoteFileContent);
-			if (logging) {
-				System.out.println("tabby config downloaded");
-			}
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+	public List<TabbyServer> readLocal() {
+		TabbyFile tabbyFile = parseFile(tabbyConfigPath);
+		return tabbyMapper.map(tabbyFile);
 	}
 
-	public String getRemoteFileContent() {
+	@SneakyThrows
+	private void save(String fileContent) {
+		Files.writeString(tabbyConfigPath, fileContent);
+		System.out.println("tabby config downloaded");
+	}
+
+	@SneakyThrows
+	private TabbyFile parseFile(Path tabbyConfigPath) {
+		return yamlMapper.readValue(tabbyConfigPath.toFile(), TabbyFile.class);
+	}
+
+	@SneakyThrows
+	private TabbyFile parseFile(String fileContent) {
+		return yamlMapper.readValue(fileContent, TabbyFile.class);
+	}
+
+	private String getRemoteFileContent() {
 		String downloaded = tabbyS3.download().split("\n")[1];
 		return decode(downloaded);
 	}
