@@ -2,9 +2,11 @@ package art.aelaort.models.servers;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.extern.jackson.Jacksonized;
 
 @Getter
 @Builder
+@Jacksonized
 public class ServiceDto {
 	private String service;
 	private String ymlName;
