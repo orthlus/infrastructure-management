@@ -54,7 +54,7 @@ public class DockerService {
 
 	private SshServer getServerByAppNumber(int appNumber) {
 		String jobName = buildService.getJobsMapById().get(appNumber).getName();
-		List<Server> servers = serversManagementService.scanAndJoinData(false);
+		List<Server> servers = serversManagementService.scanOnlyLocalData();
 		for (Server server : servers) {
 			for (ServiceDto service : server.getServices()) {
 				String dockerImageName = service.getDockerImageName();
