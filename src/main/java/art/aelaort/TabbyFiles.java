@@ -6,7 +6,7 @@ import art.aelaort.models.servers.yaml.TabbyFile;
 import art.aelaort.s3.TabbyS3;
 import art.aelaort.utils.ExternalUtilities;
 import art.aelaort.utils.Utils;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
@@ -25,7 +25,7 @@ public class TabbyFiles {
 	private final TabbyS3 tabbyS3;
 	private final ExternalUtilities externalUtilities;
 	private final Utils utils;
-	private final ObjectMapper yamlMapper;
+	private final YAMLMapper yamlMapper;
 	private final TabbyMapper tabbyMapper;
 	@Value("${tabby.config.path}")
 	private Path tabbyConfigPath;

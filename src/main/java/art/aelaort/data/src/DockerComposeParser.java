@@ -3,7 +3,7 @@ package art.aelaort.data.src;
 import art.aelaort.models.servers.DirServer;
 import art.aelaort.models.servers.ServiceDto;
 import art.aelaort.models.servers.yaml.DockerComposeFile;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +18,7 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class DockerComposeParser {
-	private final ObjectMapper yamlMapper;
+	private final YAMLMapper yamlMapper;
 	@Value("${servers.management.files.monitoring}")
 	private String monitoringFile;
 	@Value("${servers.management.docker.image.pattern}")

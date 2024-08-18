@@ -1,7 +1,6 @@
 package art.aelaort;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,8 +14,8 @@ import java.net.URI;
 @Configuration
 public class Config {
 	@Bean
-	public ObjectMapper yamlMapper() {
-		return new ObjectMapper(new YAMLFactory());
+	public YAMLMapper yamlMapper() {
+		return new YAMLMapper();
 	}
 
 	@Bean

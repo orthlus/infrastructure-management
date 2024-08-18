@@ -3,7 +3,7 @@ package art.aelaort.data.src;
 import art.aelaort.models.servers.DirServer;
 import art.aelaort.models.servers.ServiceDto;
 import art.aelaort.models.servers.yaml.CustomFile;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -16,7 +16,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class CustomProjectYamlParser {
-	private final ObjectMapper yamlMapper;
+	private final YAMLMapper yamlMapper;
 	@Value("${servers.management.files.monitoring}")
 	private String monitoringFile;
 
