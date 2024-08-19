@@ -7,7 +7,7 @@ import art.aelaort.models.build.Job;
 import art.aelaort.utils.ExternalUtilities;
 import art.aelaort.utils.Utils;
 import art.aelaort.utils.system.SystemProcess;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -43,7 +43,7 @@ public class BuildService {
 	private final ExternalUtilities externalUtilities;
 	private final Utils utils;
 	private final SystemProcess systemProcess;
-	private final ObjectMapper jackson;
+	private final JsonMapper jsonMapper;
 	@Value("${build.data.config.path}")
 	private Path buildConfigPath;
 	@Value("${build.main.dir.secrets_dir}")
@@ -239,7 +239,7 @@ public class BuildService {
 	@SneakyThrows
 	private List<Job> readBuildConfig() {
 		String jobsStr = externalUtilities.readBuildConfig();
-		Job[] jobs = jackson.readValue(jobsStr, Job[].class);
+		Job[] jobs = jsonMapper.readValue(jobsStr, Job[].class);
 		return Arrays.asList(jobs);
 	}
 

@@ -7,7 +7,7 @@ import art.aelaort.models.servers.DirServer;
 import art.aelaort.models.servers.Server;
 import art.aelaort.models.servers.TabbyServer;
 import art.aelaort.s3.ServersManagementS3;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +27,7 @@ public class ServersManagementService {
 	private final TabbyFiles tabbyFiles;
 	private final DockerComposeParser dockerComposeParser;
 	private final CustomProjectYamlParser customProjectYamlParser;
-	private final ObjectMapper jacksonObjectMapper;
+	private final JsonMapper jsonMapper;
 	private final ServerMapper serverMapper;
 	@Value("${servers.management.dir}")
 	private Path serversDir;
@@ -117,12 +117,12 @@ public class ServersManagementService {
 
 	@SneakyThrows
 	private String toJson(List<Server> server) {
-		return jacksonObjectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(server);
+		return jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(server);
 	}
 
 	@SneakyThrows
 	private List<Server> serversParse(Path jsonPath) {
-		return List.of(jacksonObjectMapper.readValue(jsonPath.toFile(), Server[].class));
+		return List.of(jsonMapper.readValue(jsonPath.toFile(), Server[].class));
 	}
 
 	@SneakyThrows

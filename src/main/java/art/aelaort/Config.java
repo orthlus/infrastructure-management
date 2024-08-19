@@ -1,9 +1,11 @@
 package art.aelaort;
 
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -16,6 +18,12 @@ public class Config {
 	@Bean
 	public YAMLMapper yamlMapper() {
 		return new YAMLMapper();
+	}
+
+	@Bean
+	@Primary
+	public JsonMapper jsonMapper() {
+		return new JsonMapper();
 	}
 
 	@Bean
