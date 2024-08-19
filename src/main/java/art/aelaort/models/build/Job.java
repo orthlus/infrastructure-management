@@ -1,6 +1,7 @@
 package art.aelaort.models.build;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,12 +18,22 @@ public class Job {
 	private BuildType buildType;
 	@JsonProperty("sub_directory")
 	private String subDirectory;
-	@JsonProperty("project_dir")
+	@Nullable
 	private String projectDir;
-	@JsonProperty("secrets_directory")
+	@Nullable
 	private String secretsDirectory;
 	@JsonProperty
 	private boolean db;
+
+	@JsonProperty("project_dir")
+	public void setProjectDir(String projectDir) {
+		this.projectDir = projectDir.isEmpty() ? null : projectDir;
+	}
+
+	@JsonProperty("secrets_directory")
+	public void setSecretsDirectory(String secretsDirectory) {
+		this.secretsDirectory = secretsDirectory.isEmpty() ? null : secretsDirectory;
+	}
 
 	@Override
 	public String toString() {
