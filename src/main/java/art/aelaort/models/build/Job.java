@@ -21,6 +21,8 @@ public class Job {
 	private String projectDir;
 	@JsonProperty("secrets_directory")
 	private String secretsDirectory;
+	@JsonProperty
+	private boolean db;
 
 	@Override
 	public String toString() {

@@ -44,6 +44,7 @@ public class BuildService {
 	private final Utils utils;
 	private final SystemProcess systemProcess;
 	private final JsonMapper jsonMapper;
+	private final DatabaseManageService databaseManageService;
 	@Value("${build.data.config.path}")
 	private Path buildConfigPath;
 	@Value("${build.main.dir.secrets_dir}")
@@ -83,8 +84,15 @@ public class BuildService {
 			copySrcDirToTmpDir(job, tmpDir);
 			copyDefaultDockerfile(job, tmpDir);
 			fillSecretsToTmpDir(job, tmpDir);
+			runDbIfNeed(job);
 			build(job, tmpDir, isBuildDockerNoCache);
 			cleanTmp(tmpDir);
+		}
+	}
+
+	private void runDbIfNeed(Job job) {
+		if (job.isDb() && !databaseManageService.isLocalRunning()) {
+			databaseManageService.localUp();
 		}
 	}
 

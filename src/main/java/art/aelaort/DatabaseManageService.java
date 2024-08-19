@@ -1,5 +1,6 @@
 package art.aelaort;
 
+import art.aelaort.utils.system.Response;
 import art.aelaort.utils.system.SystemProcess;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -55,6 +56,15 @@ public class DatabaseManageService {
 	private void sshDown() {
 		systemProcess.callProcessInheritIO("docker compose -f %s down".formatted(dbRemoteSshDockerComposePath));
 		System.out.println("SSH tunnel - stopped");
+	}
+
+	public boolean isLocalRunning() {
+		Response response = systemProcess.callProcess("docker compose -f %s ps -q".formatted(dbLocalDockerComposePath));
+		if (response.exitCode() == 0) {
+			return !response.stdout().trim().isEmpty();
+		}
+
+		throw new RuntimeException(response.stderr());
 	}
 
 	public void localUp() {
