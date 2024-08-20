@@ -19,6 +19,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
+import static art.aelaort.utils.Utils.log;
+
 @Component
 @RequiredArgsConstructor
 public class TabbyFiles {
@@ -45,7 +47,7 @@ public class TabbyFiles {
 	@SneakyThrows
 	private void save(String fileContent) {
 		Files.writeString(tabbyConfigPath, fileContent);
-		System.out.println("tabby config downloaded");
+		log("tabby config downloaded");
 	}
 
 	@SneakyThrows

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import static art.aelaort.utils.Utils.log;
 import static java.lang.Integer.parseInt;
 
 @Component
@@ -48,12 +49,12 @@ public class Entrypoint implements CommandLineRunner {
 				case "git-stat" -> gitStat(args);
 				case "proxy" -> externalUtilities.proxyUp();
 				case "proxy-d" -> externalUtilities.proxyDown();
-				case "dstat" -> System.out.println(dockerService.statAllServers());
-				default -> System.out.println("unknown args\n" + usage());
+				case "dstat" -> log(dockerService.statAllServers());
+				default -> log("unknown args\n" + usage());
 			}
 		} else {
-			System.out.println("at least one arg required");
-			System.out.println(usage());
+			log("at least one arg required");
+			log(usage());
 			System.exit(1);
 		}
 	}
@@ -89,9 +90,9 @@ public class Entrypoint implements CommandLineRunner {
 
 	private void gitStat(String[] args) {
 		if (args.length < 2) {
-			System.out.println(gitStatService.readStatForDay());
+			log(gitStatService.readStatForDay());
 		} else {
-			System.out.println(gitStatService.readStatWithInterval(args[1]));
+			log(gitStatService.readStatWithInterval(args[1]));
 		}
 	}
 
@@ -104,9 +105,9 @@ public class Entrypoint implements CommandLineRunner {
 				boolean isBuildDockerNoCache = buildService.isBuildDockerNoCache(args);
 				buildService.run(job, isBuildDockerNoCache);
 			} catch (TooManyDockerFilesException e) {
-				System.out.println("too many docker-files");
+				log("too many docker-files");
 			} catch (BuildJobNotFoundException e) {
-				System.out.printf("job %s not found\n", args[1]);
+				log("job %s not found\n", args[1]);
 			}
 		}
 	}
@@ -117,13 +118,13 @@ public class Entrypoint implements CommandLineRunner {
 				SshServer sshServer = dockerService.findServer(args[1]);
 				dockerService.uploadDockerFile(sshServer);
 			} catch (ServerNotFoundException e) {
-				System.out.println("server not found");
+				log("server not found");
 			} catch (ServerByPortTooManyServersException e) {
-				System.out.println("too many servers found, need more uniq param or fix data");
+				log("too many servers found, need more uniq param or fix data");
 			}
 		} else {
-			System.out.println("at least 2 args required");
-			System.out.println(usage());
+			log("at least 2 args required");
+			log(usage());
 			System.exit(1);
 		}
 	}

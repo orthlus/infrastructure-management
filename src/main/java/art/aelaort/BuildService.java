@@ -34,6 +34,7 @@ import java.util.stream.Stream;
 
 import static art.aelaort.models.build.BuildType.java_docker;
 import static art.aelaort.models.build.BuildType.java_graal_local;
+import static art.aelaort.utils.Utils.log;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.chop;
 
@@ -128,7 +129,7 @@ public class BuildService {
 			try {
 				FileUtils.copyFile(srcFile.toFile(), destFile.toFile(), false);
 			} catch (Exception e) {
-				System.out.printf("error copy %s to %s, trying new name\n", srcFile, destFile);
+				log("error copy %s to %s, trying new name\n", srcFile, destFile);
 				Path newDestFile = binDirectory.resolve("new-" + graalvmArtifactName);
 				try {
 					FileUtils.copyFile(srcFile.toFile(), newDestFile.toFile(), false);
@@ -252,7 +253,7 @@ public class BuildService {
 	}
 
 	public void printConfig() {
-		System.out.println(getConfigString());
+		log(getConfigString());
 	}
 
 	@SneakyThrows

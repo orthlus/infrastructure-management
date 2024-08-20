@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import static art.aelaort.utils.Utils.log;
+
 @Component
 @RequiredArgsConstructor
 public class ScanShowServersService {
@@ -22,19 +24,19 @@ public class ScanShowServersService {
 	 */
 	public void scan() {
 		List<Server> servers = serversManagementService.scanAndJoinData();
-		System.out.println(stringFormattingService.getServersTableString(servers));
-		System.out.println();
-		System.out.println(stringFormattingService.servicesByServerFullTreeString(servers));
+		log(stringFormattingService.getServersTableString(servers));
+		log();
+		log(stringFormattingService.servicesByServerFullTreeString(servers));
 	}
 
 	public void scanTable() {
 		List<Server> servers = serversManagementService.scanAndJoinData();
-		System.out.println(stringFormattingService.getServersTableString(servers));
+		log(stringFormattingService.getServersTableString(servers));
 	}
 
 	public void scanTree() {
 		List<Server> servers = serversManagementService.scanAndJoinData();
-		System.out.println(stringFormattingService.servicesByServerFullTreeString(servers));
+		log(stringFormattingService.servicesByServerFullTreeString(servers));
 	}
 
 	/*
@@ -48,7 +50,7 @@ public class ScanShowServersService {
 		List<Server> servers = serversManagementService.scanAndJoinData();
 		serversManagementService.saveData(servers);
 		serversManagementService.saveIps(servers);
-		System.out.println("sync done");
+		log("sync done");
 	}
 
 	public void syncAll() {
@@ -63,18 +65,18 @@ public class ScanShowServersService {
 	 */
 	public void show() {
 		List<Server> servers = serversManagementService.readLocalJsonData();
-		System.out.println(stringFormattingService.getServersTableString(servers));
-		System.out.println();
-		System.out.println(stringFormattingService.servicesByServerFullTreeString(servers));
+		log(stringFormattingService.getServersTableString(servers));
+		log();
+		log(stringFormattingService.servicesByServerFullTreeString(servers));
 	}
 
 	public void showTree() {
 		List<Server> servers = serversManagementService.readLocalJsonData();
-		System.out.println(stringFormattingService.servicesByServerFullTreeString(servers));
+		log(stringFormattingService.servicesByServerFullTreeString(servers));
 	}
 
 	public void showTable() {
 		List<Server> servers = serversManagementService.readLocalJsonData();
-		System.out.println(stringFormattingService.getServersTableString(servers));
+		log(stringFormattingService.getServersTableString(servers));
 	}
 }

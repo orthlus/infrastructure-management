@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static art.aelaort.utils.Utils.log;
+
 @Component
 @RequiredArgsConstructor
 public class ServersManagementService {
@@ -45,15 +47,15 @@ public class ServersManagementService {
 				.collect(Collectors.joining("\n"))
 				+ "\n";
 		serversManagementS3.uploadIps(text);
-		System.out.println("ips uploaded");
+		log("ips uploaded");
 	}
 
 	public void saveData(List<Server> servers) {
 		String json = toJson(servers);
 		saveJsonToLocal(json);
-		System.out.println("saved data to local");
+		log("saved data to local");
 		serversManagementS3.uploadData(json);
-		System.out.println("saved data to s3");
+		log("saved data to s3");
 	}
 
 	@SneakyThrows

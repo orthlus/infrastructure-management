@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.Scanner;
 
 import static art.aelaort.utils.Utils.linuxResolve;
+import static art.aelaort.utils.Utils.log;
 import static java.util.stream.Collectors.joining;
 
 @Component
@@ -115,32 +116,32 @@ public class DockerService {
 
 				sshClient.downloadFile(linuxResolve(defaultRemoteDir, defaultRemoteFilename), oldFilePath, sshServer);
 
-				System.out.printf("processing update docker compose on server '%s'%n", sshServer.serverDirName());
+				log("processing update docker compose on server '%s'%n", sshServer.serverDirName());
 
 				String coloredFilesDiff = fileDiffService.getColoredFilesDiff(oldFilePath, newFileLocalPath);
-				System.out.println("new file changes:\n" + coloredFilesDiff);
+				log("new file changes:\n" + coloredFilesDiff);
 
 				if (isApproved("replace file?: ")) {
 					sshClient.uploadFile(newFileLocalPath, defaultRemoteDir, sshServer);
-					System.out.println("new file uploaded!");
+					log("new file uploaded!");
 				}
 
 				Files.deleteIfExists(oldFilePath);
 			} catch (DockerComposeValidationFailedException e) {
-				System.out.printf("docker compose file - failed validation:%n%s", e.getStderr());
+				log("docker compose file - failed validation:%n%s", e.getStderr());
 			} catch (SshNotFountFileException e) {
-				System.out.println("remote file doesn't exists");
+				log("remote file doesn't exists");
 				if (isApproved("create remote file?: ")) {
 					sshClient.uploadFile(newFileLocalPath, defaultRemoteDir, sshServer);
-					System.out.println("remote file updated!");
+					log("remote file updated!");
 				}
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 		} catch (NoDifferenceInFilesException e) {
-			System.out.println("new file has no changes, exit...");
+			log("new file has no changes, exit...");
 		} catch (TooManyDockerFilesException e) {
-			System.out.println("too many docker files found in local dir, exit...");
+			log("too many docker files found in local dir, exit...");
 		}
 	}
 

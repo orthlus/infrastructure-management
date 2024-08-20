@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
+import static art.aelaort.utils.Utils.log;
+
 @Component
 @RequiredArgsConstructor
 public class DatabaseManageService {
@@ -50,12 +52,12 @@ public class DatabaseManageService {
 
 	private void sshUp() {
 		systemProcess.callProcessInheritIO("docker compose -f %s up -d --build".formatted(dbRemoteSshDockerComposePath));
-		System.out.printf("SSH tunnel (%s) - started%n", dbRemoteSshPort);
+		log("SSH tunnel (%s) - started%n", dbRemoteSshPort);
 	}
 
 	private void sshDown() {
 		systemProcess.callProcessInheritIO("docker compose -f %s down".formatted(dbRemoteSshDockerComposePath));
-		System.out.println("SSH tunnel - stopped");
+		log("SSH tunnel - stopped");
 	}
 
 	public boolean isLocalRunning() {
@@ -69,18 +71,18 @@ public class DatabaseManageService {
 
 	public void localUp() {
 		systemProcess.callProcessInheritIO("docker compose -f %s up -d --build".formatted(dbLocalDockerComposePath));
-		System.out.println("PostgreSQL (5433) - started");
+		log("PostgreSQL (5433) - started");
 
 		sleep();
 		for (String script : dbLocalMigrationsScripts) {
 			systemProcess.callProcessInheritIO(dbLocalMigrationsDir.resolve(script).toString(), dbLocalMigrationsDir);
 		}
-		System.out.println("Migrations - executed");
+		log("Migrations - executed");
 	}
 
 	public void localDown() {
 		systemProcess.callProcessInheritIO("docker compose -f %s down".formatted(dbLocalDockerComposePath));
-		System.out.println("PostgreSQL (5433) - stopped");
+		log("PostgreSQL (5433) - stopped");
 	}
 
 	@SneakyThrows

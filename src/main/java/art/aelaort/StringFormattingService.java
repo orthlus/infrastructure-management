@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static art.aelaort.utils.Utils.log;
 import static java.lang.String.join;
 import static java.lang.String.valueOf;
 import static org.apache.commons.lang3.StringUtils.*;
@@ -68,7 +69,7 @@ public class StringFormattingService {
 	 */
 
 	public String getServersTableString(List<Server> servers) {
-		System.out.println("servers:");
+		log("servers:");
 		String[] columnNames = {
 				"name",
 				"ip",

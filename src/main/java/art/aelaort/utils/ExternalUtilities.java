@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import static art.aelaort.utils.Utils.log;
+
 @Component
 @RequiredArgsConstructor
 public class ExternalUtilities {
@@ -44,14 +46,14 @@ public class ExternalUtilities {
 	}
 
 	public void ydSync() {
-		System.out.println("yd sync started...");
+		log("yd sync started...");
 		Response response = systemProcess.callProcess("wsl yandex-disk sync");
 
 		if (response.exitCode() != 0) {
 			throw new RuntimeException("ydSync error \n%s\n%s".formatted(response.stderr(), response.stdout()));
 		}
 
-		System.out.println("yd sync done");
+		log("yd sync done");
 	}
 
 	public void tabbyDecode(Path cipherFile, Path decodedFile) {
