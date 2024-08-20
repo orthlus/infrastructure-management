@@ -1,18 +1,18 @@
 package art.aelaort.ssh;
 
 import art.aelaort.models.ssh.SshServer;
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
+import com.jcraft.jsch.*;
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 @RequiredArgsConstructor
 public class JschConnection implements AutoCloseable {
 	private Session jschSession;
 	private ChannelSftp channelSftp;
+	private ChannelExec channelExec;
 
 	private final String username;
 	private final String host;
@@ -23,10 +23,35 @@ public class JschConnection implements AutoCloseable {
 		this(username, server.host(), server.port(), server.fullKeyPath());
 	}
 
+	public InputStream exec(String command) {
+		try {
+			JSch jsch = jsch(privateKeyPath);
+			setupSession(jsch);
+			setupExecChannel();
+
+			channelExec.setCommand(command);
+			InputStream is = channelExec.getInputStream();
+
+			channelExec.connect();
+
+			return is;
+		} catch (IOException | JSchException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void setupExecChannel() {
+		try {
+			channelExec = (ChannelExec) jschSession.openChannel("exec");
+		} catch (JSchException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public ChannelSftp sftp() {
 		JSch jsch = jsch(privateKeyPath);
-		setupSession(jsch, username, host, port);
-		setupChannel();
+		setupSession(jsch);
+		setupSftpChannel();
 
 		return channelSftp;
 	}
@@ -42,13 +67,17 @@ public class JschConnection implements AutoCloseable {
 		}
 	}
 
-	private void setupChannel() {
+	private void setupSftpChannel() {
 		try {
 			channelSftp = (ChannelSftp) jschSession.openChannel("sftp");
 			channelSftp.connect();
 		} catch (JSchException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private void setupSession(JSch jsch) {
+		setupSession(jsch, username, host, port);
 	}
 
 	private void setupSession(JSch jsch, String username, String host, int port) {
@@ -72,7 +101,14 @@ public class JschConnection implements AutoCloseable {
 
 	@Override
 	public void close() {
-		channelSftp.exit();
+		try {
+			channelSftp.exit();
+		} catch (NullPointerException ignored) {
+		}
+		try {
+			channelExec.disconnect();
+		} catch (NullPointerException ignored) {
+		}
 		jschSession.disconnect();
 	}
 }

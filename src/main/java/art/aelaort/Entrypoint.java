@@ -48,6 +48,7 @@ public class Entrypoint implements CommandLineRunner {
 				case "git-stat" -> gitStat(args);
 				case "proxy" -> externalUtilities.proxyUp();
 				case "proxy-d" -> externalUtilities.proxyDown();
+				case "dstat" -> System.out.println(dockerService.statAllServers());
 				default -> System.out.println("unknown args\n" + usage());
 			}
 		} else {
@@ -81,7 +82,8 @@ public class Entrypoint implements CommandLineRunner {
 					git-stat - print git stat for all local repo
 						optional args: day, week, month
 					proxy - start socks5 proxy
-					proxy-d - stop socks5 proxy"""
+					proxy-d - stop socks5 proxy
+					dstat - docker stats from all servers"""
 				.formatted(dockerDefaultRemoteDir);
 	}
 

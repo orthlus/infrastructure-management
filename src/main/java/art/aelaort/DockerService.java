@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.Scanner;
 
 import static art.aelaort.utils.Utils.linuxResolve;
+import static java.util.stream.Collectors.joining;
 
 @Component
 @RequiredArgsConstructor
@@ -40,6 +41,22 @@ public class DockerService {
 	private String defaultRemoteFilename;
 	@Value("${servers.management.dir}")
 	private Path serversDir;
+
+	public String statAllServers() {
+		String command = "docker stats --no-stream --format \"table {{.Name}}\\t{{.CPUPerc}}\\t{{.MemUsage}}\\t{{.MemPerc}}\\t{{.NetIO}}\"";
+		return serversManagementService.scanOnlyLocalData()
+				.stream()
+				.filter(this::hasDockerService)
+				.map(dockerMapper::map)
+				.map(sshServer -> sshServer.serverDirName() + "\n" + sshClient.getCommandStdout(command, sshServer))
+				.collect(joining("\n\n"));
+	}
+
+	private boolean hasDockerService(Server server) {
+		return server.getServices()
+				.stream()
+				.anyMatch(serviceDto -> serviceDto.getYmlName().startsWith("docker"));
+	}
 
 	public SshServer findServer(String nameOrPortOrAppNumber) {
 		try {
