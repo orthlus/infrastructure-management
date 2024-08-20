@@ -11,15 +11,10 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import static art.aelaort.ColoredConsoleTextUtils.*;
+
 @Component
 public class FileDiffService {
-	private static final String ANSI_RESET = "\u001B[0m";
-	private static final String ANSI_RED = "\u001B[31m";
-	private static final String ANSI_GREEN = "\u001B[32m";
-	private static final String ANSI_RESET_REGEXP = "\\u001B\\[0m";
-	private static final String ANSI_RED_REGEXP = "\\u001B\\[31m";
-	private static final String ANSI_GREEN_REGEXP = "\\u001B\\[32m";
-
 	public String getColoredFilesDiff(Path oldFile, Path newFile) {
 		try {
 			List<DiffRow> rows = getGenerator().generateDiffRows(

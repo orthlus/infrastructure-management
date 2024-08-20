@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
+import static art.aelaort.ColoredConsoleTextUtils.wrapGreen;
 import static art.aelaort.utils.Utils.linuxResolve;
 import static art.aelaort.utils.Utils.log;
 import static java.util.stream.Collectors.joining;
@@ -44,13 +45,23 @@ public class DockerService {
 	private Path serversDir;
 
 	public String statAllServers() {
-		String command = "docker stats --no-stream --format \"table {{.Name}}\\t{{.CPUPerc}}\\t{{.MemUsage}}\\t{{.MemPerc}}\\t{{.NetIO}}\"";
+		String statsCommand = "docker stats --no-stream --format \"table {{.Name}}\\t{{.CPUPerc}}\\t{{.MemUsage}}\\t{{.MemPerc}}\\t{{.NetIO}}\"";
+		String dfhCommand = "df -h";
 		return serversManagementService.scanOnlyLocalData()
 				.stream()
 				.filter(this::hasDockerService)
 				.map(dockerMapper::map)
-				.map(sshServer -> sshServer.serverDirName() + "\n" + sshClient.getCommandStdout(command, sshServer))
-				.collect(joining("\n\n"));
+				.map(sshServer -> prettyStdoutExecCommandsOnServer(sshServer, statsCommand, dfhCommand))
+				.collect(joining("\n"));
+	}
+
+	private String prettyStdoutExecCommandsOnServer(SshServer server, String command1, String command2) {
+		return "%s:\n%s\n%s\n"
+				.formatted(
+						wrapGreen(server.serverDirName()),
+						sshClient.getCommandStdout(command1, server),
+						sshClient.getCommandStdout(command2, server)
+				);
 	}
 
 	private boolean hasDockerService(Server server) {

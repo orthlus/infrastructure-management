@@ -84,7 +84,7 @@ public class Entrypoint implements CommandLineRunner {
 						optional args: day, week, month
 					proxy - start socks5 proxy
 					proxy-d - stop socks5 proxy
-					dstat - docker stats from all servers"""
+					dstat - docker stats and df -h from all servers"""
 				.formatted(dockerDefaultRemoteDir);
 	}
 
