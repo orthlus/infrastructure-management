@@ -20,6 +20,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.stream.Stream;
 
 import static art.aelaort.ColoredConsoleTextUtils.wrapGreen;
 import static art.aelaort.utils.Utils.linuxResolve;
@@ -52,15 +53,19 @@ public class DockerService {
 				.filter(this::hasDockerService)
 				.map(dockerMapper::map)
 				.map(sshServer -> prettyStdoutExecCommandsOnServer(sshServer, statsCommand, dfhCommand))
-				.collect(joining("\n"));
+				.collect(joining("\n\n"));
 	}
 
-	private String prettyStdoutExecCommandsOnServer(SshServer server, String command1, String command2) {
+	private String prettyStdoutExecCommandsOnServer(SshServer server, String statsCommand, String dfhCommand) {
+		String dfhResult = sshClient.getCommandStdout(dfhCommand, server);
+		String newDfhResult = Stream.of(dfhResult.split("\n"))
+				.filter(row -> !row.contains("/var/lib/docker/"))
+				.collect(joining("\n"));
 		return "%s:\n%s\n%s\n"
 				.formatted(
 						wrapGreen(server.serverDirName()),
-						sshClient.getCommandStdout(command1, server),
-						sshClient.getCommandStdout(command2, server)
+						sshClient.getCommandStdout(statsCommand, server),
+						newDfhResult
 				);
 	}
 
