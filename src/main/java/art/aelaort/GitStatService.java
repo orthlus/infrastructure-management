@@ -12,6 +12,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
+import static art.aelaort.utils.Utils.log;
+
 @Component
 @RequiredArgsConstructor
 public class GitStatService {
@@ -60,7 +62,7 @@ public class GitStatService {
 		if (response.exitCode() == 0) {
 			return response.stdout();
 		}
-
-		throw new RuntimeException(response.stdout());
+		log("error read git stat from " + dir);
+		return "";
 	}
 }
