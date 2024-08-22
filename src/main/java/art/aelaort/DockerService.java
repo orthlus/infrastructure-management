@@ -49,12 +49,13 @@ public class DockerService {
 	public String statAllServers() {
 		String statsCommand = "docker stats --no-stream --format \"table {{.Name}}\\t{{.CPUPerc}}\\t{{.MemUsage}}\\t{{.MemPerc}}\\t{{.NetIO}}\"";
 		String dfhCommand = "df -h";
+		String splitRow = "\n" + "=".repeat(100) + "\n";
 		return serversManagementService.scanOnlyLocalData()
 				.stream()
 				.filter(this::hasDockerService)
 				.map(dockerMapper::map)
 				.map(sshServer -> prettyStdoutExecCommandsOnServer(sshServer, statsCommand, dfhCommand))
-				.collect(joining("\n\n"));
+				.collect(joining(splitRow));
 	}
 
 	private String prettyStdoutExecCommandsOnServer(SshServer server, String statsCommand, String dfhCommand) {
