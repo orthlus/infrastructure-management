@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.Scanner;
 import java.util.stream.Stream;
 
+import static art.aelaort.ColoredConsoleTextUtils.wrapBlue;
 import static art.aelaort.ColoredConsoleTextUtils.wrapGreen;
 import static art.aelaort.utils.Utils.linuxResolve;
 import static art.aelaort.utils.Utils.log;
@@ -57,16 +58,29 @@ public class DockerService {
 	}
 
 	private String prettyStdoutExecCommandsOnServer(SshServer server, String statsCommand, String dfhCommand) {
+		String statsResult = sshClient.getCommandStdout(statsCommand, server);
 		String dfhResult = sshClient.getCommandStdout(dfhCommand, server);
-		String newDfhResult = Stream.of(dfhResult.split("\n"))
-				.filter(row -> !row.contains("/var/lib/docker/"))
-				.collect(joining("\n"));
-		return "%s:\n%s\n%s\n"
+		return """
+				%s:
+				%s
+				%s
+				
+				%s
+				%s
+				"""
 				.formatted(
 						wrapGreen(server.serverDirName()),
-						sshClient.getCommandStdout(statsCommand, server),
-						newDfhResult
+						wrapBlue("docker stats"),
+						statsResult.trim(),
+						wrapBlue("df -h"),
+						filterDockerStatsOutput(dfhResult).trim()
 				);
+	}
+
+	private String filterDockerStatsOutput(String dockerStats) {
+		return Stream.of(dockerStats.split("\n"))
+				.filter(row -> !row.contains("/var/lib/docker/"))
+				.collect(joining("\n"));
 	}
 
 	private boolean hasDockerService(Server server) {
