@@ -223,12 +223,7 @@ public class BuildService {
 	}
 
 	public boolean isBuildDockerNoCache(String[] args) {
-		for (String arg : args) {
-			if (arg.equals("clean")) {
-				return true;
-			}
-		}
-		return false;
+		return Arrays.asList(args).contains("clean");
 	}
 
 	public Map<Integer, Job> getJobsMapById() {
