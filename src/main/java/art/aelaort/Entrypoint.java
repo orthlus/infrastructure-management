@@ -1,9 +1,7 @@
 package art.aelaort;
 
-import art.aelaort.exceptions.BuildJobNotFoundException;
-import art.aelaort.exceptions.ServerByPortTooManyServersException;
-import art.aelaort.exceptions.ServerNotFoundException;
-import art.aelaort.exceptions.TooManyDockerFilesException;
+import art.aelaort.exceptions.*;
+import art.aelaort.maker.ProjectsMakerService;
 import art.aelaort.models.build.Job;
 import art.aelaort.models.ssh.SshServer;
 import art.aelaort.utils.ExternalUtilities;
@@ -24,6 +22,7 @@ public class Entrypoint implements CommandLineRunner {
 	private final DatabaseManageService databaseManageService;
 	private final GitStatService gitStatService;
 	private final ScanShowServersService scanShow;
+	private final ProjectsMakerService projectsMakerService;
 	@Value("${docker.compose.remote.dir.default}")
 	private String dockerDefaultRemoteDir;
 
@@ -50,6 +49,7 @@ public class Entrypoint implements CommandLineRunner {
 				case "proxy" -> externalUtilities.proxyUp();
 				case "proxy-d" -> externalUtilities.proxyDown();
 				case "dstat" -> log(dockerService.statAllServers());
+				case "make-java" -> makeProject(args);
 				default -> log("unknown args\n" + usage());
 			}
 		} else {
@@ -84,8 +84,31 @@ public class Entrypoint implements CommandLineRunner {
 						optional args: day, week, month
 					proxy - start socks5 proxy
 					proxy-d - stop socks5 proxy
-					dstat - docker stats and df -h from all servers"""
+					dstat - docker stats and df -h from all servers
+					make-java - create project folder
+						name (required)
+							could be with sub directories
+						optional:
+							no-git - not init git
+							jooq - add jooq config and plugin"""
 				.formatted(dockerDefaultRemoteDir);
+	}
+
+	private void makeProject(String[] args) {
+		if (args.length < 2) {
+			log("project name required");
+			log(usage());
+			System.exit(1);
+		} else {
+			String name = args[1];
+			try {
+				boolean hasGit = projectsMakerService.hasGit(args);
+				boolean hasJooq = projectsMakerService.hasJooq(args);
+				projectsMakerService.makeJavaProject(name, hasGit, hasJooq);
+			} catch (ProjectAlreadyExistsException e) {
+				log("project create failed - dir %s already exists\n", e.getDir());
+			}
+		}
 	}
 
 	private void gitStat(String[] args) {
