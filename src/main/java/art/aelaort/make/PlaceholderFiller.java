@@ -15,19 +15,7 @@ public class PlaceholderFiller {
 	private Path defaultFilesDir;
 	private final FillerProperties fillerProperties;
 
-	public String fillClassFile(String srcFileContent, ProjectMaker projectMaker) {
-		return fillFile(srcFileContent, projectMaker);
-	}
-
-	public String fillJooqFile(String srcFileContent, ProjectMaker projectMaker) {
-		return fillFile(srcFileContent, projectMaker);
-	}
-
-	public String fillPomFile(String srcFileContent, ProjectMaker projectMaker) {
-		return fillFile(srcFileContent, projectMaker);
-	}
-
-	private String fillFile(String srcFileContent, ProjectMaker projectMaker) {
+	public String fillFile(String srcFileContent, ProjectMaker projectMaker) {
 		FillerProperties.Placeholder placeholder = fillerProperties.getPlaceholder();
 		FillerProperties.Value value = fillerProperties.getValue();
 		return srcFileContent

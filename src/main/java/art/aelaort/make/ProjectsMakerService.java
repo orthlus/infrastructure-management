@@ -80,7 +80,7 @@ public class ProjectsMakerService {
 	private void generateJooqFile(Path dir, ProjectMaker projectMaker) {
 		if (projectMaker.isHasJooq()) {
 			String fileContent = getFileContent(fillerProperties.getJooqFile());
-			String filled = placeholderFiller.fillJooqFile(fileContent, projectMaker);
+			String filled = placeholderFiller.fillFile(fileContent, projectMaker);
 			writeFile(dir, filled, fillerProperties.getJooqFile());
 		}
 	}
@@ -91,13 +91,13 @@ public class ProjectsMakerService {
 
 	private void generateClassFile(Path dir, ProjectMaker projectMaker) {
 		String fileContent = getFileContent(fillerProperties.getClassFile());
-		String filled = placeholderFiller.fillClassFile(fileContent, projectMaker);
+		String filled = placeholderFiller.fillFile(fileContent, projectMaker);
 		writeFile(dir, filled, fillerProperties.getClassFile());
 	}
 
 	private void generateMavenFile(Path dir, ProjectMaker projectMaker) {
 		String pomFileContent = getFileContent(fillerProperties.getPomFilepath());
-		String filled = placeholderFiller.fillPomFile(pomFileContent, projectMaker);
+		String filled = placeholderFiller.fillFile(pomFileContent, projectMaker);
 		writeFile(dir, filled, fillerProperties.getPomFilepath());
 	}
 
