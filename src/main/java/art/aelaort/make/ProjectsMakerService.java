@@ -2,6 +2,7 @@ package art.aelaort.make;
 
 import art.aelaort.BuildService;
 import art.aelaort.exceptions.AppNotFoundException;
+import art.aelaort.exceptions.InvalidAppParamsException;
 import art.aelaort.exceptions.ProjectAlreadyExistsException;
 import art.aelaort.models.build.Job;
 import art.aelaort.utils.system.SystemProcess;
@@ -72,7 +73,11 @@ public class ProjectsMakerService {
 			Job job = buildService.getJobsMapById().get(project.getId());
 			if (job != null) {
 				String jobName = job.getName();
-				return ProjectMapper.map(project, jobName);
+				if (job.getSubDirectory().equals("java")) {
+					return ProjectMapper.map(project, jobName);
+				} else {
+					throw new InvalidAppParamsException();
+				}
 			} else {
 				throw new AppNotFoundException(project);
 			}

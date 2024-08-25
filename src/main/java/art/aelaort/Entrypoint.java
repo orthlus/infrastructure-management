@@ -107,6 +107,8 @@ public class Entrypoint implements CommandLineRunner {
 				boolean hasGit = projectsMakerService.hasGit(args);
 				boolean hasJooq = projectsMakerService.hasJooq(args);
 				projectsMakerService.makeJavaProject(nameOrId, hasGit, hasJooq);
+			} catch (InvalidAppParamsException e) {
+				log("make project by id - app found, but params not correct");
 			} catch (AppNotFoundException e) {
 				log("app by id %d not found\n", e.getProject().getId());
 			} catch (ProjectAlreadyExistsException e) {
