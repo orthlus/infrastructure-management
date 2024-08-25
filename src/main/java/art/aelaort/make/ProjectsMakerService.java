@@ -1,7 +1,6 @@
 package art.aelaort.make;
 
 import art.aelaort.exceptions.ProjectAlreadyExistsException;
-import art.aelaort.utils.system.Response;
 import art.aelaort.utils.system.SystemProcess;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -54,9 +53,13 @@ public class ProjectsMakerService {
 
 	private void generateGit(Path dir, ProjectMaker projectMaker) {
 		if (projectMaker.isHasGit()) {
-			Response response = systemProcess.callProcess(dir, "git init");
-			if (response.exitCode() != 0) {
-				throw new RuntimeException(response.stderr());
+			try {
+				systemProcess.callProcessThrows(dir, "git init");
+				systemProcess.callProcessThrows(dir, "git add .");
+				systemProcess.callProcessThrows(dir, "git commit -m 'init'");
+			} catch (RuntimeException e) {
+				log("generate git error");
+				throw new RuntimeException(e);
 			}
 		}
 	}

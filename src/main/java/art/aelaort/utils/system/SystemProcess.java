@@ -87,6 +87,14 @@ public class SystemProcess {
 		return callProcess(null, command);
 	}
 
+	public Response callProcessThrows(Path dir, String... command) {
+		Response response = callProcess(dir, command);
+		if (response.exitCode() != 0) {
+			throw new RuntimeException(response.stderr());
+		}
+		return response;
+	}
+
 	public Response callProcess(Path dir, String... command) {
 		try {
 			ProcessBuilder pb;
