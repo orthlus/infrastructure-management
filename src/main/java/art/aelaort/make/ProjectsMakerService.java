@@ -1,4 +1,4 @@
-package art.aelaort.maker;
+package art.aelaort.make;
 
 import art.aelaort.exceptions.ProjectAlreadyExistsException;
 import lombok.RequiredArgsConstructor;

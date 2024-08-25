@@ -1,4 +1,4 @@
-package art.aelaort.maker;
+package art.aelaort.make;
 
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
