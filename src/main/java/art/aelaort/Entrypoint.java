@@ -86,25 +86,29 @@ public class Entrypoint implements CommandLineRunner {
 					proxy-d - stop socks5 proxy
 					dstat - docker stats and df -h from all servers
 					make-java - create project folder
-						name (required)
-							could be with sub directories
+						one arg required
+						`name` for make project by name (could be with sub directories)
+							or
+						`id` for make project with name from config by id
 						optional:
-							no-git - not init git
-							jooq - add jooq config and plugin"""
+							`no-git` - not init git
+							`jooq` - add jooq config and plugin"""
 				.formatted(dockerDefaultRemoteDir);
 	}
 
 	private void makeProject(String[] args) {
 		if (args.length < 2) {
-			log("project name required");
+			log("project `name` or `id` required");
 			log(usage());
 			System.exit(1);
 		} else {
-			String name = args[1];
+			String nameOrId = args[1];
 			try {
 				boolean hasGit = projectsMakerService.hasGit(args);
 				boolean hasJooq = projectsMakerService.hasJooq(args);
-				projectsMakerService.makeJavaProject(name, hasGit, hasJooq);
+				projectsMakerService.makeJavaProject(nameOrId, hasGit, hasJooq);
+			} catch (AppNotFoundException e) {
+				log("app by id %d not found\n", e.getProject().getId());
 			} catch (ProjectAlreadyExistsException e) {
 				log("project create failed - dir %s already exists\n", e.getDir());
 			}

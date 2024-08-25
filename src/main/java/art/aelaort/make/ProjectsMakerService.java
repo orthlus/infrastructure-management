@@ -1,6 +1,9 @@
 package art.aelaort.make;
 
+import art.aelaort.BuildService;
+import art.aelaort.exceptions.AppNotFoundException;
 import art.aelaort.exceptions.ProjectAlreadyExistsException;
+import art.aelaort.models.build.Job;
 import art.aelaort.utils.system.SystemProcess;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -19,6 +22,7 @@ public class ProjectsMakerService {
 	private final PlaceholderFiller placeholderFiller;
 	private final FillerMakeJavaProperties properties;
 	private final SystemProcess systemProcess;
+	private final BuildService buildService;
 	@Value("${build.main.src.dir}")
 	private Path mainSrcDir;
 	@Value("${build.main.default_files.dir}")
@@ -32,13 +36,9 @@ public class ProjectsMakerService {
 		return Arrays.asList(args).contains("jooq");
 	}
 
-	public void makeJavaProject(String name, boolean hasGit, boolean hasJooq) {
-		Path dir = mkdirForJava("java", name);
-		Project project = Project.builder()
-				.name(splitName(name))
-				.hasGit(hasGit)
-				.hasJooq(hasJooq)
-				.build();
+	public void makeJavaProject(String nameOrId, boolean hasGit, boolean hasJooq) {
+		Project project = buildProject(nameOrId, hasGit, hasJooq);
+		Path dir = mkdirForJava("java", project.getName());
 
 		generateMavenFile(dir, project);
 		generateGitignoreFile(dir);
@@ -49,6 +49,36 @@ public class ProjectsMakerService {
 		generateClassFile(getClassDir(dir), project);
 		generatePropertiesFile(getResourcesDir(dir), project);
 		generateGit(dir, project);
+	}
+
+	private Project buildProject(String nameOrId, boolean hasGit, boolean hasJooq) {
+		Project.ProjectBuilder projectBuilder = Project.builder()
+				.hasGit(hasGit)
+				.hasJooq(hasJooq);
+		try {
+			int id = Integer.parseInt(nameOrId);
+			projectBuilder.id(id);
+		} catch (NumberFormatException e) {
+			projectBuilder.name(nameOrId);
+		}
+
+		return enrich(projectBuilder);
+	}
+
+	private Project enrich(Project.ProjectBuilder projectBuilder) {
+		Project project = projectBuilder.build();
+
+		if (project.getId() != null && project.getName() == null) {
+			Job job = buildService.getJobsMapById().get(project.getId());
+			if (job != null) {
+				String jobName = job.getName();
+				return ProjectMapper.map(project, jobName);
+			} else {
+				throw new AppNotFoundException(project);
+			}
+		} else {
+			return project;
+		}
 	}
 
 	private void generateGit(Path dir, Project project) {

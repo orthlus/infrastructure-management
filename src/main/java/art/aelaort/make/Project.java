@@ -9,6 +9,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class Project {
 	private String name;
+	private Integer id;
 	private boolean hasGit;
 	private boolean hasJooq;
 }
