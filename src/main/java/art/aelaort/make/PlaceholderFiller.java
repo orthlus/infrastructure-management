@@ -15,7 +15,7 @@ public class PlaceholderFiller {
 	private Path defaultFilesDir;
 	private final FillerMakeJavaProperties properties;
 
-	public String fillFile(String srcFileContent, ProjectMaker projectMaker) {
+	public String fillFile(String srcFileContent, Project project) {
 		FillerMakeJavaProperties.Placeholder placeholder = properties.getPlaceholder();
 		FillerMakeJavaProperties.Value value = properties.getValue();
 		return srcFileContent
@@ -23,9 +23,9 @@ public class PlaceholderFiller {
 				.replace(placeholder.getGroupVersion(), value.getGroupVersion())
 				.replace(placeholder.getSpringVersion(), value.getSpringVersion())
 				.replace(placeholder.getJavaVersion(), value.getJavaVersion())
-				.replace(placeholder.getProjectName(), projectMaker.getName())
+				.replace(placeholder.getProjectName(), project.getName())
 				.replace(placeholder.getMainPackage(), value.getMainPackage())
-				.replace(placeholder.getJooqPlugin(), projectMaker.isHasJooq() ? readJooqPluginContent() : "");
+				.replace(placeholder.getJooqPlugin(), project.isHasJooq() ? readJooqPluginContent() : "");
 	}
 
 	@SneakyThrows

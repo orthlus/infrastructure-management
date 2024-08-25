@@ -34,25 +34,25 @@ public class ProjectsMakerService {
 
 	public void makeJavaProject(String name, boolean hasGit, boolean hasJooq) {
 		Path dir = mkdirForJava("java", name);
-		ProjectMaker projectMaker = ProjectMaker.builder()
+		Project project = Project.builder()
 				.name(splitName(name))
 				.hasGit(hasGit)
 				.hasJooq(hasJooq)
 				.build();
 
-		generateMavenFile(dir, projectMaker);
+		generateMavenFile(dir, project);
 		generateGitignoreFile(dir);
-		generateJooqFile(dir, projectMaker);
+		generateJooqFile(dir, project);
 
 		createSubDirectories(dir);
 
-		generateClassFile(getClassDir(dir), projectMaker);
-		generatePropertiesFile(getResourcesDir(dir), projectMaker);
-		generateGit(dir, projectMaker);
+		generateClassFile(getClassDir(dir), project);
+		generatePropertiesFile(getResourcesDir(dir), project);
+		generateGit(dir, project);
 	}
 
-	private void generateGit(Path dir, ProjectMaker projectMaker) {
-		if (projectMaker.isHasGit()) {
+	private void generateGit(Path dir, Project project) {
+		if (project.isHasGit()) {
 			try {
 				systemProcess.callProcessThrows(dir, "git init");
 				systemProcess.callProcessThrows(dir, "git add .");
@@ -64,9 +64,9 @@ public class ProjectsMakerService {
 		}
 	}
 
-	private void generatePropertiesFile(Path dir, ProjectMaker projectMaker) {
+	private void generatePropertiesFile(Path dir, Project project) {
 		String fileContent = getFileContent(properties.getPropertiesFile());
-		String filled = placeholderFiller.fillFile(fileContent, projectMaker);
+		String filled = placeholderFiller.fillFile(fileContent, project);
 		writeFile(dir, filled, properties.getPropertiesFile());
 	}
 
@@ -106,10 +106,10 @@ public class ProjectsMakerService {
 		return result;
 	}
 
-	private void generateJooqFile(Path dir, ProjectMaker projectMaker) {
-		if (projectMaker.isHasJooq()) {
+	private void generateJooqFile(Path dir, Project project) {
+		if (project.isHasJooq()) {
 			String fileContent = getFileContent(properties.getJooqFile());
-			String filled = placeholderFiller.fillFile(fileContent, projectMaker);
+			String filled = placeholderFiller.fillFile(fileContent, project);
 			writeFile(dir, filled, properties.getJooqFile());
 		}
 	}
@@ -118,15 +118,15 @@ public class ProjectsMakerService {
 		writeFile(dir, getFileContent(properties.getGitignoreFile()), properties.getGitignoreFile());
 	}
 
-	private void generateClassFile(Path dir, ProjectMaker projectMaker) {
+	private void generateClassFile(Path dir, Project project) {
 		String fileContent = getFileContent(properties.getClassFile());
-		String filled = placeholderFiller.fillFile(fileContent, projectMaker);
+		String filled = placeholderFiller.fillFile(fileContent, project);
 		writeFile(dir, filled, properties.getClassFile());
 	}
 
-	private void generateMavenFile(Path dir, ProjectMaker projectMaker) {
+	private void generateMavenFile(Path dir, Project project) {
 		String pomFileContent = getFileContent(properties.getPomFilepath());
-		String filled = placeholderFiller.fillFile(pomFileContent, projectMaker);
+		String filled = placeholderFiller.fillFile(pomFileContent, project);
 		writeFile(dir, filled, properties.getPomFilepath());
 	}
 

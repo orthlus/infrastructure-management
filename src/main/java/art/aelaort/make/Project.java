@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class ProjectMaker {
+public class Project {
 	private String name;
 	private boolean hasGit;
 	private boolean hasJooq;
