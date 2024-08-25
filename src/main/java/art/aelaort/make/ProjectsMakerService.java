@@ -16,20 +16,11 @@ import static art.aelaort.utils.Utils.log;
 @RequiredArgsConstructor
 public class ProjectsMakerService {
 	private final PlaceholderFiller placeholderFiller;
+	private final FillerProperties fillerProperties;
 	@Value("${build.main.src.dir}")
 	private Path mainSrcDir;
 	@Value("${build.main.default_files.dir}")
 	private Path defaultFilesDir;
-	@Value("${projects.maker.maven.pom.filepath}")
-	private String pomFilepath;
-	@Value("${projects.maker.maven.class.file}")
-	private String classFilepath;
-	@Value("${projects.maker.maven.gitignore.file}")
-	private String gitignoreFilepath;
-	@Value("${projects.maker.maven.jooq.file}")
-	private String jooqFilepath;
-	@Value("${projects.maker.maven.main.package.value}")
-	private String projectsMakerMavenMainPackageValue;
 
 	public boolean hasGit(String[] args) {
 		return Arrays.stream(args).noneMatch(arg -> arg.equals("no-git"));
@@ -49,11 +40,12 @@ public class ProjectsMakerService {
 
 		generateMavenFile(dir, projectMaker);
 		generateGitignoreFile(dir);
-		generateJooqFile(dir);
+		generateJooqFile(dir, projectMaker);
 
 		createSubDirectories(dir);
 
-		generateClassFile(getClassDir(dir));
+		generateClassFile(getClassDir(dir), projectMaker);
+//		generatePropertiesFile();
 	}
 
 	private String splitName(String name) {
@@ -79,32 +71,34 @@ public class ProjectsMakerService {
 				.resolve("src")
 				.resolve("main")
 				.resolve("java");
-		for (String path : projectsMakerMavenMainPackageValue.split("\\.")) {
+		for (String path : fillerProperties.getValue().getMainPackage().split("\\.")) {
 			result = result.resolve(path);
 		}
 		return result;
 	}
 
-	private void generateJooqFile(Path dir) {
-		String pomFileContent = getFileContent(jooqFilepath);
-		String filled = placeholderFiller.fillJooqFile(pomFileContent);
-		writeFile(dir, filled, jooqFilepath);
+	private void generateJooqFile(Path dir, ProjectMaker projectMaker) {
+		if (projectMaker.isHasJooq()) {
+			String fileContent = getFileContent(fillerProperties.getJooqFile());
+			String filled = placeholderFiller.fillJooqFile(fileContent, projectMaker);
+			writeFile(dir, filled, fillerProperties.getJooqFile());
+		}
 	}
 
 	private void generateGitignoreFile(Path dir) {
-		writeFile(dir, getFileContent(gitignoreFilepath), gitignoreFilepath);
+		writeFile(dir, getFileContent(fillerProperties.getGitignoreFile()), fillerProperties.getGitignoreFile());
 	}
 
-	private void generateClassFile(Path dir) {
-		String pomFileContent = getFileContent(classFilepath);
-		String filled = placeholderFiller.fillClassFile(pomFileContent);
-		writeFile(dir, filled, classFilepath);
+	private void generateClassFile(Path dir, ProjectMaker projectMaker) {
+		String fileContent = getFileContent(fillerProperties.getClassFile());
+		String filled = placeholderFiller.fillClassFile(fileContent, projectMaker);
+		writeFile(dir, filled, fillerProperties.getClassFile());
 	}
 
 	private void generateMavenFile(Path dir, ProjectMaker projectMaker) {
-		String pomFileContent = getFileContent(pomFilepath);
+		String pomFileContent = getFileContent(fillerProperties.getPomFilepath());
 		String filled = placeholderFiller.fillPomFile(pomFileContent, projectMaker);
-		writeFile(dir, filled, pomFilepath);
+		writeFile(dir, filled, fillerProperties.getPomFilepath());
 	}
 
 	@SneakyThrows
