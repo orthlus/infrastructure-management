@@ -16,7 +16,7 @@ import static art.aelaort.utils.Utils.log;
 @RequiredArgsConstructor
 public class ProjectsMakerService {
 	private final PlaceholderFiller placeholderFiller;
-	private final FillerProperties fillerProperties;
+	private final FillerMakeJavaProperties properties;
 	@Value("${build.main.src.dir}")
 	private Path mainSrcDir;
 	@Value("${build.main.default_files.dir}")
@@ -71,7 +71,7 @@ public class ProjectsMakerService {
 				.resolve("src")
 				.resolve("main")
 				.resolve("java");
-		for (String path : fillerProperties.getValue().getMainPackage().split("\\.")) {
+		for (String path : properties.getValue().getMainPackage().split("\\.")) {
 			result = result.resolve(path);
 		}
 		return result;
@@ -79,26 +79,26 @@ public class ProjectsMakerService {
 
 	private void generateJooqFile(Path dir, ProjectMaker projectMaker) {
 		if (projectMaker.isHasJooq()) {
-			String fileContent = getFileContent(fillerProperties.getJooqFile());
+			String fileContent = getFileContent(properties.getJooqFile());
 			String filled = placeholderFiller.fillFile(fileContent, projectMaker);
-			writeFile(dir, filled, fillerProperties.getJooqFile());
+			writeFile(dir, filled, properties.getJooqFile());
 		}
 	}
 
 	private void generateGitignoreFile(Path dir) {
-		writeFile(dir, getFileContent(fillerProperties.getGitignoreFile()), fillerProperties.getGitignoreFile());
+		writeFile(dir, getFileContent(properties.getGitignoreFile()), properties.getGitignoreFile());
 	}
 
 	private void generateClassFile(Path dir, ProjectMaker projectMaker) {
-		String fileContent = getFileContent(fillerProperties.getClassFile());
+		String fileContent = getFileContent(properties.getClassFile());
 		String filled = placeholderFiller.fillFile(fileContent, projectMaker);
-		writeFile(dir, filled, fillerProperties.getClassFile());
+		writeFile(dir, filled, properties.getClassFile());
 	}
 
 	private void generateMavenFile(Path dir, ProjectMaker projectMaker) {
-		String pomFileContent = getFileContent(fillerProperties.getPomFilepath());
+		String pomFileContent = getFileContent(properties.getPomFilepath());
 		String filled = placeholderFiller.fillFile(pomFileContent, projectMaker);
-		writeFile(dir, filled, fillerProperties.getPomFilepath());
+		writeFile(dir, filled, properties.getPomFilepath());
 	}
 
 	@SneakyThrows

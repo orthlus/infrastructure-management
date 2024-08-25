@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("projects.make.java")
 @Getter
 @Setter
-public class FillerProperties {
+public class FillerMakeJavaProperties {
 	private Placeholder placeholder;
 	private Value value;
 	private String jooqPluginFilepath;

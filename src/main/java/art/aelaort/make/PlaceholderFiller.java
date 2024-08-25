@@ -13,11 +13,11 @@ import java.nio.file.Path;
 public class PlaceholderFiller {
 	@Value("${build.main.default_files.dir}")
 	private Path defaultFilesDir;
-	private final FillerProperties fillerProperties;
+	private final FillerMakeJavaProperties properties;
 
 	public String fillFile(String srcFileContent, ProjectMaker projectMaker) {
-		FillerProperties.Placeholder placeholder = fillerProperties.getPlaceholder();
-		FillerProperties.Value value = fillerProperties.getValue();
+		FillerMakeJavaProperties.Placeholder placeholder = properties.getPlaceholder();
+		FillerMakeJavaProperties.Value value = properties.getValue();
 		return srcFileContent
 				.replace(placeholder.getGroupId(), value.getGroupId())
 				.replace(placeholder.getGroupVersion(), value.getGroupVersion())
@@ -30,6 +30,6 @@ public class PlaceholderFiller {
 
 	@SneakyThrows
 	private String readJooqPluginContent() {
-		return Files.readString(defaultFilesDir.resolve(fillerProperties.getJooqPluginFilepath()));
+		return Files.readString(defaultFilesDir.resolve(properties.getJooqPluginFilepath()));
 	}
 }
