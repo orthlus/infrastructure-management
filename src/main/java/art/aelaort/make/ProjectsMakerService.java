@@ -1,6 +1,8 @@
 package art.aelaort.make;
 
 import art.aelaort.exceptions.ProjectAlreadyExistsException;
+import art.aelaort.utils.system.Response;
+import art.aelaort.utils.system.SystemProcess;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +19,7 @@ import static art.aelaort.utils.Utils.log;
 public class ProjectsMakerService {
 	private final PlaceholderFiller placeholderFiller;
 	private final FillerMakeJavaProperties properties;
+	private final SystemProcess systemProcess;
 	@Value("${build.main.src.dir}")
 	private Path mainSrcDir;
 	@Value("${build.main.default_files.dir}")
@@ -45,7 +48,23 @@ public class ProjectsMakerService {
 		createSubDirectories(dir);
 
 		generateClassFile(getClassDir(dir), projectMaker);
-//		generatePropertiesFile();
+		generatePropertiesFile(getResourcesDir(dir), projectMaker);
+		generateGit(dir, projectMaker);
+	}
+
+	private void generateGit(Path dir, ProjectMaker projectMaker) {
+		if (projectMaker.isHasGit()) {
+			Response response = systemProcess.callProcess(dir, "git init");
+			if (response.exitCode() != 0) {
+				throw new RuntimeException(response.stderr());
+			}
+		}
+	}
+
+	private void generatePropertiesFile(Path dir, ProjectMaker projectMaker) {
+		String fileContent = getFileContent(properties.getPropertiesFile());
+		String filled = placeholderFiller.fillFile(fileContent, projectMaker);
+		writeFile(dir, filled, properties.getPropertiesFile());
 	}
 
 	private String splitName(String name) {
@@ -64,6 +83,13 @@ public class ProjectsMakerService {
 				.resolve("src")
 				.resolve("test")
 				.resolve("main"));
+	}
+
+	private Path getResourcesDir(Path dir) {
+		return dir
+				.resolve("src")
+				.resolve("main")
+				.resolve("resources");
 	}
 
 	private Path getClassDir(Path dir) {

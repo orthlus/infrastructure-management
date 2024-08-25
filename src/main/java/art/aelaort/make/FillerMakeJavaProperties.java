@@ -17,6 +17,7 @@ public class FillerMakeJavaProperties {
 	private String classFile;
 	private String jooqFile;
 	private String gitignoreFile;
+	private String propertiesFile;
 
 	@Getter
 	@Setter
