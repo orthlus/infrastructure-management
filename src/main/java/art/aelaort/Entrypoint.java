@@ -49,7 +49,7 @@ public class Entrypoint implements CommandLineRunner {
 				case "proxy" -> externalUtilities.proxyUp();
 				case "proxy-d" -> externalUtilities.proxyDown();
 				case "dstat" -> log(dockerService.statAllServers());
-				case "make-java" -> makeProject(args);
+				case "jmake" -> makeProject(args);
 				default -> log("unknown args\n" + usage());
 			}
 		} else {
@@ -85,7 +85,7 @@ public class Entrypoint implements CommandLineRunner {
 					proxy - start socks5 proxy
 					proxy-d - stop socks5 proxy
 					dstat - docker stats and df -h from all servers
-					make-java - create project folder
+					jmake - create project folder
 						one arg required
 						`name` for make project by name (could be with sub directories)
 							or
