@@ -69,21 +69,22 @@ public class ProjectsMakerService {
 	private Project enrich(Project.ProjectBuilder projectBuilder) {
 		Project project = projectBuilder.build();
 
-		if (project.getId() != null && project.getName() == null) {
-			Job job = buildService.getJobsMapById().get(project.getId());
-			if (job != null) {
-				String jobName = job.getName();
-				Set<BuildType> javaTypes = Set.of(BuildType.java_local, BuildType.java_docker);
-				if (job.getSubDirectory().equals("java") && javaTypes.contains(job.getBuildType())) {
-					return project.withName(jobName);
-				} else {
-					throw new InvalidAppParamsException();
-				}
-			} else {
-				throw new AppNotFoundException(project);
-			}
-		} else {
+		if (project.getId() == null || project.getName() != null) {
 			return project;
+		}
+
+		Job job = buildService.getJobsMapById().get(project.getId());
+		if (job == null) {
+			throw new AppNotFoundException(project);
+		}
+
+		String jobName = job.getName();
+
+		Set<BuildType> javaTypes = Set.of(BuildType.java_local, BuildType.java_docker);
+		if (job.getSubDirectory().equals("java") && javaTypes.contains(job.getBuildType())) {
+			return project.withName(jobName);
+		} else {
+			throw new InvalidAppParamsException();
 		}
 	}
 
