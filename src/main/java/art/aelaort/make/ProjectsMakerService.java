@@ -173,7 +173,7 @@ public class ProjectsMakerService {
 
 		String pomFileContent = getFileContent(filepath);
 		String filled = placeholderFiller.fillFile(pomFileContent, project);
-		writeFile(dir, filled, filepath);
+		writeFile(dir, filled, properties.getPomDefaultName());
 	}
 
 	@SneakyThrows
