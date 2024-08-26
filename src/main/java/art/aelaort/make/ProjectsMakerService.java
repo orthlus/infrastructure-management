@@ -74,7 +74,7 @@ public class ProjectsMakerService {
 			if (job != null) {
 				String jobName = job.getName();
 				if (job.getSubDirectory().equals("java")) {
-					return ProjectMapper.map(project, jobName);
+					return project.withName(jobName);
 				} else {
 					throw new InvalidAppParamsException();
 				}
