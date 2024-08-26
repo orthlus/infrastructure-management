@@ -78,11 +78,11 @@ public class ProjectsMakerService {
 			throw new AppNotFoundException(project);
 		}
 
-		String jobName = job.getName();
-
 		Set<BuildType> javaTypes = Set.of(BuildType.java_local, BuildType.java_docker);
 		if (job.getSubDirectory().equals("java") && javaTypes.contains(job.getBuildType())) {
-			return project.withName(jobName);
+			return project
+					.withName(job.getName())
+					.withHasJooq(job.isDb());
 		} else {
 			throw new InvalidAppParamsException();
 		}

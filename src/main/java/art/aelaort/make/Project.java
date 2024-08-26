@@ -13,5 +13,6 @@ public class Project {
 	private String name;
 	private Integer id;
 	private boolean hasGit;
+	@With
 	private boolean hasJooq;
 }
