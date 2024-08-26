@@ -18,6 +18,7 @@ public class FillerMakeJavaProperties {
 	private String jooqFile;
 	private String gitignoreFile;
 	private String propertiesFile;
+	private String pomForLocalFilepath;
 
 	@Getter
 	@Setter

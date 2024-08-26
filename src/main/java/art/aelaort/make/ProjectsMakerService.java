@@ -60,15 +60,13 @@ public class ProjectsMakerService {
 				.hasJooq(hasJooq);
 		try {
 			int id = Integer.parseInt(nameOrId);
-			return enrich(projectBuilder.id(id));
+			return enrich(projectBuilder.id(id).build());
 		} catch (NumberFormatException e) {
 			return projectBuilder.name(nameOrId).build();
 		}
 	}
 
-	private Project enrich(Project.ProjectBuilder projectBuilder) {
-		Project project = projectBuilder.build();
-
+	private Project enrich(Project project) {
 		if (project.getId() == null || project.getName() != null) {
 			return project;
 		}
@@ -80,9 +78,16 @@ public class ProjectsMakerService {
 
 		Set<BuildType> javaTypes = Set.of(BuildType.java_local, BuildType.java_docker);
 		if (job.getSubDirectory().equals("java") && javaTypes.contains(job.getBuildType())) {
-			return project
-					.withName(job.getName())
-					.withHasJooq(job.isDb());
+			Project.ProjectBuilder newProjectBuilder = Project.builder()
+					.name(job.getName())
+					.hasJooq(job.isDb())
+					.hasGit(project.isHasGit());
+
+			if (job.getBuildType() == BuildType.java_local) {
+				newProjectBuilder.isMavenBuildForLocal(true);
+			}
+
+			return newProjectBuilder.build();
 		} else {
 			throw new InvalidAppParamsException();
 		}
@@ -162,9 +167,13 @@ public class ProjectsMakerService {
 	}
 
 	private void generateMavenFile(Path dir, Project project) {
-		String pomFileContent = getFileContent(properties.getPomFilepath());
+		String filepath = project.isMavenBuildForLocal() ?
+				properties.getPomForLocalFilepath() :
+				properties.getPomFilepath();
+
+		String pomFileContent = getFileContent(filepath);
 		String filled = placeholderFiller.fillFile(pomFileContent, project);
-		writeFile(dir, filled, properties.getPomFilepath());
+		writeFile(dir, filled, filepath);
 	}
 
 	@SneakyThrows
