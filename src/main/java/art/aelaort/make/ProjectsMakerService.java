@@ -4,6 +4,7 @@ import art.aelaort.BuildService;
 import art.aelaort.exceptions.AppNotFoundException;
 import art.aelaort.exceptions.InvalidAppParamsException;
 import art.aelaort.exceptions.ProjectAlreadyExistsException;
+import art.aelaort.models.build.BuildType;
 import art.aelaort.models.build.Job;
 import art.aelaort.utils.system.SystemProcess;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Set;
 
 import static art.aelaort.utils.Utils.log;
 
@@ -71,7 +73,8 @@ public class ProjectsMakerService {
 			Job job = buildService.getJobsMapById().get(project.getId());
 			if (job != null) {
 				String jobName = job.getName();
-				if (job.getSubDirectory().equals("java")) {
+				Set<BuildType> javaTypes = Set.of(BuildType.java_local, BuildType.java_docker);
+				if (job.getSubDirectory().equals("java") && javaTypes.contains(job.getBuildType())) {
 					return project.withName(jobName);
 				} else {
 					throw new InvalidAppParamsException();
