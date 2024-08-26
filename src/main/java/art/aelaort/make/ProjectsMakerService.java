@@ -58,12 +58,10 @@ public class ProjectsMakerService {
 				.hasJooq(hasJooq);
 		try {
 			int id = Integer.parseInt(nameOrId);
-			projectBuilder.id(id);
+			return enrich(projectBuilder.id(id));
 		} catch (NumberFormatException e) {
-			projectBuilder.name(nameOrId);
+			return projectBuilder.name(nameOrId).build();
 		}
-
-		return enrich(projectBuilder);
 	}
 
 	private Project enrich(Project.ProjectBuilder projectBuilder) {
