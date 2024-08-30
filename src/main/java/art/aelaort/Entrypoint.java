@@ -1,5 +1,6 @@
 package art.aelaort;
 
+import art.aelaort.build.BuildService;
 import art.aelaort.exceptions.*;
 import art.aelaort.make.ProjectsMakerService;
 import art.aelaort.models.build.Job;

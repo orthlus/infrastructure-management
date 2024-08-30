@@ -1,6 +1,6 @@
 package art.aelaort.make;
 
-import art.aelaort.BuildService;
+import art.aelaort.build.BuildService;
 import art.aelaort.exceptions.AppNotFoundException;
 import art.aelaort.exceptions.InvalidAppParamsException;
 import art.aelaort.exceptions.ProjectAlreadyExistsException;

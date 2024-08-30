@@ -1,5 +1,6 @@
-package art.aelaort;
+package art.aelaort.build;
 
+import art.aelaort.DatabaseManageService;
 import art.aelaort.build.models.PomModel;
 import art.aelaort.exceptions.BuildJobNotFoundException;
 import art.aelaort.exceptions.TooManyDockerFilesException;
