@@ -1,4 +1,4 @@
-package art.aelaort.build.models;
+package art.aelaort.models.build;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
