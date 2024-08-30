@@ -1,5 +1,6 @@
 package art.aelaort;
 
+import art.aelaort.build.models.PomModel;
 import art.aelaort.exceptions.BuildJobNotFoundException;
 import art.aelaort.exceptions.TooManyDockerFilesException;
 import art.aelaort.models.build.BuildType;
@@ -8,6 +9,7 @@ import art.aelaort.utils.ExternalUtilities;
 import art.aelaort.utils.Utils;
 import art.aelaort.utils.system.SystemProcess;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -46,6 +48,7 @@ public class BuildService {
 	private final SystemProcess systemProcess;
 	private final JsonMapper jsonMapper;
 	private final DatabaseManageService databaseManageService;
+	private final XmlMapper xmlMapper;
 	@Value("${build.data.config.path}")
 	private Path buildConfigPath;
 	@Value("${build.main.dir.secrets_dir}")
@@ -58,6 +61,8 @@ public class BuildService {
 	private Path defaultFilesDir;
 	@Value("${build.main.default_files.java_docker.path}")
 	private String defaultJavaDockerfilePath;
+	@Value("${build.main.default.java.version}")
+	private int defaultJavaVersion;
 	@Value("${build.main.docker.registry.url}")
 	private String dockerRegistryUrl;
 	@Value("${build.graalvm.artifact.name}")
@@ -160,7 +165,7 @@ public class BuildService {
 		try {
 			if (job.getBuildType() == java_docker) {
 				if (notExistsAnyDockerfile(tmpDir)) {
-					Path defaultFile = defaultFilesDir.resolve(defaultJavaDockerfilePath);
+					Path defaultFile = defaultFilesDir.resolve(getDefaultJavaDockerfilePath(tmpDir));
 					Path dest = tmpDir.resolve(defaultFile.getFileName());
 					FileUtils.copyFile(defaultFile.toFile(), dest.toFile(), false);
 				}
@@ -168,6 +173,17 @@ public class BuildService {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private String getDefaultJavaDockerfilePath(Path tmpDir) {
+		PomModel pomModel = parsePomFile(tmpDir.resolve("pom.xml"));
+		Integer mavenCompilerTarget = pomModel.getMavenCompilerTarget();
+		return defaultJavaDockerfilePath.formatted(mavenCompilerTarget == null ? defaultJavaVersion : mavenCompilerTarget);
+	}
+
+	@SneakyThrows
+	private PomModel parsePomFile(Path file) {
+		return xmlMapper.readValue(file.toFile(), PomModel.class);
 	}
 
 	private Path lookupOneDockerfile(Path dir) {

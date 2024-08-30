@@ -1,6 +1,7 @@
 package art.aelaort;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +16,11 @@ import java.net.URI;
 
 @Configuration
 public class Config {
+	@Bean
+	public XmlMapper xmlMapper() {
+		return new XmlMapper();
+	}
+
 	@Bean
 	public YAMLMapper yamlMapper() {
 		return new YAMLMapper();
