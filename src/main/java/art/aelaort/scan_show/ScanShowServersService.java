@@ -1,5 +1,6 @@
-package art.aelaort;
+package art.aelaort.scan_show;
 
+import art.aelaort.ServersManagementService;
 import art.aelaort.models.servers.Server;
 import art.aelaort.utils.ExternalUtilities;
 import lombok.RequiredArgsConstructor;

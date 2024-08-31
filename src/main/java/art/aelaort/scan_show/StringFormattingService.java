@@ -1,4 +1,4 @@
-package art.aelaort;
+package art.aelaort.scan_show;
 
 import art.aelaort.models.servers.Server;
 import art.aelaort.models.servers.ServerDataLength;
