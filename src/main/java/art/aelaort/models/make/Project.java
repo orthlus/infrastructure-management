@@ -1,4 +1,4 @@
-package art.aelaort.make;
+package art.aelaort.models.make;
 
 import lombok.Builder;
 import lombok.Getter;

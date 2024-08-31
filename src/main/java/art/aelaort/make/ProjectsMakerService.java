@@ -6,6 +6,7 @@ import art.aelaort.exceptions.InvalidAppParamsException;
 import art.aelaort.exceptions.ProjectAlreadyExistsException;
 import art.aelaort.models.build.BuildType;
 import art.aelaort.models.build.Job;
+import art.aelaort.models.make.Project;
 import art.aelaort.utils.system.SystemProcess;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;

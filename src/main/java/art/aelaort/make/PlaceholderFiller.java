@@ -1,5 +1,6 @@
 package art.aelaort.make;
 
+import art.aelaort.models.make.Project;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
