@@ -1,4 +1,4 @@
-package art.aelaort;
+package art.aelaort.utils;
 
 public class ColoredConsoleTextUtils {
 	public static final String ANSI_RESET = "\u001B[0m";

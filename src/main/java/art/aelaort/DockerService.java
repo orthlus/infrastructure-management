@@ -23,8 +23,8 @@ import java.util.Optional;
 import java.util.Scanner;
 import java.util.stream.Stream;
 
-import static art.aelaort.ColoredConsoleTextUtils.wrapBlue;
-import static art.aelaort.ColoredConsoleTextUtils.wrapGreen;
+import static art.aelaort.utils.ColoredConsoleTextUtils.wrapBlue;
+import static art.aelaort.utils.ColoredConsoleTextUtils.wrapGreen;
 import static art.aelaort.utils.Utils.linuxResolve;
 import static art.aelaort.utils.Utils.log;
 import static java.util.stream.Collectors.joining;

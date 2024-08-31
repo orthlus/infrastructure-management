@@ -11,7 +11,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import static art.aelaort.ColoredConsoleTextUtils.*;
+import static art.aelaort.utils.ColoredConsoleTextUtils.*;
 
 @Component
 public class FileDiffService {
