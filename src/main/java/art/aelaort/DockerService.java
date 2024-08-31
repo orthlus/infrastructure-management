@@ -9,6 +9,7 @@ import art.aelaort.models.servers.TabbyServer;
 import art.aelaort.models.ssh.SshServer;
 import art.aelaort.ssh.SshClient;
 import art.aelaort.utils.ExternalUtilities;
+import art.aelaort.utils.FileDiffService;
 import art.aelaort.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;

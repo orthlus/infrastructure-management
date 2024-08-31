@@ -1,4 +1,4 @@
-package art.aelaort;
+package art.aelaort.utils;
 
 import art.aelaort.exceptions.NoDifferenceInFilesException;
 import com.github.difflib.text.DiffRow;
