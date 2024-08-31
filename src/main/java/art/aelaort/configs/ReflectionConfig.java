@@ -1,4 +1,4 @@
-package art.aelaort;
+package art.aelaort.configs;
 
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 import org.springframework.context.annotation.Configuration;

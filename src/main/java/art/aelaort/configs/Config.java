@@ -1,4 +1,4 @@
-package art.aelaort;
+package art.aelaort.configs;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
