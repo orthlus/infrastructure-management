@@ -99,7 +99,7 @@ public class ProjectsMakerService {
 			try {
 				systemProcess.callProcessThrows(dir, "git init");
 				systemProcess.callProcessThrows(dir, "git add .");
-				systemProcess.callProcessThrows(dir, "git commit -m 'init'");
+				systemProcess.callProcessThrows(dir, "git commit -m init");
 			} catch (RuntimeException e) {
 				log("generate git error");
 				throw new RuntimeException(e);
