@@ -162,9 +162,13 @@ public class ProjectsMakerService {
 	}
 
 	private void generateClassFile(Path dir, Project project) {
-		String fileContent = getFileContent(properties.getClassFile());
+		String filepath = project.isMavenBuildForLocal() ?
+				properties.getClassFileForLocalFilepath() :
+				properties.getClassFile();
+
+		String fileContent = getFileContent(filepath);
 		String filled = placeholderFiller.fillFile(fileContent, project);
-		writeFile(dir, filled, properties.getClassFile());
+		writeFile(dir, filled, properties.getClassFileDefaultName());
 	}
 
 	private void generateMavenFile(Path dir, Project project) {

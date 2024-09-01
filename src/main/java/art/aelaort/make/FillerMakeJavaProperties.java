@@ -19,7 +19,9 @@ public class FillerMakeJavaProperties {
 	private String gitignoreFile;
 	private String propertiesFile;
 	private String pomForLocalFilepath;
+	private String classFileForLocalFilepath;
 	private String pomDefaultName;
+	private String classFileDefaultName;
 
 	@Getter
 	@Setter
