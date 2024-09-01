@@ -1,11 +1,13 @@
 package art.aelaort.build;
 
 import art.aelaort.DatabaseManageService;
-import art.aelaort.models.build.PomModel;
 import art.aelaort.exceptions.BuildJobNotFoundException;
 import art.aelaort.exceptions.TooManyDockerFilesException;
 import art.aelaort.models.build.BuildType;
 import art.aelaort.models.build.Job;
+import art.aelaort.models.build.PomModel;
+import art.aelaort.properties.S3Properties;
+import art.aelaort.s3.BuildFunctionsS3;
 import art.aelaort.utils.ExternalUtilities;
 import art.aelaort.utils.Utils;
 import art.aelaort.utils.system.SystemProcess;
@@ -51,6 +53,8 @@ public class BuildService {
 	private final JsonMapper jsonMapper;
 	private final DatabaseManageService databaseManageService;
 	private final XmlMapper xmlMapper;
+	private final BuildFunctionsS3 buildFunctionsS3;
+	private final S3Properties s3Properties;
 	@Value("${build.data.config.path}")
 	private Path buildConfigPath;
 	@Value("${build.main.dir.secrets_dir}")
@@ -125,14 +129,23 @@ public class BuildService {
 				run("mvn clean native:compile -P native", tmpDir);
 				copyArtifactToBinDirectory(java_graal_local, tmpDir);
 			}
-			case zip_src -> zipDir(job, tmpDir);
+			case zip_s3 -> srcZipToS3(job, tmpDir);
 		}
 	}
 
-	private void zipDir(Job job, Path tmpDir) {
+	private void srcZipToS3(Job job, Path tmpDir) {
+		Path zipFile = zipDir(job, tmpDir);
+		buildFunctionsS3.uploadZip(zipFile);
+		log("for job '%s' to s3 bucket '%s' uploaded zip file '%s'\n",
+				job.getName(),
+				s3Properties.getBuild().getBucket(),
+				zipFile);
+	}
+
+	private Path zipDir(Job job, Path tmpDir) {
 		Path zipFile = utils.createTmpDir().resolve(job.getName() + ".zip");
 		ZipUtil.pack(tmpDir.toFile(), zipFile.toFile(), 0);
-		log("for job '%s' created zip file '%s'\n", job.getName(), zipFile);
+		return zipFile;
 	}
 
 	private void copyArtifactToBinDirectory(BuildType type, Path tmpDir) {
