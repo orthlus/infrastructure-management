@@ -1,8 +1,8 @@
 package art.aelaort.s3;
 
 import art.aelaort.S3Params;
+import art.aelaort.properties.S3Properties;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -14,14 +14,13 @@ import static art.aelaort.S3ClientProvider.client;
 @RequiredArgsConstructor
 public class ServersManagementS3 {
 	private final S3Params serversManagementS3Params;
-	@Value("${servers.management.s3.bucket}")
-	private String bucket;
+	private final S3Properties s3Properties;
 
 	public void uploadIps(String ipsText) {
 		try (S3Client client = client(serversManagementS3Params)) {
 			RequestBody requestBody = RequestBody.fromString(ipsText);
 			client.putObject(PutObjectRequest.builder()
-					.bucket(bucket)
+					.bucket(s3Properties.getServersManagement().getBucket())
 					.key("ips.txt")
 					.build(), requestBody);
 		}
@@ -30,7 +29,7 @@ public class ServersManagementS3 {
 	public String downloadData() {
 		try (S3Client client = client(serversManagementS3Params)) {
 			return client.getObjectAsBytes(builder -> builder
-							.bucket(bucket)
+							.bucket(s3Properties.getServersManagement().getBucket())
 							.key("data.json"))
 					.asUtf8String();
 		}
@@ -40,7 +39,7 @@ public class ServersManagementS3 {
 		try (S3Client client = client(serversManagementS3Params)) {
 			RequestBody requestBody = RequestBody.fromString(jsonStr);
 			client.putObject(PutObjectRequest.builder()
-					.bucket(bucket)
+					.bucket(s3Properties.getServersManagement().getBucket())
 					.key("data.json")
 					.build(), requestBody);
 		}
