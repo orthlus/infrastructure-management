@@ -139,7 +139,7 @@ public class BuildService {
 		log("for job '%s' to s3 bucket '%s' uploaded zip file '%s'\n",
 				job.getName(),
 				s3Properties.getBuild().getBucket(),
-				zipFile);
+				zipFile.getFileName());
 		cleanTmp(zipFile.getParent());
 	}
 
