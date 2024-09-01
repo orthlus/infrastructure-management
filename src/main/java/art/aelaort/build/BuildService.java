@@ -140,6 +140,7 @@ public class BuildService {
 				job.getName(),
 				s3Properties.getBuild().getBucket(),
 				zipFile);
+		cleanTmp(zipFile.getParent());
 	}
 
 	private Path zipDir(Job job, Path tmpDir) {
