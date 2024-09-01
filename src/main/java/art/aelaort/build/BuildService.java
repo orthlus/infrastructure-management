@@ -21,6 +21,7 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.OrFileFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.zeroturnaround.zip.ZipUtil;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -124,7 +125,14 @@ public class BuildService {
 				run("mvn clean native:compile -P native", tmpDir);
 				copyArtifactToBinDirectory(java_graal_local, tmpDir);
 			}
+			case zip_src -> zipDir(job, tmpDir);
 		}
+	}
+
+	private void zipDir(Job job, Path tmpDir) {
+		Path zipFile = utils.createTmpDir().resolve(job.getName() + ".zip");
+		ZipUtil.pack(tmpDir.toFile(), zipFile.toFile(), 0);
+		log("for job '%s' created zip file '%s'\n", job.getName(), zipFile);
 	}
 
 	private void copyArtifactToBinDirectory(BuildType type, Path tmpDir) {
