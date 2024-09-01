@@ -129,7 +129,7 @@ public class BuildService {
 				run("mvn clean native:compile -P native", tmpDir);
 				copyArtifactToBinDirectory(java_graal_local, tmpDir);
 			}
-			case zip_s3 -> srcZipToS3(job, tmpDir);
+			case ya_func -> srcZipToS3(job, tmpDir);
 		}
 	}
 

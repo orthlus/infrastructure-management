@@ -1,7 +1,7 @@
 package art.aelaort.models.build;
 
 public enum BuildType {
-	zip_s3,
+	ya_func,
 	java_docker,
 	frontend_vue,
 	java_local,
