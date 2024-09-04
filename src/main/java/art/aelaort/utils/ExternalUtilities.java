@@ -15,10 +15,6 @@ import static art.aelaort.utils.Utils.log;
 @RequiredArgsConstructor
 public class ExternalUtilities {
 	private final SystemProcess systemProcess;
-	@Value("${tabby.decode.script.bin}")
-	private String tabbyDecodeScriptBin;
-	@Value("${tabby.decode.script.file}")
-	private String tabbyDecodeScriptFile;
 	@Value("${build.data.config.bin}")
 	private String buildConfigBin;
 	@Value("${build.data.config.converter.path}")
@@ -54,18 +50,6 @@ public class ExternalUtilities {
 		}
 
 		log("yd sync done");
-	}
-
-	public void tabbyDecode(Path cipherFile, Path decodedFile) {
-		Response response = systemProcess.callProcess(
-				tabbyDecodeScriptBin,
-				tabbyDecodeScriptFile,
-				cipherFile.toString(),
-				decodedFile.toString());
-
-		if (response.exitCode() != 0) {
-			throw new RuntimeException("tabbyDecode \n%s\n%s".formatted(response.stderr(), response.stdout()));
-		}
 	}
 
 	public void proxyUp() {
