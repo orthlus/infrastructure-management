@@ -8,7 +8,9 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,6 +24,7 @@ public class TabbyFiles {
 	private final TabbyS3 tabbyS3;
 	private final YAMLMapper yamlMapper;
 	private final TabbyMapper tabbyMapper;
+	private final RestTemplate tabbyDecoder;
 	@Value("${tabby.config.path}")
 	private Path tabbyConfigPath;
 	@Value("${tabby.decode.password}")
@@ -57,6 +60,11 @@ public class TabbyFiles {
 
 	private String getRemoteFileContent() {
 		String downloaded = tabbyS3.download().split("\n")[1];
-		return CryptoJSImpl.decrypt(downloaded, decodePassword);
+		return decode(downloaded);
+	}
+
+	private String decode(String data) {
+		String url = "/decrypt?password={decodePassword}";
+		return tabbyDecoder.postForObject(url, new HttpEntity<>(data), String.class, decodePassword);
 	}
 }
