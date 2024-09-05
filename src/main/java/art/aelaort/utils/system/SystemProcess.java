@@ -1,10 +1,11 @@
 package art.aelaort.utils.system;
 
+import com.google.common.io.CharStreams;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.file.Path;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -110,25 +111,22 @@ public class SystemProcess {
 			}
 
 			Process p = pb.start();
+
+			Response.ResponseBuilder builder = Response.builder();
+
+			try (Reader reader = new InputStreamReader(p.getInputStream())) {
+				String stdout = CharStreams.toString(reader);
+				builder.stdout(stdout);
+			}
+
+			try (Reader reader = new InputStreamReader(p.getErrorStream())) {
+				String stderr = CharStreams.toString(reader);
+				builder.stderr(stderr);
+			}
+
 			p.waitFor(30, TimeUnit.MINUTES);
 
-			StringBuilder stdout = new StringBuilder();
-			try (BufferedReader b = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
-				String line;
-				while ((line = b.readLine()) != null) {
-					stdout.append(line);
-				}
-			}
-
-			StringBuilder stderr = new StringBuilder();
-			try (BufferedReader b = new BufferedReader(new InputStreamReader(p.getErrorStream()))) {
-				String line;
-				while ((line = b.readLine()) != null) {
-					stderr.append(line);
-				}
-			}
-
-			return new Response(p.exitValue(), stdout.toString(), stderr.toString());
+			return builder.exitCode(p.exitValue()).build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new Response(1, "thrown exception in java", e.getMessage());
