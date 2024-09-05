@@ -115,13 +115,11 @@ public class SystemProcess {
 			Response.ResponseBuilder builder = Response.builder();
 
 			try (Reader reader = new InputStreamReader(p.getInputStream())) {
-				String stdout = CharStreams.toString(reader);
-				builder.stdout(stdout);
+				builder.stdout(CharStreams.toString(reader));
 			}
 
 			try (Reader reader = new InputStreamReader(p.getErrorStream())) {
-				String stderr = CharStreams.toString(reader);
-				builder.stderr(stderr);
+				builder.stderr(CharStreams.toString(reader));
 			}
 
 			p.waitFor(30, TimeUnit.MINUTES);
