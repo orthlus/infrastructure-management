@@ -1,0 +1,1 @@
+-agentlib:native-image-agent=config-output-dir=t:\native-agent
