@@ -143,13 +143,11 @@ public class DockerService {
 			Path newFileLocalPath = resolveDockerFileLocalPath(sshServer.serverDirName());
 
 			try {
-				validateDockerComposeFile(newFileLocalPath);
-
-				Path oldFilePath = utils.createTmpDir().resolve(defaultRemoteFilename);
-
-				sshClient.downloadFile(linuxResolve(defaultRemoteDir, defaultRemoteFilename), oldFilePath, sshServer);
-
 				log("processing update docker compose on server '%s'%n", sshServer.serverDirName());
+
+				validateDockerComposeFile(newFileLocalPath);
+				Path oldFilePath = utils.createTmpDir().resolve(defaultRemoteFilename);
+				sshClient.downloadFile(linuxResolve(defaultRemoteDir, defaultRemoteFilename), oldFilePath, sshServer);
 
 				String coloredFilesDiff = fileDiffService.getColoredFilesDiff(oldFilePath, newFileLocalPath);
 				log("new file changes:\n" + coloredFilesDiff);
