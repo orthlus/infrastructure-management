@@ -1,6 +1,7 @@
 package art.aelaort;
 
 import art.aelaort.build.BuildService;
+import art.aelaort.docker.DockerService;
 import art.aelaort.docker.DockerStatsService;
 import art.aelaort.exceptions.*;
 import art.aelaort.make.ProjectsMakerService;
