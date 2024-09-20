@@ -22,13 +22,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
-import java.util.stream.Stream;
 
-import static art.aelaort.utils.ColoredConsoleTextUtils.wrapBlue;
-import static art.aelaort.utils.ColoredConsoleTextUtils.wrapGreen;
 import static art.aelaort.utils.Utils.linuxResolve;
 import static art.aelaort.utils.Utils.log;
-import static java.util.stream.Collectors.joining;
 
 @Component
 @RequiredArgsConstructor
@@ -47,50 +43,6 @@ public class DockerService {
 	private String defaultRemoteFilename;
 	@Value("${servers.management.dir}")
 	private Path serversDir;
-
-	public String statAllServers() {
-		String statsCommand = "docker stats --no-stream --format \"table {{.Name}}\\t{{.CPUPerc}}\\t{{.MemUsage}}\\t{{.MemPerc}}\\t{{.NetIO}}\"";
-		String dfhCommand = "df -h";
-		String splitRow = "\n" + "=".repeat(100) + "\n";
-		return serversManagementService.scanOnlyLocalData()
-				.stream()
-				.filter(this::hasDockerService)
-				.map(dockerMapper::map)
-				.map(sshServer -> prettyStdoutExecCommandsOnServer(sshServer, statsCommand, dfhCommand))
-				.collect(joining(splitRow));
-	}
-
-	private String prettyStdoutExecCommandsOnServer(SshServer server, String statsCommand, String dfhCommand) {
-		String statsResult = sshClient.getCommandStdout(statsCommand, server);
-		String dfhResult = sshClient.getCommandStdout(dfhCommand, server);
-		return """
-				%s:
-				%s
-				%s
-				
-				%s
-				%s
-				"""
-				.formatted(
-						wrapGreen(server.serverDirName()),
-						wrapBlue("docker stats"),
-						statsResult.trim(),
-						wrapBlue("df -h"),
-						filterDockerStatsOutput(dfhResult).trim()
-				);
-	}
-
-	private String filterDockerStatsOutput(String dockerStats) {
-		return Stream.of(dockerStats.split("\n"))
-				.filter(row -> !row.contains("/var/lib/docker/"))
-				.collect(joining("\n"));
-	}
-
-	private boolean hasDockerService(Server server) {
-		return server.getServices()
-				.stream()
-				.anyMatch(serviceDto -> serviceDto.getYmlName().startsWith("docker"));
-	}
 
 	public SshServer findServer(String nameOrPortOrAppNumber) {
 		try {

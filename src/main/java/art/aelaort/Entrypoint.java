@@ -1,6 +1,7 @@
 package art.aelaort;
 
 import art.aelaort.build.BuildService;
+import art.aelaort.docker.DockerStatsService;
 import art.aelaort.exceptions.*;
 import art.aelaort.make.ProjectsMakerService;
 import art.aelaort.models.build.Job;
@@ -25,6 +26,7 @@ public class Entrypoint implements CommandLineRunner {
 	private final GitStatService gitStatService;
 	private final ScanShowServersService scanShow;
 	private final ProjectsMakerService projectsMakerService;
+	private final DockerStatsService dockerStatsService;
 	@Value("${docker.compose.remote.dir.default}")
 	private String dockerDefaultRemoteDir;
 
@@ -50,7 +52,7 @@ public class Entrypoint implements CommandLineRunner {
 				case "git-stat" -> gitStat(args);
 				case "proxy" -> externalUtilities.proxyUp();
 				case "proxy-d" -> externalUtilities.proxyDown();
-				case "dstat" -> log(dockerService.statAllServers());
+				case "dstat" -> log(dockerStatsService.statAllServers());
 				case "make" -> makeProject(args);
 				default -> log("unknown args\n" + usage());
 			}
