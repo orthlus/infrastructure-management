@@ -53,7 +53,7 @@ public class Entrypoint implements CommandLineRunner {
 				case "git-stat" -> gitStat(args);
 				case "proxy" -> externalUtilities.proxyUp();
 				case "proxy-d" -> externalUtilities.proxyDown();
-				case "dstat" -> log(dockerStatsService.statAllServers());
+				case "dstat" -> dockerStats(args);
 				case "make" -> makeProject(args);
 				default -> log("unknown args\n" + usage());
 			}
@@ -76,7 +76,7 @@ public class Entrypoint implements CommandLineRunner {
 					tbl-scan - show table with generate (for actual data)
 					yml-scan - show tree with generate (for actual data)
 					docker - upload docker-compose file by server name (by default in %s)
-						server_name or port number (required)
+						server_name/port_number/app_number (required)
 					build - build and deploy apps
 						number of app (required for run)
 							without args - printing apps list
@@ -89,7 +89,9 @@ public class Entrypoint implements CommandLineRunner {
 						optional args: day, week, month
 					proxy - start socks5 proxy
 					proxy-d - stop socks5 proxy
-					dstat - docker stats and df -h from all servers
+					dstat - docker stats, docker ps -a and df -h
+						for one server if server_name/port_number/app_number passed
+						or for all servers
 					make - create project folder
 						one arg required
 						`name` for make project by name (could be with sub directories)
@@ -99,6 +101,21 @@ public class Entrypoint implements CommandLineRunner {
 							`no-git` - not init git
 							`jooq` - add jooq config and plugin"""
 				.formatted(dockerDefaultRemoteDir);
+	}
+
+	private void dockerStats(String[] args) {
+		if (args.length >= 2) {
+			try {
+				SshServer sshServer = dockerService.findServer(args[1]);
+				log(dockerStatsService.statByServer(sshServer));
+			} catch (ServerNotFoundException e) {
+				log("server not found");
+			} catch (ServerByPortTooManyServersException e) {
+				log("too many servers found, need more uniq param or fix data");
+			}
+		} else {
+			log(dockerStatsService.statAllServers());
+		}
 	}
 
 	private void makeProject(String[] args) {

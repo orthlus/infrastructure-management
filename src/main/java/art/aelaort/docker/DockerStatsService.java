@@ -5,10 +5,11 @@ import art.aelaort.mappers.DockerMapper;
 import art.aelaort.models.servers.Server;
 import art.aelaort.models.ssh.SshServer;
 import art.aelaort.ssh.SshClient;
+import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static art.aelaort.utils.ColoredConsoleTextUtils.wrapBlue;
@@ -23,15 +24,19 @@ public class DockerStatsService {
 	private final ServersManagementService serversManagementService;
 	private final DockerMapper dockerMapper;
 
-	private final Set<Command> commands = Set.of(
+	private final List<Command> commands = Lists.newArrayList(
+			new Command("docker ps -a",
+					"docker ps -a --format " + dockerCommandTableFormat("Names", "RunningFor", "State", "Status", "Ports", "Size", "Mounts")
+			),
 			new Command("docker stats",
 					"docker stats --no-stream --format " + dockerCommandTableFormat("Name", "CPUPerc", "MemUsage", "MemPerc", "NetIO")
 			),
-			new Command("df -h", "df -h"),
-			new Command("docker ps -a",
-					"docker ps -a --format " + dockerCommandTableFormat("Names", "RunningFor", "State", "Status", "Ports", "Size", "Mounts")
-			)
+			new Command("df -h", "df -h")
 	);
+
+	public String statByServer(SshServer server) {
+		return prettyStdoutExecCommandsOnServer(server);
+	}
 
 	public String statAllServers() {
 		String splitRow = "\n\n" + "=".repeat(100) + "\n";
