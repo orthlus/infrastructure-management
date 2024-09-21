@@ -8,10 +8,12 @@ import art.aelaort.ssh.SshClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static art.aelaort.utils.ColoredConsoleTextUtils.wrapBlue;
 import static art.aelaort.utils.ColoredConsoleTextUtils.wrapGreen;
+import static art.aelaort.utils.Utils.dockerCommandTableFormat;
 import static java.util.stream.Collectors.joining;
 
 @Component
@@ -21,36 +23,38 @@ public class DockerStatsService {
 	private final ServersManagementService serversManagementService;
 	private final DockerMapper dockerMapper;
 
+	private final Set<Command> commands = Set.of(
+			new Command("docker stats",
+					"docker stats --no-stream --format " + dockerCommandTableFormat("Name", "CPUPerc", "MemUsage", "MemPerc", "NetIO")
+			),
+			new Command("df -h", "df -h"),
+			new Command("docker ps -a",
+					"docker ps -a --format " + dockerCommandTableFormat("Names", "RunningFor", "State", "Status", "Ports", "Size", "Mounts")
+			)
+	);
+
 	public String statAllServers() {
-		String statsCommand = "docker stats --no-stream --format \"table {{.Name}}\\t{{.CPUPerc}}\\t{{.MemUsage}}\\t{{.MemPerc}}\\t{{.NetIO}}\"";
-		String dfhCommand = "df -h";
-		String splitRow = "\n" + "=".repeat(100) + "\n";
+		String splitRow = "\n\n" + "=".repeat(100) + "\n";
 		return serversManagementService.scanOnlyLocalData()
 				.stream()
 				.filter(this::hasDockerService)
 				.map(dockerMapper::map)
-				.map(sshServer -> prettyStdoutExecCommandsOnServer(sshServer, statsCommand, dfhCommand))
+				.map(this::prettyStdoutExecCommandsOnServer)
 				.collect(joining(splitRow));
 	}
 
-	private String prettyStdoutExecCommandsOnServer(SshServer server, String statsCommand, String dfhCommand) {
-		String statsResult = sshClient.getCommandStdout(statsCommand, server);
-		String dfhResult = sshClient.getCommandStdout(dfhCommand, server);
-		return """
-				%s:
-				%s
-				%s
-				
-				%s
-				%s
-				"""
-				.formatted(
-						wrapGreen(server.serverDirName()),
-						wrapBlue("docker stats"),
-						statsResult.trim(),
-						wrapBlue("df -h"),
-						filterDockerStatsOutput(dfhResult).trim()
-				);
+	private String prettyStdoutExecCommandsOnServer(SshServer server) {
+		String list = commands.stream()
+				.map(command -> getCommandString(command, sshClient.getCommandStdout(command.command(), server)))
+				.collect(joining("\n\n"));
+		return "%s:\n%s".formatted(
+				wrapGreen(server.serverDirName()),
+				list
+		);
+	}
+
+	private String getCommandString(Command command, String result) {
+		return wrapBlue(command.title()) + "\n" + filterOutput(command, result).trim();
 	}
 
 	private boolean hasDockerService(Server server) {
@@ -59,9 +63,16 @@ public class DockerStatsService {
 				.anyMatch(serviceDto -> serviceDto.getYmlName().startsWith("docker"));
 	}
 
-	private String filterDockerStatsOutput(String dockerStats) {
-		return Stream.of(dockerStats.split("\n"))
-				.filter(row -> !row.contains("/var/lib/docker/"))
-				.collect(joining("\n"));
+	private String filterOutput(Command command, String output) {
+		return switch (command.title()) {
+			case "df -h" -> Stream.of(output.split("\n"))
+					.filter(row -> !row.contains("/var/lib/docker/"))
+					.filter(row -> !row.contains("tmpfs"))
+					.collect(joining("\n"));
+			default -> output;
+		};
+	}
+
+	record Command(String title, String command) {
 	}
 }

@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.joining;
 
 @Component
 public class Utils {
@@ -25,6 +28,13 @@ public class Utils {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public static String dockerCommandTableFormat(String... keys) {
+		String collect = Stream.of(keys)
+				.map("{{.%s}}"::formatted)
+				.collect(joining("\\t"));
+		return "\"table %s\"".formatted(collect);
 	}
 
 	public static String linuxResolve(String root, Path path) {
