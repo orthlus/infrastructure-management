@@ -35,7 +35,7 @@ public class SshKeyUploader {
 			Path authorizedKeysPath = tmp.resolve("authorized_keys");
 			sshClient.downloadFile(authorizedKeysFileByUser(user), authorizedKeysPath, sshServer);
 			appendToNewLine(toUpload, authorizedKeysPath);
-			sshClient.uploadFile(authorizedKeysPath, authorizedKeysFileByUser(user), sshServer);
+			sshClient.uploadFileNewName(authorizedKeysPath, authorizedKeysFileByUser(user), sshServer);
 			log("append new key to remote authorized_keys (%s)%n", user);
 		} catch (SshNotFountFileException e) {
 			sshClient.uploadFileNewName(
