@@ -38,6 +38,16 @@ public class SshClient {
 		}
 	}
 
+	public void uploadFileNewName(Path fileToUpload, String remotePath, SshServer server) {
+		try (JschConnection jsch = jsch(server)) {
+			jsch.sftp().put(
+					fileToUpload.toString(),
+					remotePath);
+		} catch (SftpException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public void uploadFile(Path fileToUpload, String remoteDir, SshServer server) {
 		try (JschConnection jsch = jsch(server)) {
 			jsch.sftp().put(

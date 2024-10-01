@@ -28,6 +28,7 @@ public class Entrypoint implements CommandLineRunner {
 	private final ScanShowServersService scanShow;
 	private final ProjectsMakerService projectsMakerService;
 	private final DockerStatsService dockerStatsService;
+	private final SshKeyUploader sshKeyUploader;
 	@Value("${docker.compose.remote.dir.default}")
 	private String dockerDefaultRemoteDir;
 
@@ -55,6 +56,7 @@ public class Entrypoint implements CommandLineRunner {
 				case "proxy-d" -> externalUtilities.proxyDown();
 				case "dstat" -> dockerStats(args);
 				case "make" -> makeProject(args);
+				case "upld-ssh" -> uploadSshKey(args);
 				default -> log("unknown args\n" + usage());
 			}
 		} else {
@@ -99,7 +101,10 @@ public class Entrypoint implements CommandLineRunner {
 						`id` for make project with name from config by id
 						optional:
 							`no-git` - not init git
-							`jooq` - add jooq config and plugin"""
+							`jooq` - add jooq config and plugin
+					upld-ssh - upload ssh key to server
+						by server port/name or app number
+						required user name (2 arg)"""
 				.formatted(dockerDefaultRemoteDir);
 	}
 
@@ -160,6 +165,21 @@ public class Entrypoint implements CommandLineRunner {
 			} catch (BuildJobNotFoundException e) {
 				log("job %s not found\n", args[1]);
 			}
+		}
+	}
+
+	private void uploadSshKey(String[] args) {
+		validArgs(args, 4);
+
+		try {
+			SshServer sshServer = dockerService.findServer(args[1]);
+			sshKeyUploader.uploadSshKey(sshServer, args[2], args[3]);
+		} catch (LocalFileNotFountException e) {
+			log("file to upload not found: %s%n", e.getMessage());
+		} catch (ServerNotFoundException e) {
+			log("server not found");
+		} catch (ServerByPortTooManyServersException e) {
+			log("too many servers found, need more uniq param or fix data");
 		}
 	}
 
