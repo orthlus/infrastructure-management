@@ -164,17 +164,21 @@ public class Entrypoint implements CommandLineRunner {
 	}
 
 	private void dockerUpload(String[] args) {
-		if (args.length >= 2) {
-			try {
-				SshServer sshServer = dockerService.findServer(args[1]);
-				dockerService.uploadDockerFile(sshServer);
-			} catch (ServerNotFoundException e) {
-				log("server not found");
-			} catch (ServerByPortTooManyServersException e) {
-				log("too many servers found, need more uniq param or fix data");
-			}
-		} else {
-			log("at least 2 args required");
+		validArgs(args, 2);
+
+		try {
+			SshServer sshServer = dockerService.findServer(args[1]);
+			dockerService.uploadDockerFile(sshServer);
+		} catch (ServerNotFoundException e) {
+			log("server not found");
+		} catch (ServerByPortTooManyServersException e) {
+			log("too many servers found, need more uniq param or fix data");
+		}
+	}
+
+	private void validArgs(String[] args, int requiredLength) {
+		if (args.length < requiredLength) {
+			log("at least %d args required%n", requiredLength);
 			log(usage());
 			System.exit(1);
 		}
