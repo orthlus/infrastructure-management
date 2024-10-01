@@ -104,7 +104,8 @@ public class Entrypoint implements CommandLineRunner {
 							`jooq` - add jooq config and plugin
 					upld-ssh - upload ssh key to server
 						by server port/name or app number
-						required user name (2 arg)"""
+						required key file path (2 arg)
+						required user name (3 arg)"""
 				.formatted(dockerDefaultRemoteDir);
 	}
 
