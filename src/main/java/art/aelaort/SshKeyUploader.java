@@ -32,6 +32,7 @@ public class SshKeyUploader {
 
 		Path tmp = utils.createTmpDir();
 		try {
+			sshClient.mkdir(sshDirByUser(user), sshServer);
 			Path authorizedKeysPath = tmp.resolve("authorized_keys");
 			sshClient.downloadFile(authorizedKeysFileByUser(user), authorizedKeysPath, sshServer);
 			appendToNewLine(toUpload, authorizedKeysPath);
@@ -57,8 +58,12 @@ public class SshKeyUploader {
 		}
 	}
 
+	private String sshDirByUser(String user) {
+		return linuxResolve(linuxHomeByUser(user), ".ssh");
+	}
+
 	private String authorizedKeysFileByUser(String user) {
-		return linuxResolve(linuxHomeByUser(user), ".ssh/authorized_keys");
+		return linuxResolve(sshDirByUser(user), "authorized_keys");
 	}
 
 	public String linuxHomeByUser(String user) {

@@ -38,6 +38,13 @@ public class SshClient {
 		}
 	}
 
+	public void mkdir(String remotePath, SshServer server) {
+		try (JschConnection jsch = jsch(server)) {
+			jsch.sftp().mkdir(remotePath);
+		} catch (Exception ignored) {
+		}
+	}
+
 	public void uploadFileNewName(Path fileToUpload, String remotePath, SshServer server) {
 		try (JschConnection jsch = jsch(server)) {
 			jsch.sftp().put(
