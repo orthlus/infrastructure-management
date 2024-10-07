@@ -25,7 +25,7 @@ public class PlaceholderFiller {
 				.replace(placeholder.getGroupVersion(), value.getGroupVersion())
 				.replace(placeholder.getSpringVersion(), value.getSpringVersion())
 				.replace(placeholder.getJavaVersion(), value.getJavaVersion())
-				.replace(placeholder.getProjectName(), project.getName())
+				.replace(placeholder.getProjectName(), getNameWithoutDir(project))
 				.replace(placeholder.getMainPackage(), value.getMainPackage())
 				.replace(placeholder.getJooqPlugin(), project.isHasJooq() ? readJooqPluginContent() : "");
 	}
@@ -33,5 +33,18 @@ public class PlaceholderFiller {
 	@SneakyThrows
 	private String readJooqPluginContent() {
 		return Files.readString(defaultFilesDir.resolve(properties.getJooqPluginFilepath()));
+	}
+
+	private String getNameWithoutDir(Project project) {
+		String name = project.getName();
+		if (name.contains("/")) {
+			String[] split = name.split("/");
+			return split[split.length - 1];
+		} else if (name.contains("\\")) {
+			String[] split = name.split("\\\\");
+			return split[split.length - 1];
+		} else {
+			return name;
+		}
 	}
 }
