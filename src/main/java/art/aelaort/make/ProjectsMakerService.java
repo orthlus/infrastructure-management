@@ -129,6 +129,7 @@ public class ProjectsMakerService {
 		Files.createDirectories(dir
 				.resolve("src")
 				.resolve("test")
+				.resolve("java")
 				.resolve("main"));
 	}
 
