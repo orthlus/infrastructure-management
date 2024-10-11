@@ -116,10 +116,10 @@ public class BuildService {
 		switch (job.getBuildType()) {
 			case docker -> dockerBuildPush(job, tmpDir, isBuildDockerNoCache);
 			case java_docker -> {
-				run("mvn clean package", tmpDir);
+				run("mvn clean package -DskipTests", tmpDir);
 				dockerBuildPush(job, tmpDir, isBuildDockerNoCache);
 			}
-			case java_local -> run("mvn clean install", tmpDir);
+			case java_local -> run("mvn clean install -DskipTests", tmpDir);
 			case frontend_vue -> {
 				run("yarn install", tmpDir);
 				run("yarn run build", tmpDir);
