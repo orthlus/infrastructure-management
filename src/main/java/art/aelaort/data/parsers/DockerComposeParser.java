@@ -38,7 +38,7 @@ public class DockerComposeParser {
 			boolean monitoring = serverDir.resolve(monitoringFile).toFile().exists();
 
 			DockerComposeFile file = yamlMapper.readValue(ymlFile.toFile(), DockerComposeFile.class);
-			validateDockerServices(file);
+			validateDockerServices(file, ymlFile);
 
 			List<ServiceDto> resultServices = new ArrayList<>();
 			for (Map.Entry<String, DockerComposeFile.Service> entry : file.getServices().entrySet()) {
@@ -51,12 +51,12 @@ public class DockerComposeParser {
 		}
 	}
 
-	private void validateDockerServices(DockerComposeFile file) {
+	private void validateDockerServices(DockerComposeFile file, Path ymlFile) {
 		file.getServices()
 				.entrySet()
 				.stream()
 				.filter(e -> e.getValue().getRestart() == null)
-				.forEach(e -> log("docker service '%s' - not found 'restart'\n", e.getKey()));
+				.forEach(e -> log("docker service '%s' - not found 'restart' (%s)\n", e.getKey(), ymlFile));
 	}
 
 	private ServiceDto getServiceDto(Path ymlFile, Map.Entry<String, DockerComposeFile.Service> entry) {
