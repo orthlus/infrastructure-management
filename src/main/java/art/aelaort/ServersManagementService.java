@@ -1,7 +1,7 @@
 package art.aelaort;
 
-import art.aelaort.data.src.CustomProjectYamlParser;
-import art.aelaort.data.src.DockerComposeParser;
+import art.aelaort.data.parsers.CustomProjectYamlParser;
+import art.aelaort.data.parsers.DockerComposeParser;
 import art.aelaort.mappers.ServerMapper;
 import art.aelaort.models.servers.DirServer;
 import art.aelaort.models.servers.Server;
