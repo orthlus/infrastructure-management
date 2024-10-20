@@ -20,5 +20,7 @@ public class DockerComposeFile {
 		String containerName;
 		@JsonProperty
 		String image;
+		@JsonProperty
+		String restart;
 	}
 }

@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static art.aelaort.utils.Utils.log;
+
 @Component
 @RequiredArgsConstructor
 public class DockerComposeParser {
@@ -36,6 +38,7 @@ public class DockerComposeParser {
 			boolean monitoring = serverDir.resolve(monitoringFile).toFile().exists();
 
 			DockerComposeFile file = yamlMapper.readValue(ymlFile.toFile(), DockerComposeFile.class);
+			validateDockerServices(file);
 
 			List<ServiceDto> resultServices = new ArrayList<>();
 			for (Map.Entry<String, DockerComposeFile.Service> entry : file.getServices().entrySet()) {
@@ -46,6 +49,14 @@ public class DockerComposeParser {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private void validateDockerServices(DockerComposeFile file) {
+		file.getServices()
+				.entrySet()
+				.stream()
+				.filter(e -> e.getValue().getRestart() == null)
+				.forEach(e -> log("docker service '%s' - not found 'restart'\n", e.getKey()));
 	}
 
 	private ServiceDto getServiceDto(Path ymlFile, Map.Entry<String, DockerComposeFile.Service> entry) {
