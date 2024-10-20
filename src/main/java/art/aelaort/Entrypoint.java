@@ -29,6 +29,7 @@ public class Entrypoint implements CommandLineRunner {
 	private final ProjectsMakerService projectsMakerService;
 	private final DockerStatsService dockerStatsService;
 	private final SshKeyUploader sshKeyUploader;
+	private final RandomPortService randomPortService;
 	@Value("${docker.compose.remote.dir.default}")
 	private String dockerDefaultRemoteDir;
 
@@ -57,6 +58,7 @@ public class Entrypoint implements CommandLineRunner {
 				case "dstat" -> dockerStats(args);
 				case "make" -> makeProject(args);
 				case "upld-ssh" -> uploadSshKey(args);
+				case "port" -> log(randomPortService.getRandomPort());
 				default -> log("unknown args\n" + usage());
 			}
 		} else {
@@ -105,7 +107,8 @@ public class Entrypoint implements CommandLineRunner {
 					upld-ssh - upload ssh key to server
 						by server port/name or app number
 						required key file path (2 arg)
-						required user name (3 arg)"""
+						required user name (3 arg)
+					port - generate random, not used, port for tcp. 5 digits"""
 				.formatted(dockerDefaultRemoteDir);
 	}
 
