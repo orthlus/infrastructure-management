@@ -13,6 +13,7 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -132,19 +133,25 @@ public class ServersManagementService {
 		Files.writeString(jsonDataPath, jsonStr);
 	}
 
-	@SneakyThrows
 	private List<Path> findYmlFiles(Path dir) {
-		return Files.walk(dir, 1)
-				.filter(path -> path.getFileName().toString().toLowerCase().endsWith(".yml"))
-				.toList();
+		try (Stream<Path> walk = Files.walk(dir, 1)) {
+			return walk
+					.filter(path -> path.getFileName().toString().toLowerCase().endsWith(".yml"))
+					.toList();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	@SneakyThrows
 	private List<Path> scanLocalDirs() {
-		return Files.walk(serversDir, 1)
-				.filter(path -> !path.equals(serversDir))
-				.filter(path -> path.toFile().isDirectory())
-				.filter(path -> !path.resolve(notScanFile).toFile().exists())
-				.toList();
+		try (Stream<Path> walk = Files.walk(serversDir, 1)) {
+			return walk
+					.filter(path -> !path.equals(serversDir))
+					.filter(path -> path.toFile().isDirectory())
+					.filter(path -> !path.resolve(notScanFile).toFile().exists())
+					.toList();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
