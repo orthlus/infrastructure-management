@@ -1,7 +1,7 @@
 package art.aelaort.docker;
 
 import art.aelaort.ServersManagementService;
-import art.aelaort.mappers.DockerMapper;
+import art.aelaort.mappers.ServerMapper;
 import art.aelaort.models.servers.Server;
 import art.aelaort.models.ssh.SshServer;
 import art.aelaort.ssh.SshClient;
@@ -22,7 +22,7 @@ import static java.util.stream.Collectors.joining;
 public class DockerStatsService {
 	private final SshClient sshClient;
 	private final ServersManagementService serversManagementService;
-	private final DockerMapper dockerMapper;
+	private final ServerMapper serverMapper;
 
 	private final List<Command> commands = Lists.newArrayList(
 			new Command("docker ps -a",
@@ -43,7 +43,7 @@ public class DockerStatsService {
 		return serversManagementService.scanOnlyLocalData()
 				.stream()
 				.filter(this::hasDockerService)
-				.map(dockerMapper::map)
+				.map(serverMapper::map)
 				.map(this::prettyStdoutExecCommandsOnServer)
 				.collect(joining(splitRow));
 	}

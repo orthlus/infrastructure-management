@@ -1,13 +1,9 @@
 package art.aelaort.docker;
 
-import art.aelaort.ServersManagementService;
-import art.aelaort.TabbyFiles;
-import art.aelaort.build.BuildService;
-import art.aelaort.exceptions.*;
-import art.aelaort.mappers.DockerMapper;
-import art.aelaort.models.servers.Server;
-import art.aelaort.models.servers.ServiceDto;
-import art.aelaort.models.servers.TabbyServer;
+import art.aelaort.exceptions.DockerComposeValidationFailedException;
+import art.aelaort.exceptions.NoDifferenceInFilesException;
+import art.aelaort.exceptions.SshNotFountFileException;
+import art.aelaort.exceptions.TooManyDockerFilesException;
 import art.aelaort.models.ssh.SshServer;
 import art.aelaort.ssh.SshClient;
 import art.aelaort.utils.ExternalUtilities;
@@ -35,62 +31,12 @@ public class DockerService {
 	private final FileDiffService fileDiffService;
 	private final ExternalUtilities externalUtilities;
 	private final Utils utils;
-	private final DockerMapper dockerMapper;
-	private final TabbyFiles tabbyFiles;
-	private final BuildService buildService;
-	private final ServersManagementService serversManagementService;
 	@Value("${docker.compose.remote.dir.default}")
 	private String defaultRemoteDir;
 	@Value("${docker.compose.remote.filename.default}")
 	private String defaultRemoteFilename;
 	@Value("${servers.management.dir}")
 	private Path serversDir;
-
-	public SshServer findServer(String nameOrPortOrAppNumber) {
-		try {
-			int appNumberOrPort = Integer.parseInt(nameOrPortOrAppNumber);
-			return appNumberOrPort > 9999 ?
-					getServerByPortNumber(appNumberOrPort) :
-					getServerByAppNumber(appNumberOrPort);
-		} catch (NumberFormatException e) {
-			return getServerByName(nameOrPortOrAppNumber);
-		}
-	}
-
-	private SshServer getServerByAppNumber(int appNumber) {
-		String jobName = buildService.getJobsMapById().get(appNumber).getName();
-		List<Server> servers = serversManagementService.scanOnlyLocalData();
-		for (Server server : servers) {
-			for (ServiceDto service : server.getServices()) {
-				String dockerImageName = service.getDockerImageName();
-				if (dockerImageName != null && dockerImageName.equals(jobName)) {
-					return dockerMapper.map(server);
-				}
-			}
-		}
-		throw new ServerNotFoundException();
-	}
-
-	private SshServer getServerByPortNumber(int port) {
-		List<TabbyServer> list = tabbyFiles.readLocal()
-				.stream()
-				.filter(s -> s.port() == port)
-				.toList();
-		return switch (list.size()) {
-			case 0 -> throw new ServerNotFoundException();
-			case 1 -> dockerMapper.map(list.get(0));
-			default -> throw new ServerByPortTooManyServersException();
-		};
-	}
-
-	private SshServer getServerByName(String name) {
-		return tabbyFiles.readLocal()
-				.stream()
-				.filter(s -> s.name().equals(name))
-				.map(dockerMapper::map)
-				.findFirst()
-				.orElseThrow(ServerNotFoundException::new);
-	}
 
 	public void uploadDockerFile(SshServer sshServer) {
 		try {

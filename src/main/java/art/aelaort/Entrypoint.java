@@ -30,6 +30,7 @@ public class Entrypoint implements CommandLineRunner {
 	private final DockerStatsService dockerStatsService;
 	private final SshKeyUploader sshKeyUploader;
 	private final RandomPortService randomPortService;
+	private final ServerProvider serverProvider;
 	@Value("${docker.compose.remote.dir.default}")
 	private String dockerDefaultRemoteDir;
 
@@ -115,7 +116,7 @@ public class Entrypoint implements CommandLineRunner {
 	private void dockerStats(String[] args) {
 		if (args.length >= 2) {
 			try {
-				SshServer sshServer = dockerService.findServer(args[1]);
+				SshServer sshServer = serverProvider.findServer(args[1]);
 				log(dockerStatsService.statByServer(sshServer));
 			} catch (ServerNotFoundException e) {
 				log("server not found");
@@ -176,7 +177,7 @@ public class Entrypoint implements CommandLineRunner {
 		validArgs(args, 4);
 
 		try {
-			SshServer sshServer = dockerService.findServer(args[1]);
+			SshServer sshServer = serverProvider.findServer(args[1]);
 			sshKeyUploader.uploadSshKey(sshServer, args[2], args[3]);
 		} catch (LocalFileNotFountException e) {
 			log("file to upload not found: %s%n", e.getMessage());
@@ -191,7 +192,7 @@ public class Entrypoint implements CommandLineRunner {
 		validArgs(args, 2);
 
 		try {
-			SshServer sshServer = dockerService.findServer(args[1]);
+			SshServer sshServer = serverProvider.findServer(args[1]);
 			dockerService.uploadDockerFile(sshServer);
 		} catch (ServerNotFoundException e) {
 			log("server not found");
