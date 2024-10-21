@@ -43,10 +43,10 @@ public class ServersManagementService {
 
 	public void saveIps(List<Server> servers) {
 		String text = servers.stream()
-				.filter(Server::isMonitoring)
-				.map(server -> server.getName() + ":" + server.getIp() + ":" + server.getPort())
-				.collect(Collectors.joining("\n"))
-				+ "\n";
+							  .filter(Server::isMonitoring)
+							  .map(server -> server.getName() + ":" + server.getIp() + ":" + server.getPort())
+							  .collect(Collectors.joining("\n"))
+					  + "\n";
 		serversManagementS3.uploadIps(text);
 		log("ips uploaded");
 	}
