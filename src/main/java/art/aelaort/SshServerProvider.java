@@ -15,7 +15,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class ServerProvider {
+public class SshServerProvider {
 	private final TabbyFiles tabbyFiles;
 	private final ServerMapper serverMapper;
 	private final BuildService buildService;
