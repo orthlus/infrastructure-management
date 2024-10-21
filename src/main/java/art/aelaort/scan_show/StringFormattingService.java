@@ -97,14 +97,28 @@ public class StringFormattingService {
 		for (int i = 0; i < servers.size(); i++) {
 			Server server = servers.get(i);
 			result[i][0] = server.getName();
-			result[i][1] = server.getIp() + " ";
-			result[i][2] = server.getPort() == -1 ? "-" : server.getPort() + " ";
+			result[i][1] = nullable(server.getIp());
+			result[i][2] = nullable(server.getPort());
 			result[i][3] = server.isMonitoring();
-			result[i][4] = server.getSshKey();
+			result[i][4] = nullable(server.getSshKey());
 			result[i][5] = server.getServicesStr();
 		}
 
+		appendSpaceToRight(result);
+
 		return result;
+	}
+
+	private String nullable(Object obj) {
+		return obj == null ? " - " : String.valueOf(obj);
+	}
+
+	private void appendSpaceToRight(Object[][] result) {
+		for (Object[] row : result) {
+			for (int j = 0; j < row.length; j++) {
+				row[j] = row[j] + " ";
+			}
+		}
 	}
 
 	@Deprecated
