@@ -5,12 +5,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.unix4j.Unix4j;
 
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Random;
 import java.util.stream.Stream;
+
+import static art.aelaort.utils.Utils.log;
 
 @Component
 @RequiredArgsConstructor
@@ -27,7 +32,12 @@ public class RandomPortService {
 		while (isPortUsed(port)) {
 			port = random.nextInt(minPort, maxPort);
 		}
-		return String.valueOf(port);
+
+		String str = String.valueOf(port);
+		copyToClipboard(str);
+		log("copied to clipboard");
+
+		return str;
 	}
 
 	private boolean isPortUsed(int port) {
@@ -47,5 +57,11 @@ public class RandomPortService {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private void copyToClipboard(String s) {
+		StringSelection stringSelection = new StringSelection(s);
+		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		clipboard.setContents(stringSelection, null);
 	}
 }
