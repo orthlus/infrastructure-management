@@ -32,12 +32,7 @@ public class RandomPortService {
 		while (isPortUsed(port)) {
 			port = random.nextInt(minPort, maxPort);
 		}
-
-		String str = String.valueOf(port);
-		copyToClipboard(str);
-		log("copied to clipboard");
-
-		return str;
+		return String.valueOf(port);
 	}
 
 	private boolean isPortUsed(int port) {
