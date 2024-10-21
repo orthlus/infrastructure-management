@@ -46,7 +46,7 @@ public class StringFormattingService {
 					.append("\n      ")
 					.append(join);
 		}
-		return sb.append("\n").toString();
+		return sb.append("\n\n").toString();
 	}
 
 	private Map<String, List<String>> servicesMapList(List<ServiceDto> services) {
