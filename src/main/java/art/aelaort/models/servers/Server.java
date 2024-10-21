@@ -1,16 +1,24 @@
 package art.aelaort.models.servers;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.With;
+import lombok.extern.jackson.Jacksonized;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.String.join;
 
+@Builder
 @Getter
-@NoArgsConstructor
+@Jacksonized
 public class Server {
+	@JsonProperty
+	@With
+	private Integer id;
 	@JsonProperty
 	private String name;
 	@JsonProperty
@@ -18,27 +26,23 @@ public class Server {
 	@JsonProperty
 	private String sshKey;
 	@JsonProperty
-	private int port;
+	private Integer port;
 	@JsonProperty
 	private boolean monitoring;
 	@JsonProperty
 	private List<ServiceDto> services;
-	@JsonProperty
-	private String servicesStr;
 
-	public Server(String name, String ip, String sshKey, int port, boolean monitoring, List<ServiceDto> services) {
-		this.name = name;
-		this.ip = ip;
-		this.sshKey = sshKey;
-		this.port = port;
-		this.monitoring = monitoring;
-		this.services = services;
-		this.servicesStr = servicesStr(services);
-	}
-
-	private static String servicesStr(List<ServiceDto> services) {
+	public static String servicesStr(List<ServiceDto> services) {
 		return join(", ", services.stream()
 				.map(s -> s.getDockerName() != null ? s.getDockerName() : s.getService())
 				.toList());
+	}
+
+	public static List<Server> addNumbers(List<Server> servers) {
+		AtomicInteger i = new AtomicInteger(1);
+		return servers.stream()
+				.sorted(Comparator.comparing(Server::getName))
+				.map(server -> server.withId(i.getAndIncrement()))
+				.toList();
 	}
 }

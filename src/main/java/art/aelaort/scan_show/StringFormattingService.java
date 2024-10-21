@@ -71,6 +71,7 @@ public class StringFormattingService {
 	public String getServersTableString(List<Server> servers) {
 		log("servers:");
 		String[] columnNames = {
+				"id",
 				"name",
 				"ip",
 				"port",
@@ -81,7 +82,6 @@ public class StringFormattingService {
 
 		Object[][] data = convertServersToArrays(servers);
 		TextTable tt = new TextTable(columnNames, data);
-		tt.setAddRowNumbering(true);
 		return getTableString(tt);
 	}
 
@@ -93,15 +93,16 @@ public class StringFormattingService {
 	}
 
 	private Object[][] convertServersToArrays(List<Server> servers) {
-		Object[][] result = new Object[servers.size()][6];
+		Object[][] result = new Object[servers.size()][7];
 		for (int i = 0; i < servers.size(); i++) {
 			Server server = servers.get(i);
-			result[i][0] = server.getName();
-			result[i][1] = nullable(server.getIp());
-			result[i][2] = nullable(server.getPort());
-			result[i][3] = server.isMonitoring();
-			result[i][4] = nullable(server.getSshKey());
-			result[i][5] = server.getServicesStr();
+			result[i][0] = server.getId();
+			result[i][1] = server.getName();
+			result[i][2] = nullable(server.getIp());
+			result[i][3] = nullable(server.getPort());
+			result[i][4] = server.isMonitoring();
+			result[i][5] = nullable(server.getSshKey());
+			result[i][6] = Server.servicesStr(server.getServices());
 		}
 
 		appendSpaceToRight(result);
@@ -153,7 +154,7 @@ public class StringFormattingService {
 		String portStr = rightPad(valueOf(obj.getPort()), lengths.portLength());
 		String monitoringStr = rightPad(valueOf(obj.isMonitoring()), lengths.monitoringLength());
 		String sshKeyStr = rightPad(obj.getSshKey(), lengths.sshKeyLength());
-		String servicesStr = rightPad(obj.getServicesStr(), lengths.servicesLength());
+		String servicesStr = rightPad(Server.servicesStr(obj.getServices()), lengths.servicesLength());
 
 		return "%s %s %s %s %s %s".formatted(nameStr, ipStr, portStr, monitoringStr, sshKeyStr, servicesStr);
 	}
@@ -167,7 +168,7 @@ public class StringFormattingService {
 		for (Server server : servers) {
 			lengths.nameLength(Math.max(lengths.nameLength(), server.getName().length()));
 			lengths.sshKeyLength(Math.max(lengths.sshKeyLength(), server.getSshKey().length()));
-			lengths.servicesLength(Math.max(lengths.servicesLength(), server.getServicesStr().length()));
+			lengths.servicesLength(Math.max(lengths.servicesLength(), Server.servicesStr(server.getServices()).length()));
 		}
 		lengths.nameLength(lengths.nameLength() + 1);
 		lengths.ipLength(lengths.ipLength() + 1);

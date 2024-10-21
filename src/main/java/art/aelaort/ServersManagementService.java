@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static art.aelaort.utils.Utils.log;
 
@@ -99,23 +100,38 @@ public class ServersManagementService {
 		List<Server> result = new ArrayList<>(tabbyServers.size());
 
 		for (TabbyServer tabbyServer : tabbyServers) {
+			Server.ServerBuilder serverBuilder = Server.builder()
+					.name(tabbyServer.name())
+					.ip(tabbyServer.host())
+					.port(tabbyServer.port())
+					.sshKey(tabbyServer.keyPath().replace("\\", "/"));
+
 			DirServer dirServer = mapServers.get(tabbyServer.name());
-			String sshKey = tabbyServer.keyPath().replace("\\", "/");
 			if (dirServer == null) {
-				result.add(new Server(tabbyServer.name(), tabbyServer.host(), sshKey, tabbyServer.port(), false, List.of()));
+				serverBuilder
+						.monitoring(false)
+						.services(List.of());
 			} else {
-				result.add(new Server(tabbyServer.name(), tabbyServer.host(), sshKey, tabbyServer.port(), dirServer.monitoring(), dirServer.services()));
+				serverBuilder
+						.monitoring(dirServer.monitoring())
+						.services(dirServer.services());
 			}
+			result.add(serverBuilder.build());
 		}
 
 		Map<String, TabbyServer> mapTabbyServers = serverMapper.toMapTabby(tabbyServers);
 		for (DirServer dirServer : dirServers) {
 			if (!mapTabbyServers.containsKey(dirServer.name())) {
-				result.add(new Server(dirServer.name(), "-", "-", -1, dirServer.monitoring(), dirServer.services()));
+				Server server = Server.builder()
+						.name(dirServer.name())
+						.monitoring(dirServer.monitoring())
+						.services(dirServer.services())
+						.build();
+				result.add(server);
 			}
 		}
 
-		return result;
+		return Server.addNumbers(result);
 	}
 
 	@SneakyThrows
