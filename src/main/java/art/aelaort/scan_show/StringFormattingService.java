@@ -107,6 +107,7 @@ public class StringFormattingService {
 		return result;
 	}
 
+	@Deprecated
 	public String serversTableString(List<Server> servers) {
 		ServerDataLength lengths = getLengths(servers);
 		String nameHeader = center("name", lengths.nameLength());
@@ -131,6 +132,7 @@ public class StringFormattingService {
 		return sb.toString().replaceAll(" +$", "");
 	}
 
+	@Deprecated
 	private String toStr(Server obj, ServerDataLength lengths) {
 		String nameStr = rightPad(obj.getName(), lengths.nameLength());
 		String ipStr = rightPad(obj.getIp(), lengths.ipLength());
@@ -142,6 +144,7 @@ public class StringFormattingService {
 		return "%s %s %s %s %s %s".formatted(nameStr, ipStr, portStr, monitoringStr, sshKeyStr, servicesStr);
 	}
 
+	@Deprecated
 	private ServerDataLength getLengths(List<Server> servers) {
 		ServerDataLength lengths = new ServerDataLength();
 		lengths.monitoringLength(12);
