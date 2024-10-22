@@ -6,13 +6,12 @@ import art.aelaort.models.servers.ServiceDto;
 import dnl.utils.text.table.TextTable;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static art.aelaort.utils.TablePrintingUtils.*;
 import static art.aelaort.utils.Utils.log;
 import static java.lang.String.join;
 import static java.lang.String.valueOf;
@@ -85,13 +84,6 @@ public class StringFormattingService {
 		return getTableString(tt);
 	}
 
-	private String getTableString(TextTable textTable) {
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		PrintStream printStream = new PrintStream(outputStream);
-		textTable.printTable(printStream, 0);
-		return outputStream.toString();
-	}
-
 	private Object[][] convertServersToArrays(List<Server> servers) {
 		Object[][] result = new Object[servers.size()][7];
 		for (int i = 0; i < servers.size(); i++) {
@@ -108,18 +100,6 @@ public class StringFormattingService {
 		appendSpaceToRight(result);
 
 		return result;
-	}
-
-	private String nullable(Object obj) {
-		return obj == null ? " - " : String.valueOf(obj);
-	}
-
-	private void appendSpaceToRight(Object[][] result) {
-		for (Object[] row : result) {
-			for (int j = 0; j < row.length; j++) {
-				row[j] = row[j] + " ";
-			}
-		}
 	}
 
 	@Deprecated

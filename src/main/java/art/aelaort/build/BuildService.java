@@ -57,6 +57,7 @@ public class BuildService {
 
 	private final IOFileFilter dockerLookupFilter =
 			FileFilterUtils.suffixFileFilter("dockerfile", IOCase.INSENSITIVE);
+	private final JobsTextTable jobsTextTable;
 
 	public void run(Job job, boolean isBuildDockerNoCache) {
 		if (isApproved(job)) {
@@ -261,11 +262,11 @@ public class BuildService {
 	private List<Job> readBuildConfig() {
 		String jobsStr = externalUtilities.readBuildConfig();
 		Job[] jobs = jsonMapper.readValue(jobsStr, Job[].class);
-		return Arrays.asList(jobs);
+		return Job.addNumbers(Arrays.asList(jobs));
 	}
 
 	public void printConfig() {
-		log(getConfigString());
+		log(jobsTextTable.getJobsTableString(readBuildConfig()));
 	}
 
 	@SneakyThrows

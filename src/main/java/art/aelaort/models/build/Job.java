@@ -5,13 +5,22 @@ import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.With;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+
+import static java.util.Collections.frequency;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 public class Job {
-	@JsonProperty
-	private int id;
+	@With
+	private Integer id;
 	@JsonProperty
 	private String name;
 	@JsonProperty("build_type")
@@ -35,6 +44,36 @@ public class Job {
 		this.secretsDirectory = secretsDirectory.isEmpty() ? null : secretsDirectory;
 	}
 
+	public static List<Job> addNumbers(List<Job> jobs) {
+		AtomicInteger inc1 = new AtomicInteger(1);
+		List<Job> repeatedItems = jobs.stream()
+				.filter(i -> frequency(jobs, i) > 1)
+				.sorted(getJobComparator())
+				.map(getJobMapFunction(inc1))
+				.toList();
+
+		AtomicInteger inc2 = new AtomicInteger(1 + repeatedItems.size());
+		List<Job> notRepeatedItems = jobs.stream()
+				.filter(i -> frequency(jobs, i) == 1)
+				.sorted(getJobComparator())
+				.map(getJobMapFunction(inc2))
+				.toList();
+
+		return new ArrayList<>(notRepeatedItems) {{
+			addAll(repeatedItems);
+		}};
+	}
+
+	private static Comparator<Job> getJobComparator() {
+		return Comparator.comparing(job -> job.buildType.ordinal() + "%" + job.name);
+	}
+
+	private static Function<Job, Job> getJobMapFunction(AtomicInteger inc1) {
+		return server -> server.id == null ?
+				server.withId(inc1.getAndIncrement()) :
+				server;
+	}
+
 	@Override
 	public String toString() {
 		return "Job{" +
@@ -45,5 +84,22 @@ public class Job {
 				", projectDir='" + projectDir + '\'' +
 				", secretsDirectory='" + secretsDirectory + '\'' +
 				'}';
+	}
+
+	@Override
+	public final boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof Job job)) {
+			return false;
+		}
+
+		return name.equals(job.name);
+	}
+
+	@Override
+	public int hashCode() {
+		return name.hashCode();
 	}
 }
