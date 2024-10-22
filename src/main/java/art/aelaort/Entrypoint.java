@@ -81,8 +81,8 @@ public class Entrypoint implements CommandLineRunner {
 					scan - show with generate (for actual data)
 					tbl-scan - show table with generate (for actual data)
 					yml-scan - show tree with generate (for actual data)
-					docker - upload docker-compose file by server name (by default in %s)
-						server_name/port_number/app_number (required)
+					docker - upload docker-compose file to server (in %s)
+						by server id/name (required)
 					build - build and deploy apps
 						number of app (required for run)
 							without args - printing apps list
@@ -96,8 +96,8 @@ public class Entrypoint implements CommandLineRunner {
 					proxy - start socks5 proxy
 					proxy-d - stop socks5 proxy
 					dstat - docker stats, docker ps -a and df -h
-						for one server if server_name/port_number/app_number passed
-						or for all servers
+						by server id/name
+						or all servers if no arguments
 					make - create project folder
 						one arg required
 						`name` for make project by name (could be with sub directories)
@@ -107,7 +107,7 @@ public class Entrypoint implements CommandLineRunner {
 							`no-git` - not init git
 							`jooq` - add jooq config and plugin
 					upld-ssh - upload ssh key to server
-						by server port/name or app number
+						by server id/name
 						required key file path (2 arg)
 						required user name (3 arg)
 					port - generate random, not used, port for tcp. 5 digits"""

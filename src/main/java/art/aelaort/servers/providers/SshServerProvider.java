@@ -21,15 +21,21 @@ public class SshServerProvider {
 	private final BuildService buildService;
 	private final ServerProvider serverProvider;
 
-	public SshServer findServer(String nameOrPortOrAppNumber) {
+	public SshServer findServer(String serverNameOrServerId) {
 		try {
-			int appNumberOrPort = Integer.parseInt(nameOrPortOrAppNumber);
-			return appNumberOrPort > 9999 ?
-					getServerByPortNumber(appNumberOrPort) :
-					getServerByAppNumber(appNumberOrPort);
+			int serverId = Integer.parseInt(serverNameOrServerId);
+			return getServerByServerId(serverId);
 		} catch (NumberFormatException e) {
-			return getServerByName(nameOrPortOrAppNumber);
+			return getServerByName(serverNameOrServerId);
 		}
+	}
+
+	private SshServer getServerByServerId(int serverId) {
+		return serverProvider.scanOnlyLocalData().stream()
+				.filter(server -> server.getId().equals(serverId))
+				.map(serverMapper::map)
+				.findFirst()
+				.orElseThrow(ServerNotFoundException::new);
 	}
 
 	private SshServer getServerByAppNumber(int appNumber) {
