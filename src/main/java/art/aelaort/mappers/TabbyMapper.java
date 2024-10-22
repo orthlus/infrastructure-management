@@ -17,15 +17,22 @@ public class TabbyMapper {
 				.stream()
 				.filter(profile -> profile.getType().equals("ssh"))
 				.map(profile -> {
-					String keyPath = profile.getOptions().getPrivateKeys().get(0);
 					Integer filePort = profile.getOptions().getPort();
 					return new TabbyServer(
 							profile.getName(),
 							profile.getOptions().getHost(),
-							keyPath.replace(tabbyConfigRsaFilePrefix, ""),
+							privateKey(profile).replace(tabbyConfigRsaFilePrefix, ""),
 							filePort != null ? filePort : 22
 					);
 				})
 				.toList();
+	}
+
+	private String privateKey(TabbyFile.Profile profile) {
+		List<String> privateKeys = profile.getOptions().getPrivateKeys();
+		if (privateKeys != null && !privateKeys.isEmpty()) {
+			return privateKeys.get(0);
+		}
+		return "";
 	}
 }
