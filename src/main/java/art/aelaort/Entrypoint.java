@@ -8,6 +8,7 @@ import art.aelaort.make.ProjectsMakerService;
 import art.aelaort.models.build.Job;
 import art.aelaort.models.ssh.SshServer;
 import art.aelaort.scan_show.ScanShowServersService;
+import art.aelaort.servers.providers.SshServerProvider;
 import art.aelaort.utils.ExternalUtilities;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

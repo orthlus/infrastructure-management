@@ -1,4 +1,4 @@
-package art.aelaort;
+package art.aelaort.servers.providers;
 
 import art.aelaort.mappers.TabbyMapper;
 import art.aelaort.models.servers.TabbyServer;
@@ -20,7 +20,7 @@ import static art.aelaort.utils.Utils.log;
 
 @Component
 @RequiredArgsConstructor
-public class TabbyFiles {
+public class TabbyServerProvider {
 	private final TabbyS3 tabbyS3;
 	private final YAMLMapper yamlMapper;
 	private final TabbyMapper tabbyMapper;

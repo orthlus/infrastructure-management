@@ -1,5 +1,6 @@
-package art.aelaort;
+package art.aelaort.servers.providers;
 
+import art.aelaort.ServersManagementService;
 import art.aelaort.build.BuildService;
 import art.aelaort.exceptions.ServerByPortTooManyServersException;
 import art.aelaort.exceptions.ServerNotFoundException;
@@ -16,7 +17,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class SshServerProvider {
-	private final TabbyFiles tabbyFiles;
+	private final TabbyServerProvider tabbyServerProvider;
 	private final ServerMapper serverMapper;
 	private final BuildService buildService;
 	private final ServersManagementService serversManagementService;
@@ -47,7 +48,7 @@ public class SshServerProvider {
 	}
 
 	private SshServer getServerByPortNumber(int port) {
-		List<TabbyServer> list = tabbyFiles.readLocal()
+		List<TabbyServer> list = tabbyServerProvider.readLocal()
 				.stream()
 				.filter(s -> s.port() == port)
 				.toList();
@@ -59,7 +60,7 @@ public class SshServerProvider {
 	}
 
 	private SshServer getServerByName(String name) {
-		return tabbyFiles.readLocal()
+		return tabbyServerProvider.readLocal()
 				.stream()
 				.filter(s -> s.name().equals(name))
 				.map(serverMapper::map)
