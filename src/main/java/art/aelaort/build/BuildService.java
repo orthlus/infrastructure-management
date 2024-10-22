@@ -13,7 +13,6 @@ import art.aelaort.utils.Utils;
 import art.aelaort.utils.system.SystemProcess;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
@@ -21,7 +20,6 @@ import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.OrFileFilter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.zeroturnaround.zip.ZipUtil;
 
@@ -55,40 +53,10 @@ public class BuildService {
 	private final XmlMapper xmlMapper;
 	private final BuildFunctionsS3 buildFunctionsS3;
 	private final S3Properties s3Properties;
-	@Value("${build.data.config.path}")
-	private Path buildConfigPath;
-	@Value("${build.main.dir.secrets_dir}")
-	private Path secretsRootDir;
-	@Value("${build.main.src.dir}")
-	private Path srcRootDir;
-	@Value("${build.main.src.exclude.dirs}")
-	private String[] excludeDirs;
-	@Value("${build.main.default_files.dir}")
-	private Path defaultFilesDir;
-	@Value("${build.main.default_files.java_docker.path}")
-	private String defaultJavaDockerfilePath;
-	@Value("${build.main.default.java.version}")
-	private int defaultJavaVersion;
-	@Value("${build.main.docker.registry.url}")
-	private String dockerRegistryUrl;
-	@Value("${build.graalvm.artifact.name}")
-	private String graalvmArtifactName;
-	@Value("${build.main.bin.directory}")
-	private Path binDirectory;
+	private final BuildProperties buildProperties;
 
-	private FileFilter excludeDirsFilter;
-	private IOFileFilter dockerLookupFilter;
-
-	@PostConstruct
-	private void init() {
-		excludeDirsFilter = new OrFileFilter(Stream
-				.of(excludeDirs)
-				.map(FileFilterUtils::nameFileFilter)
-				.map(FileFilterUtils::makeDirectoryOnly)
-				.toList()
-		).negate();
-		dockerLookupFilter = FileFilterUtils.suffixFileFilter("dockerfile", IOCase.INSENSITIVE);
-	}
+	private final IOFileFilter dockerLookupFilter =
+			FileFilterUtils.suffixFileFilter("dockerfile", IOCase.INSENSITIVE);
 
 	public void run(Job job, boolean isBuildDockerNoCache) {
 		if (isApproved(job)) {
@@ -150,6 +118,9 @@ public class BuildService {
 	}
 
 	private void copyArtifactToBinDirectory(BuildType type, Path tmpDir) {
+		String graalvmArtifactName = buildProperties.graalvmArtifactName();
+		Path binDirectory = buildProperties.binDirectory();
+
 		if (type == java_graal_local) {
 			Path srcFile = tmpDir.resolve("target").resolve(graalvmArtifactName);
 			Path destFile = binDirectory.resolve(graalvmArtifactName);
@@ -176,8 +147,8 @@ public class BuildService {
 		} else {
 			run("docker build -t %s:latest -f %s %s".formatted(name, dockerfile, tmpDir), tmpDir);
 		}
-		run("docker image tag %s:latest %s/%s:latest".formatted(name, dockerRegistryUrl, name), tmpDir);
-		run("docker image push %s/%s:latest".formatted(dockerRegistryUrl, name), tmpDir);
+		run("docker image tag %s:latest %s/%s:latest".formatted(name, buildProperties.dockerRegistryUrl(), name), tmpDir);
+		run("docker image push %s/%s:latest".formatted(buildProperties.dockerRegistryUrl(), name), tmpDir);
 	}
 
 	private void run(String command, Path tmpDir) {
@@ -188,7 +159,7 @@ public class BuildService {
 		try {
 			if (job.getBuildType() == java_docker) {
 				if (notExistsAnyDockerfile(tmpDir)) {
-					Path defaultFile = defaultFilesDir.resolve(getDefaultJavaDockerfilePath(tmpDir));
+					Path defaultFile = buildProperties.defaultFilesDir().resolve(getDefaultJavaDockerfilePath(tmpDir));
 					Path dest = tmpDir.resolve(defaultFile.getFileName());
 					FileUtils.copyFile(defaultFile.toFile(), dest.toFile(), false);
 				}
@@ -201,7 +172,8 @@ public class BuildService {
 	private String getDefaultJavaDockerfilePath(Path tmpDir) {
 		PomModel pomModel = parsePomFile(tmpDir.resolve("pom.xml"));
 		Integer mavenCompilerTarget = pomModel.getMavenCompilerTarget();
-		return defaultJavaDockerfilePath.formatted(mavenCompilerTarget == null ? defaultJavaVersion : mavenCompilerTarget);
+		return buildProperties.defaultJavaDockerfilePath()
+				.formatted(mavenCompilerTarget == null ? buildProperties.defaultJavaVersion() : mavenCompilerTarget);
 	}
 
 	@SneakyThrows
@@ -237,6 +209,12 @@ public class BuildService {
 
 	@SneakyThrows
 	public void copySrcDirToTmpDir(Job job, Path tmpDir) {
+		FileFilter excludeDirsFilter = new OrFileFilter(Stream
+				.of(buildProperties.excludeDirs())
+				.map(FileFilterUtils::nameFileFilter)
+				.map(FileFilterUtils::makeDirectoryOnly)
+				.toList()
+		).negate();
 		FileUtils.copyDirectory(
 				getSrcDir(job).toFile(),
 				tmpDir.toFile(),
@@ -246,11 +224,11 @@ public class BuildService {
 
 	public Path getSrcDir(Job job) {
 		String name = job.getProjectDir() == null ? job.getName() : job.getProjectDir();
-		return srcRootDir.resolve(job.getSubDirectory()).resolve(name);
+		return buildProperties.srcRootDir().resolve(job.getSubDirectory()).resolve(name);
 	}
 
 	public void fillSecretsToTmpDir(Job job, Path tmpDir) {
-		fillSecretsToTmpDir(job, secretsRootDir, tmpDir);
+		fillSecretsToTmpDir(job, buildProperties.secretsRootDir(), tmpDir);
 	}
 
 	@SneakyThrows
@@ -293,7 +271,7 @@ public class BuildService {
 	@SneakyThrows
 	public String getConfigString() {
 		return chop(chop(
-				Files.readAllLines(buildConfigPath)
+				Files.readAllLines(buildProperties.buildConfigPath())
 						.stream()
 						.skip(3)
 						.collect(joining("\n"))
