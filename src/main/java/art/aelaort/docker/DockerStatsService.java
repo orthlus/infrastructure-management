@@ -1,9 +1,9 @@
 package art.aelaort.docker;
 
-import art.aelaort.ServersManagementService;
 import art.aelaort.mappers.ServerMapper;
 import art.aelaort.models.servers.Server;
 import art.aelaort.models.ssh.SshServer;
+import art.aelaort.servers.providers.ServerProvider;
 import art.aelaort.ssh.SshClient;
 import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import static java.util.stream.Collectors.joining;
 @RequiredArgsConstructor
 public class DockerStatsService {
 	private final SshClient sshClient;
-	private final ServersManagementService serversManagementService;
+	private final ServerProvider serverProvider;
 	private final ServerMapper serverMapper;
 
 	private final List<Command> commands = Lists.newArrayList(
@@ -40,7 +40,7 @@ public class DockerStatsService {
 
 	public String statAllServers() {
 		String splitRow = "\n\n" + "=".repeat(100) + "\n";
-		return serversManagementService.scanOnlyLocalData()
+		return serverProvider.scanOnlyLocalData()
 				.stream()
 				.filter(this::hasDockerService)
 				.map(serverMapper::map)

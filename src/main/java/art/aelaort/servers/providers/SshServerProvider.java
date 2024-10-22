@@ -1,6 +1,5 @@
 package art.aelaort.servers.providers;
 
-import art.aelaort.ServersManagementService;
 import art.aelaort.build.BuildService;
 import art.aelaort.exceptions.ServerByPortTooManyServersException;
 import art.aelaort.exceptions.ServerNotFoundException;
@@ -20,7 +19,7 @@ public class SshServerProvider {
 	private final TabbyServerProvider tabbyServerProvider;
 	private final ServerMapper serverMapper;
 	private final BuildService buildService;
-	private final ServersManagementService serversManagementService;
+	private final ServerProvider serverProvider;
 
 	public SshServer findServer(String nameOrPortOrAppNumber) {
 		try {
@@ -35,7 +34,7 @@ public class SshServerProvider {
 
 	private SshServer getServerByAppNumber(int appNumber) {
 		String jobName = buildService.getJobsMapById().get(appNumber).getName();
-		List<Server> servers = serversManagementService.scanOnlyLocalData();
+		List<Server> servers = serverProvider.scanOnlyLocalData();
 		for (Server server : servers) {
 			for (ServiceDto service : server.getServices()) {
 				String dockerImageName = service.getDockerImageName();

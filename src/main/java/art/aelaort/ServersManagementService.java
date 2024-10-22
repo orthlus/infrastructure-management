@@ -1,12 +1,7 @@
 package art.aelaort;
 
-import art.aelaort.models.servers.DirServer;
 import art.aelaort.models.servers.Server;
-import art.aelaort.models.servers.TabbyServer;
 import art.aelaort.s3.ServersManagementS3;
-import art.aelaort.servers.providers.DirServerProvider;
-import art.aelaort.servers.providers.ServerProvider;
-import art.aelaort.servers.providers.TabbyServerProvider;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -24,10 +19,7 @@ import static art.aelaort.utils.Utils.log;
 @RequiredArgsConstructor
 public class ServersManagementService {
 	private final ServersManagementS3 serversManagementS3;
-	private final TabbyServerProvider tabbyServerProvider;
 	private final JsonMapper jsonMapper;
-	private final DirServerProvider dirServerProvider;
-	private final ServerProvider serverProvider;
 	@Value("${servers.management.json_path}")
 	private Path jsonDataPath;
 
@@ -49,30 +41,9 @@ public class ServersManagementService {
 		log("saved data to s3");
 	}
 
-	public List<Server> readLocalJsonData() {
-		return serversParse(jsonDataPath);
-	}
-
-	public List<Server> scanOnlyLocalData() {
-		List<DirServer> dirServers = dirServerProvider.scanServersDir();
-		List<TabbyServer> tabbyServers = tabbyServerProvider.readLocal();
-		return serverProvider.joinDirAndTabbyServers(dirServers, tabbyServers);
-	}
-
-	public List<Server> scanAndJoinData() {
-		List<DirServer> dirServers = dirServerProvider.scanServersDir();
-		List<TabbyServer> tabbyServers = tabbyServerProvider.readRemote();
-		return serverProvider.joinDirAndTabbyServers(dirServers, tabbyServers);
-	}
-
 	@SneakyThrows
 	private String toJson(List<Server> server) {
 		return jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(server);
-	}
-
-	@SneakyThrows
-	private List<Server> serversParse(Path jsonPath) {
-		return List.of(jsonMapper.readValue(jsonPath.toFile(), Server[].class));
 	}
 
 	@SneakyThrows

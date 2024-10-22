@@ -2,6 +2,7 @@ package art.aelaort.scan_show;
 
 import art.aelaort.ServersManagementService;
 import art.aelaort.models.servers.Server;
+import art.aelaort.servers.providers.ServerProvider;
 import art.aelaort.utils.ExternalUtilities;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,7 @@ public class ScanShowServersService {
 	private final ServersManagementService serversManagementService;
 	private final StringFormattingService stringFormattingService;
 	private final ExternalUtilities externalUtilities;
+	private final ServerProvider serverProvider;
 
 	/*
 	 * scan dirs
@@ -24,19 +26,19 @@ public class ScanShowServersService {
 	 * print
 	 */
 	public void scan() {
-		List<Server> servers = serversManagementService.scanAndJoinData();
+		List<Server> servers = serverProvider.scanAndJoinData();
 		log(stringFormattingService.getServersTableString(servers));
 		log();
 		log(stringFormattingService.servicesByServerFullTreeString(servers));
 	}
 
 	public void scanTable() {
-		List<Server> servers = serversManagementService.scanAndJoinData();
+		List<Server> servers = serverProvider.scanAndJoinData();
 		log(stringFormattingService.getServersTableString(servers));
 	}
 
 	public void scanTree() {
-		List<Server> servers = serversManagementService.scanAndJoinData();
+		List<Server> servers = serverProvider.scanAndJoinData();
 		log(stringFormattingService.servicesByServerFullTreeString(servers));
 	}
 
@@ -48,7 +50,7 @@ public class ScanShowServersService {
 	 * save ips to s3
 	 */
 	public void sync() {
-		List<Server> servers = serversManagementService.scanAndJoinData();
+		List<Server> servers = serverProvider.scanAndJoinData();
 		serversManagementService.saveData(servers);
 		serversManagementService.saveIps(servers);
 		log("sync done");
@@ -65,19 +67,19 @@ public class ScanShowServersService {
 	 * print tree
 	 */
 	public void show() {
-		List<Server> servers = serversManagementService.readLocalJsonData();
+		List<Server> servers = serverProvider.readLocalJsonData();
 		log(stringFormattingService.getServersTableString(servers));
 		log();
 		log(stringFormattingService.servicesByServerFullTreeString(servers));
 	}
 
 	public void showTree() {
-		List<Server> servers = serversManagementService.readLocalJsonData();
+		List<Server> servers = serverProvider.readLocalJsonData();
 		log(stringFormattingService.servicesByServerFullTreeString(servers));
 	}
 
 	public void showTable() {
-		List<Server> servers = serversManagementService.readLocalJsonData();
+		List<Server> servers = serverProvider.readLocalJsonData();
 		log(stringFormattingService.getServersTableString(servers));
 	}
 }
