@@ -38,30 +38,35 @@ public class DatabaseManageService {
 
 	public void remoteStatus() {
 		sshUp();
-		systemProcess.callProcessInheritIO(dbRemoteMigrationsDir.resolve(dbRemoteMigrationsStatus).toString(), dbRemoteMigrationsDir);
+		String command = dbRemoteMigrationsDir.resolve(dbRemoteMigrationsStatus).toString();
+		systemProcess.callProcessInheritIO(command, dbRemoteMigrationsDir);
 		sshDown();
 	}
 
 	public void remoteUpdate() {
 		sshUp();
 		for (String script : dbRemoteMigrationsScripts) {
-			systemProcess.callProcessInheritIO(dbRemoteMigrationsDir.resolve(script).toString(), dbRemoteMigrationsDir);
+			String command = dbRemoteMigrationsDir.resolve(script).toString();
+			systemProcess.callProcessInheritIO(command, dbRemoteMigrationsDir);
 		}
 		sshDown();
 	}
 
 	private void sshUp() {
-		systemProcess.callProcessInheritIO("docker compose -f %s up -d --build".formatted(dbRemoteSshDockerComposePath));
+		String command = "docker compose -f %s up -d --build".formatted(dbRemoteSshDockerComposePath);
+		systemProcess.callProcessInheritIO(command);
 		log("SSH tunnel (%s) - started%n", dbRemoteSshPort);
 	}
 
 	private void sshDown() {
-		systemProcess.callProcessInheritIO("docker compose -f %s down".formatted(dbRemoteSshDockerComposePath));
+		String command = "docker compose -f %s down".formatted(dbRemoteSshDockerComposePath);
+		systemProcess.callProcessInheritIO(command);
 		log("SSH tunnel - stopped");
 	}
 
 	public boolean isLocalRunning() {
-		Response response = systemProcess.callProcess("docker compose -f %s ps -q".formatted(dbLocalDockerComposePath));
+		String command = "docker compose -f %s ps -q".formatted(dbLocalDockerComposePath);
+		Response response = systemProcess.callProcess(command);
 		if (response.exitCode() == 0) {
 			return !response.stdout().trim().isEmpty();
 		}
@@ -70,7 +75,8 @@ public class DatabaseManageService {
 	}
 
 	public void localUp() {
-		systemProcess.callProcessInheritIO("docker compose -f %s up -d --build".formatted(dbLocalDockerComposePath));
+		String command = "docker compose -f %s up -d --build".formatted(dbLocalDockerComposePath);
+		systemProcess.callProcessInheritIO(command);
 		log("PostgreSQL (5433) - started");
 
 		sleep();
@@ -81,7 +87,8 @@ public class DatabaseManageService {
 	}
 
 	public void localDown() {
-		systemProcess.callProcessInheritIO("docker compose -f %s down".formatted(dbLocalDockerComposePath));
+		String command = "docker compose -f %s down".formatted(dbLocalDockerComposePath);
+		systemProcess.callProcessInheritIO(command);
 		log("PostgreSQL (5433) - stopped");
 	}
 
