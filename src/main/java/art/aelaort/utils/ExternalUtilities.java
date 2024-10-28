@@ -3,6 +3,7 @@ package art.aelaort.utils;
 import art.aelaort.utils.system.Response;
 import art.aelaort.utils.system.SystemProcess;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -53,8 +54,9 @@ public class ExternalUtilities {
 				.filter(s -> !s.contains(".git"))
 				.forEach(Utils::log);
 
-		if (response.stdout().contains(".git")) {
-			log("also synced .git");
+		int gitRows = StringUtils.countMatches(response.stdout(), "/.git/");
+		if (gitRows > 0) {
+			log("also synced .git: %d paths\n", gitRows);
 		}
 	}
 
