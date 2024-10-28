@@ -42,14 +42,15 @@ public class ExternalUtilities {
 	}
 
 	public void dirSync() {
-		log("dir sync started...");
-		Response response = systemProcess.callProcess("workdir-sync");
+		systemProcess.callProcessInheritIO("workdir-sync");
+//		log("dir sync started...");
+//		Response response = systemProcess.callProcessInheritIO("workdir-sync");
 
-		if (response.exitCode() != 0) {
-			throw new RuntimeException("dir sync error \n%s\n%s".formatted(response.stderr(), response.stdout()));
-		}
+//		if (response.exitCode() != 0) {
+//			throw new RuntimeException("dir sync error \n%s\n%s".formatted(response.stderr(), response.stdout()));
+//		}
 
-		log("dir sync done");
+//		log("dir sync done");
 	}
 
 	public void proxyUp() {
