@@ -42,7 +42,7 @@ public class ExternalUtilities {
 	}
 
 	public void dirSync() {
-		systemProcess.callProcessInheritIO("workdir-sync");
+		systemProcess.callProcessInheritIO("workdir-sync.bat");
 //		log("dir sync started...");
 //		Response response = systemProcess.callProcessInheritIO("workdir-sync");
 
