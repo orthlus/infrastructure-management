@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static art.aelaort.utils.Utils.log;
 
@@ -42,15 +43,19 @@ public class ExternalUtilities {
 	}
 
 	public void dirSync() {
-		systemProcess.callProcessInheritIO("workdir-sync.bat");
-//		log("dir sync started...");
-//		Response response = systemProcess.callProcessInheritIO("workdir-sync");
+		Response response = systemProcess.callProcess("workdir-sync.bat");
 
-//		if (response.exitCode() != 0) {
-//			throw new RuntimeException("dir sync error \n%s\n%s".formatted(response.stderr(), response.stdout()));
-//		}
+		if (response.exitCode() != 0) {
+			throw new RuntimeException("dir sync error \n%s\n%s".formatted(response.stderr(), response.stdout()));
+		}
 
-//		log("dir sync done");
+		Stream.of(response.stdout().split("\n"))
+				.filter(s -> !s.contains(".git"))
+				.forEach(Utils::log);
+
+		if (response.stdout().contains(".git")) {
+			log("also synced .git");
+		}
 	}
 
 	public void proxyUp() {
