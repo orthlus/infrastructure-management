@@ -41,15 +41,15 @@ public class ExternalUtilities {
 		return response.exitCode() == 0 ? Optional.empty() : Optional.of(response.stderr());
 	}
 
-	public void ydSync() {
-		log("yd sync started...");
-		Response response = systemProcess.callProcess("wsl yandex-disk sync");
+	public void dirSync() {
+		log("dir sync started...");
+		Response response = systemProcess.callProcess("workdir-sync");
 
 		if (response.exitCode() != 0) {
-			throw new RuntimeException("ydSync error \n%s\n%s".formatted(response.stderr(), response.stdout()));
+			throw new RuntimeException("dir sync error \n%s\n%s".formatted(response.stderr(), response.stdout()));
 		}
 
-		log("yd sync done");
+		log("dir sync done");
 	}
 
 	public void proxyUp() {

@@ -58,7 +58,7 @@ public class ScanShowServersService {
 
 	public void syncAll() {
 		sync();
-		externalUtilities.ydSync();
+		externalUtilities.dirSync();
 	}
 
 	/*
