@@ -23,12 +23,9 @@ public class SshClient {
 	public void execCommandInheritIO(String command, SshServer server) {
 		log.debug("ssh - executing '{}' on server {}", command, server.host());
 		try (JschConnection jsch = jsch(server)) {
-			InputStream is = jsch.exec(command);
-			IOUtils.copy(is, System.out);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+			jsch.execInheritIOLock(command);
 		}
-	}
+    }
 
 	public String getCommandStdout(String command, SshServer server) {
 		try (JschConnection jsch = jsch(server)) {
