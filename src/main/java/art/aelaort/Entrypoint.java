@@ -1,6 +1,7 @@
 package art.aelaort;
 
 import art.aelaort.build.BuildService;
+import art.aelaort.build.JobsProvider;
 import art.aelaort.docker.DockerService;
 import art.aelaort.docker.DockerStatsService;
 import art.aelaort.exceptions.*;
@@ -32,6 +33,7 @@ public class Entrypoint implements CommandLineRunner {
 	private final SshKeyUploader sshKeyUploader;
 	private final RandomPortService randomPortService;
 	private final SshServerProvider sshServerProvider;
+	private final JobsProvider jobsProvider;
 	@Value("${docker.compose.remote.dir.default}")
 	private String dockerDefaultRemoteDir;
 
@@ -163,7 +165,7 @@ public class Entrypoint implements CommandLineRunner {
 			buildService.printConfig();
 		} else {
 			try {
-				Job job = buildService.getJobById(parseInt(args[1]));
+				Job job = jobsProvider.getJobById(parseInt(args[1]));
 				boolean isBuildDockerNoCache = buildService.isBuildDockerNoCache(args);
 				buildService.run(job, isBuildDockerNoCache);
 			} catch (TooManyDockerFilesException e) {

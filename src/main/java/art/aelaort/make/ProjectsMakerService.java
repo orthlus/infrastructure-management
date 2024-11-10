@@ -1,6 +1,6 @@
 package art.aelaort.make;
 
-import art.aelaort.build.BuildService;
+import art.aelaort.build.JobsProvider;
 import art.aelaort.exceptions.AppNotFoundException;
 import art.aelaort.exceptions.InvalidAppParamsException;
 import art.aelaort.exceptions.ProjectAlreadyExistsException;
@@ -27,7 +27,7 @@ public class ProjectsMakerService {
 	private final PlaceholderFiller placeholderFiller;
 	private final FillerMakeJavaProperties properties;
 	private final SystemProcess systemProcess;
-	private final BuildService buildService;
+	private final JobsProvider jobsProvider;
 	@Value("${build.main.src.dir}")
 	private Path mainSrcDir;
 	@Value("${build.main.default_files.dir}")
@@ -73,7 +73,7 @@ public class ProjectsMakerService {
 			return project;
 		}
 
-		Job job = buildService.getJobsMapById().get(project.getId());
+		Job job = jobsProvider.getJobsMapById().get(project.getId());
 		if (job == null) {
 			throw new AppNotFoundException(project);
 		}

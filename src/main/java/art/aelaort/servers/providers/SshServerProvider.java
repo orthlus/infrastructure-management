@@ -1,6 +1,6 @@
 package art.aelaort.servers.providers;
 
-import art.aelaort.build.BuildService;
+import art.aelaort.build.JobsProvider;
 import art.aelaort.exceptions.ServerByPortTooManyServersException;
 import art.aelaort.exceptions.ServerNotFoundException;
 import art.aelaort.mappers.ServerMapper;
@@ -18,8 +18,8 @@ import java.util.List;
 public class SshServerProvider {
 	private final TabbyServerProvider tabbyServerProvider;
 	private final ServerMapper serverMapper;
-	private final BuildService buildService;
 	private final ServerProvider serverProvider;
+	private final JobsProvider jobsProvider;
 
 	public SshServer findServer(String serverNameOrServerId) {
 		try {
@@ -39,7 +39,7 @@ public class SshServerProvider {
 	}
 
 	private SshServer getServerByAppNumber(int appNumber) {
-		String jobName = buildService.getJobsMapById().get(appNumber).getName();
+		String jobName = jobsProvider.getJobsMapById().get(appNumber).getName();
 		List<Server> servers = serverProvider.scanOnlyLocalData();
 		for (Server server : servers) {
 			for (ServiceDto service : server.getServices()) {

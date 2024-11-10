@@ -1,7 +1,6 @@
 package art.aelaort.build;
 
 import art.aelaort.DatabaseManageService;
-import art.aelaort.exceptions.BuildJobNotFoundException;
 import art.aelaort.exceptions.TooManyDockerFilesException;
 import art.aelaort.models.build.BuildType;
 import art.aelaort.models.build.Job;
@@ -11,10 +10,8 @@ import art.aelaort.properties.S3Properties;
 import art.aelaort.s3.BuildFunctionsS3;
 import art.aelaort.servers.providers.SshServerProvider;
 import art.aelaort.ssh.SshClient;
-import art.aelaort.utils.ExternalUtilities;
 import art.aelaort.utils.Utils;
 import art.aelaort.utils.system.SystemProcess;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -32,12 +29,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static art.aelaort.models.build.BuildType.java_docker;
@@ -49,21 +42,20 @@ import static org.apache.commons.lang3.StringUtils.chop;
 @Component
 @RequiredArgsConstructor
 public class BuildService {
-	private final ExternalUtilities externalUtilities;
 	private final Utils utils;
 	private final SystemProcess systemProcess;
-	private final JsonMapper jsonMapper;
 	private final DatabaseManageService databaseManageService;
 	private final XmlMapper xmlMapper;
 	private final BuildFunctionsS3 buildFunctionsS3;
 	private final S3Properties s3Properties;
 	private final BuildProperties buildProperties;
-
-	private final IOFileFilter dockerLookupFilter =
-			FileFilterUtils.suffixFileFilter("dockerfile", IOCase.INSENSITIVE);
 	private final JobsTextTable jobsTextTable;
 	private final SshServerProvider sshServerProvider;
 	private final SshClient sshClient;
+	private final JobsProvider jobsProvider;
+
+	private final IOFileFilter dockerLookupFilter =
+			FileFilterUtils.suffixFileFilter("dockerfile", IOCase.INSENSITIVE);
 
 	public void run(Job job, boolean isBuildDockerNoCache) {
 		if (isApproved(job)) {
@@ -287,29 +279,8 @@ public class BuildService {
 		return Arrays.asList(args).contains("clean");
 	}
 
-	public Map<Integer, Job> getJobsMapById() {
-		return readBuildConfig()
-				.stream()
-				.collect(Collectors.toMap(Job::getId, Function.identity()));
-	}
-
-	public Job getJobById(int id) {
-		return readBuildConfig()
-				.stream()
-				.filter(job -> job.getId() == id)
-				.findFirst()
-				.orElseThrow(BuildJobNotFoundException::new);
-	}
-
-	@SneakyThrows
-	private List<Job> readBuildConfig() {
-		String jobsStr = externalUtilities.readBuildConfig();
-		Job[] jobs = jsonMapper.readValue(jobsStr, Job[].class);
-		return Job.addNumbers(Arrays.asList(jobs));
-	}
-
 	public void printConfig() {
-		log(jobsTextTable.getJobsTableString(readBuildConfig()));
+		log(jobsTextTable.getJobsTableString(jobsProvider.readBuildConfig()));
 	}
 
 	@SneakyThrows
