@@ -15,6 +15,7 @@ import art.aelaort.utils.system.SystemProcess;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -39,6 +40,7 @@ import static art.aelaort.utils.Utils.log;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.chop;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class BuildService {
@@ -143,30 +145,32 @@ public class BuildService {
 		Path dockerfile = lookupOneDockerfile(tmpDir);
 
 		Consumer<String> dockerRunner = getDockerRunner();
-		String resolvedTmpDir = getTmpDirForDocker(tmpDir);
+		String resolvedTmpDir = fixTmpDirForDocker(tmpDir);
+		String dockerfileStr = fixTmpDirForDocker(dockerfile);
+
 		if (isBuildDockerNoCache) {
-			dockerRunner.accept("docker build --no-cache -t %s:latest -f %s %s".formatted(name, dockerfile, resolvedTmpDir));
+			dockerRunner.accept("docker build --no-cache -t %s:latest -f %s %s".formatted(name, dockerfileStr, resolvedTmpDir));
 		} else {
-			dockerRunner.accept("docker build -t %s:latest -f %s %s".formatted(name, dockerfile, resolvedTmpDir));
+			dockerRunner.accept("docker build -t %s:latest -f %s %s".formatted(name, dockerfileStr, resolvedTmpDir));
 		}
 		dockerRunner.accept("docker image tag %s:latest %s/%s:latest".formatted(name, buildProperties.dockerRegistryUrl(), name));
 		dockerRunner.accept("docker image push %s/%s:latest".formatted(buildProperties.dockerRegistryUrl(), name));
 	}
 
-	private String getTmpDirForDocker(Path tmpDir) {
+	private String fixTmpDirForDocker(Path path) {
 		if (isLocalDockerRunning()) {
-			return tmpDir.toString();
+			return path.toString();
 		} else {
-			return resolveDockerRemoteTmpDir(tmpDir);
+			return resolveDockerRemoteTmpDir(path);
 		}
 	}
 
-	private String resolveDockerRemoteTmpDir(Path tmpDir) {
+	private String resolveDockerRemoteTmpDir(Path path) {
 		String dockerRemoteTmpRootDir = buildProperties.dockerRemoteTmpRootDir();
 		String localTmpRootDir = buildProperties.localTmpRootDir().toString();
-		return tmpDir.toString()
-				.replace("\\", "/")
-				.replace(localTmpRootDir, dockerRemoteTmpRootDir);
+		return path.toString()
+				.replace(localTmpRootDir, dockerRemoteTmpRootDir)
+				.replace("\\", "/");
 	}
 
 	private Consumer<String> getDockerRunner() {
