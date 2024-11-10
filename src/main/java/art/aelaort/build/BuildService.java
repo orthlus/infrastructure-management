@@ -6,8 +6,11 @@ import art.aelaort.exceptions.TooManyDockerFilesException;
 import art.aelaort.models.build.BuildType;
 import art.aelaort.models.build.Job;
 import art.aelaort.models.build.PomModel;
+import art.aelaort.models.ssh.SshServer;
 import art.aelaort.properties.S3Properties;
 import art.aelaort.s3.BuildFunctionsS3;
+import art.aelaort.servers.providers.SshServerProvider;
+import art.aelaort.ssh.SshClient;
 import art.aelaort.utils.ExternalUtilities;
 import art.aelaort.utils.Utils;
 import art.aelaort.utils.system.SystemProcess;
@@ -32,6 +35,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -58,6 +62,8 @@ public class BuildService {
 	private final IOFileFilter dockerLookupFilter =
 			FileFilterUtils.suffixFileFilter("dockerfile", IOCase.INSENSITIVE);
 	private final JobsTextTable jobsTextTable;
+	private final SshServerProvider sshServerProvider;
+	private final SshClient sshClient;
 
 	public void run(Job job, boolean isBuildDockerNoCache) {
 		if (isApproved(job)) {
@@ -143,14 +149,51 @@ public class BuildService {
 	private void dockerBuildPush(Job job, Path tmpDir, boolean isBuildDockerNoCache) {
 		String name = job.getName();
 		Path dockerfile = lookupOneDockerfile(tmpDir);
+
+		Consumer<String> dockerRunner = getDockerRunner();
+		String resolvedTmpDir = getTmpDirForDocker(tmpDir);
 		if (isBuildDockerNoCache) {
-			run("docker build --no-cache -t %s:latest -f %s %s".formatted(name, dockerfile, tmpDir), tmpDir);
+			dockerRunner.accept("docker build --no-cache -t %s:latest -f %s %s".formatted(name, dockerfile, resolvedTmpDir));
 		} else {
-			run("docker build -t %s:latest -f %s %s".formatted(name, dockerfile, tmpDir), tmpDir);
+			dockerRunner.accept("docker build -t %s:latest -f %s %s".formatted(name, dockerfile, resolvedTmpDir));
 		}
-		run("docker image tag %s:latest %s/%s:latest".formatted(name, buildProperties.dockerRegistryUrl(), name), tmpDir);
-		run("docker image push %s/%s:latest".formatted(buildProperties.dockerRegistryUrl(), name), tmpDir);
+		dockerRunner.accept("docker image tag %s:latest %s/%s:latest".formatted(name, buildProperties.dockerRegistryUrl(), name));
+		dockerRunner.accept("docker image push %s/%s:latest".formatted(buildProperties.dockerRegistryUrl(), name));
 	}
+
+	private String getTmpDirForDocker(Path tmpDir) {
+		if (isLocalDockerRunning()) {
+			return tmpDir.toString();
+		} else {
+			return resolveDockerRemoteTmpDir(tmpDir);
+		}
+	}
+
+	private String resolveDockerRemoteTmpDir(Path tmpDir) {
+		String dockerRemoteTmpRootDir = buildProperties.dockerRemoteTmpRootDir();
+		String localTmpRootDir = buildProperties.localTmpRootDir().toString();
+		return tmpDir.toString()
+				.replace("\\", "/")
+				.replace(localTmpRootDir, dockerRemoteTmpRootDir);
+	}
+
+	private Consumer<String> getDockerRunner() {
+		if (isLocalDockerRunning()) {
+			return command -> systemProcess.callProcessForBuild(command, null);
+		} else {
+			SshServer server = sshServerProvider.findServer(buildProperties.dockerRemoteName());
+			return command -> sshClient.execCommandInheritIO(command, server);
+		}
+	}
+
+	private boolean isLocalDockerRunning() {
+        try {
+            systemProcess.callProcessThrows(null, "docker ps");
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
 	private void run(String command, Path tmpDir) {
 		systemProcess.callProcessForBuild(command, tmpDir);

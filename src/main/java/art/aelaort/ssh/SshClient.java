@@ -18,6 +18,15 @@ import static com.jcraft.jsch.ChannelSftp.SSH_FX_NO_SUCH_FILE;
 @Component
 @RequiredArgsConstructor
 public class SshClient {
+	public void execCommandInheritIO(String command, SshServer server) {
+		try (JschConnection jsch = jsch(server)) {
+			InputStream is = jsch.exec(command);
+			IOUtils.copy(is, System.out);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public String getCommandStdout(String command, SshServer server) {
 		try (JschConnection jsch = jsch(server)) {
 			InputStream is = jsch.exec(command);

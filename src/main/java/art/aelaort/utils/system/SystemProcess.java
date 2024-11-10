@@ -50,11 +50,14 @@ public class SystemProcess {
 	public void callProcessForBuild(String command, Path dir) {
 		try {
 			String[] commandArray = StringUtils.split(fixCmdCall(command));
-			Process p = new ProcessBuilder(commandArray)
-					.inheritIO()
-					.directory(dir.toFile())
-					.start();
-			p.waitFor();
+			ProcessBuilder pb = new ProcessBuilder(commandArray)
+					.inheritIO();
+
+			if (dir != null) {
+				pb.directory(dir.toFile());
+			}
+
+			pb.start().waitFor();
 		} catch (Exception e) {
 			System.err.println("java system process call error: " + e.getLocalizedMessage());
 			System.exit(1);
