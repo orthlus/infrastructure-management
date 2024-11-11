@@ -34,6 +34,7 @@ public class Entrypoint implements CommandLineRunner {
 	private final RandomPortService randomPortService;
 	private final SshServerProvider sshServerProvider;
 	private final JobsProvider jobsProvider;
+	private final VirtualBoxService virtualBoxService;
 	@Value("${docker.compose.remote.dir.default}")
 	private String dockerDefaultRemoteDir;
 
@@ -63,6 +64,9 @@ public class Entrypoint implements CommandLineRunner {
 				case "make" -> makeProject(args);
 				case "upld-ssh" -> uploadSshKey(args);
 				case "port" -> log(randomPortService.getRandomPort());
+				case "vm" -> virtualBoxService.up();
+				case "vm-pause", "vmp" -> virtualBoxService.pause();
+				case "vm-stop", "vms" -> virtualBoxService.stop();
 				default -> log("unknown args\n" + usage());
 			}
 		} else {
@@ -112,7 +116,10 @@ public class Entrypoint implements CommandLineRunner {
 						by server id/name
 						required key file path (2 arg)
 						required user name (3 arg)
-					port - generate random, not used, port for tcp. 5 digits"""
+					port - generate random, not used, port for tcp. 5 digits
+					vm - start virtualbox
+					vm-pause or vmp - save state virtualbox
+					vm-stop or vms - shutdown virtualbox"""
 				.formatted(dockerDefaultRemoteDir);
 	}
 
