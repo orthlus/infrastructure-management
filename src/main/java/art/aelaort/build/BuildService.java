@@ -178,7 +178,6 @@ public class BuildService {
 		if (isLocalDockerRunning()) {
 			return command -> systemProcess.callProcessForBuild(command, null);
 		} else {
-			log(wrapRed("please don't use this, setup docker context"));
 			SshServer server = sshServerProvider.findServer(buildProperties.dockerRemoteName());
 			return command -> sshClient.execCommandInheritIO(command, server);
 		}
@@ -189,6 +188,9 @@ public class BuildService {
             systemProcess.callProcessThrows(null, "docker ps");
             return true;
         } catch (Exception e) {
+			log(wrapRed("please don't use docker over ssh, setup docker context"));
+			log(wrapRed("please don't use docker over ssh, setup docker context"));
+			log(wrapRed("please don't use docker over ssh, setup docker context"));
             return false;
         }
     }
