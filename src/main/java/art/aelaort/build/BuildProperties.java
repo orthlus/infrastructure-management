@@ -27,10 +27,6 @@ public class BuildProperties {
 	private int defaultJavaVersion;
 	@Value("${build.main.docker.registry.url}")
 	private String dockerRegistryUrl;
-	@Value("${build.main.docker.remote.name}")
-	private String dockerRemoteName;
-	@Value("${build.main.docker.remote.tmp.root}")
-	private String dockerRemoteTmpRootDir;
 	@Value("${build.graalvm.artifact.name}")
 	private String graalvmArtifactName;
 	@Value("${build.main.bin.directory}")

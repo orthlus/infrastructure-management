@@ -5,11 +5,8 @@ import art.aelaort.exceptions.TooManyDockerFilesException;
 import art.aelaort.models.build.BuildType;
 import art.aelaort.models.build.Job;
 import art.aelaort.models.build.PomModel;
-import art.aelaort.models.ssh.SshServer;
 import art.aelaort.properties.S3Properties;
 import art.aelaort.s3.BuildFunctionsS3;
-import art.aelaort.servers.providers.SshServerProvider;
-import art.aelaort.ssh.SshClient;
 import art.aelaort.utils.Utils;
 import art.aelaort.utils.system.SystemProcess;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
@@ -31,12 +28,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Scanner;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static art.aelaort.models.build.BuildType.java_docker;
 import static art.aelaort.models.build.BuildType.java_graal_local;
-import static art.aelaort.utils.ColoredConsoleTextUtils.wrapRed;
 import static art.aelaort.utils.Utils.log;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.chop;
@@ -53,8 +48,6 @@ public class BuildService {
 	private final S3Properties s3Properties;
 	private final BuildProperties buildProperties;
 	private final JobsTextTable jobsTextTable;
-	private final SshServerProvider sshServerProvider;
-	private final SshClient sshClient;
 	private final JobsProvider jobsProvider;
 
 	private final IOFileFilter dockerLookupFilter =
@@ -145,55 +138,14 @@ public class BuildService {
 		String name = job.getName();
 		Path dockerfile = lookupOneDockerfile(tmpDir);
 
-		Consumer<String> dockerRunner = getDockerRunner();
-		String resolvedTmpDir = fixTmpDirForDocker(tmpDir);
-		String dockerfileStr = fixTmpDirForDocker(dockerfile);
-
 		if (isBuildDockerNoCache) {
-			dockerRunner.accept("docker build --no-cache -t %s:latest -f %s %s".formatted(name, dockerfileStr, resolvedTmpDir));
+			run("docker build --no-cache -t %s:latest -f %s %s".formatted(name, dockerfile, tmpDir), null);
 		} else {
-			dockerRunner.accept("docker build -t %s:latest -f %s %s".formatted(name, dockerfileStr, resolvedTmpDir));
+			run("docker build -t %s:latest -f %s %s".formatted(name, dockerfile, tmpDir), null);
 		}
-		dockerRunner.accept("docker image tag %s:latest %s/%s:latest".formatted(name, buildProperties.dockerRegistryUrl(), name));
-		dockerRunner.accept("docker image push %s/%s:latest".formatted(buildProperties.dockerRegistryUrl(), name));
+		run("docker image tag %s:latest %s/%s:latest".formatted(name, buildProperties.dockerRegistryUrl(), name), null);
+		run("docker image push %s/%s:latest".formatted(buildProperties.dockerRegistryUrl(), name), null);
 	}
-
-	private String fixTmpDirForDocker(Path path) {
-		if (isLocalDockerRunning()) {
-			return path.toString();
-		} else {
-			return resolveDockerRemoteTmpDir(path);
-		}
-	}
-
-	private String resolveDockerRemoteTmpDir(Path path) {
-		String dockerRemoteTmpRootDir = buildProperties.dockerRemoteTmpRootDir();
-		String localTmpRootDir = buildProperties.localTmpRootDir().toString();
-		return path.toString()
-				.replace(localTmpRootDir, dockerRemoteTmpRootDir)
-				.replace("\\", "/");
-	}
-
-	private Consumer<String> getDockerRunner() {
-		if (isLocalDockerRunning()) {
-			return command -> systemProcess.callProcessForBuild(command, null);
-		} else {
-			SshServer server = sshServerProvider.findServer(buildProperties.dockerRemoteName());
-			return command -> sshClient.execCommandInheritIO(command, server);
-		}
-	}
-
-	private boolean isLocalDockerRunning() {
-        try {
-            systemProcess.callProcessThrows(null, "docker ps");
-            return true;
-        } catch (Exception e) {
-			log(wrapRed("please don't use docker over ssh, setup docker context"));
-			log(wrapRed("please don't use docker over ssh, setup docker context"));
-			log(wrapRed("please don't use docker over ssh, setup docker context"));
-            return false;
-        }
-    }
 
 	private void run(String command, Path tmpDir) {
 		systemProcess.callProcessForBuild(command, tmpDir);

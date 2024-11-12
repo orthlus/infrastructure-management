@@ -8,7 +8,6 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Properties;
 
 @Slf4j
@@ -44,24 +43,6 @@ public class JschConnection implements AutoCloseable {
 			IOUtils.copy(err, System.err);
 		} catch (JSchException | IOException e) {
 			log.error("ssh execInheritIO error", e);
-			throw new RuntimeException(e);
-		}
-	}
-
-	public void exec(String command, OutputStream out, OutputStream err) {
-		try {
-			JSch jsch = jsch(privateKeyPath);
-			setupSession(jsch);
-			setupExecChannel();
-
-			channelExec.setCommand(command);
-			channelExec.setOutputStream(out, true);
-			channelExec.setExtOutputStream(err, true);
-
-			channelExec.getInputStream();
-
-			channelExec.connect();
-		} catch (JSchException | IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
