@@ -29,14 +29,14 @@ public class VirtualBoxService {
 	}
 
 	private String nameById(String... args) {
-		if (args.length > 0) {
+		if (args.length > 1) {
 			try {
-				return virtualboxNames.get(Integer.parseInt(args[0]));
+				return virtualboxNames.get(Integer.parseInt(args[1]) - 1);
 			} catch (NumberFormatException | IndexOutOfBoundsException e) {
 				throw new RuntimeException(e);
 			}
 		} else {
-			log("at least one arg required");
+			log("at least 2 args required");
 			throw new RuntimeException();
 		}
 	}
