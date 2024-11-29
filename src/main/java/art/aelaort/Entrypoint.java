@@ -64,9 +64,10 @@ public class Entrypoint implements CommandLineRunner {
 				case "make" -> makeProject(args);
 				case "upld-ssh" -> uploadSshKey(args);
 				case "port" -> log(randomPortService.getRandomPort());
-				case "vm" -> virtualBoxService.up();
-				case "vm-pause", "vmp" -> virtualBoxService.pause();
-				case "vm-stop", "vms" -> virtualBoxService.stop();
+				case "vm" -> virtualBoxService.up(args);
+				case "vm-pause", "vmp" -> virtualBoxService.pause(args);
+				case "vm-stop", "vms" -> virtualBoxService.stop(args);
+				case "vml" -> log(virtualBoxService.list());
 				default -> log("unknown args\n" + usage());
 			}
 		} else {
@@ -119,7 +120,8 @@ public class Entrypoint implements CommandLineRunner {
 					port - generate random, not used, port for tcp. 5 digits
 					vm - start virtualbox
 					vm-pause or vmp - save state virtualbox
-					vm-stop or vms - shutdown virtualbox"""
+					vm-stop or vms - shutdown virtualbox
+					vml - list machines"""
 				.formatted(dockerDefaultRemoteDir);
 	}
 
