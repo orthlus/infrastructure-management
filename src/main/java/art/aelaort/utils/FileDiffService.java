@@ -9,7 +9,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.IntStream;
 
 import static art.aelaort.utils.ColoredConsoleTextUtils.*;
 
@@ -61,11 +64,25 @@ public class FileDiffService {
 	}
 
 	private String getColoredTable(List<DiffRow> rows) {
+		int rangeRowsAroundChanged = 10;
+		Set<Integer> changedRowsIndexes = new HashSet<>();
+		for (int i = 0; i < rows.size(); i++) {
+			DiffRow row = rows.get(i);
+			if (isRowChanged(row)) {
+//				changedRowsIndexes.add(i);
+				IntStream.range(i - rangeRowsAroundChanged, i + rangeRowsAroundChanged)
+						.filter(a -> a > 0)
+						.forEach(changedRowsIndexes::add);
+			}
+		}
 		int maxOldL = 0;
 		int maxNewL = 0;
-		for (DiffRow row : rows) {
-			maxOldL = Math.max(maxOldL, cleanedRow(row.getOldLine()).length());
-			maxNewL = Math.max(maxNewL, cleanedRow(row.getNewLine()).length());
+		for (int i = 0; i < rows.size(); i++) {
+			if (changedRowsIndexes.contains(i)) {
+				DiffRow row = rows.get(i);
+				maxOldL = Math.max(maxOldL, cleanedRow(row.getOldLine()).length());
+				maxNewL = Math.max(maxNewL, cleanedRow(row.getNewLine()).length());
+			}
 		}
 
 		String repeatOld = " ".repeat(maxOldL / 2 - 2);
@@ -73,14 +90,17 @@ public class FileDiffService {
 		String dashes = "-".repeat(maxOldL + maxNewL + 3);
 		String formatted = "|%s old%s|%s new%s|\n%s\n".formatted(repeatOld, repeatOld, repeatNew, repeatNew, dashes);
 		StringBuilder sb = new StringBuilder(formatted);
-		for (DiffRow row : rows) {
-			sb.append("|")
-					.append(row.getOldLine())
-					.append(" ".repeat(maxOldL - cleanedRow(row.getOldLine()).length()))
-					.append("|")
-					.append(row.getNewLine())
-					.append(" ".repeat(maxNewL - cleanedRow(row.getNewLine()).length()))
-					.append("|\n");
+		for (int i = 0; i < rows.size(); i++) {
+			if (changedRowsIndexes.contains(i)) {
+				DiffRow row = rows.get(i);
+				sb.append("|")
+						.append(row.getOldLine())
+						.append(" ".repeat(maxOldL - cleanedRow(row.getOldLine()).length()))
+						.append("|")
+						.append(row.getNewLine())
+						.append(" ".repeat(maxNewL - cleanedRow(row.getNewLine()).length()))
+						.append("|\n");
+			}
 		}
 		sb.deleteCharAt(sb.length() - 1);
 
