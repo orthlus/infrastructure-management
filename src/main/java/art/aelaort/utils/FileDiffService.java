@@ -109,11 +109,15 @@ public class FileDiffService {
 	private record MaxLengths(int maxOldL, int maxNewL) {
 	}
 
-	private static String getTableHeader(MaxLengths maxes) {
+	private String getTableHeader(MaxLengths maxes) {
 		String repeatOld = " ".repeat(maxes.maxOldL() / 2 - 2);
 		String repeatNew = " ".repeat(maxes.maxNewL() / 2 - 2);
-		String dashes = "-".repeat(maxes.maxOldL() + maxes.maxNewL() + 3);
+		String dashes = getDashes(maxes);
 		return "|%s old%s|%s new%s|\n%s\n".formatted(repeatOld, repeatOld, repeatNew, repeatNew, dashes);
+	}
+
+	private String getDashes(MaxLengths maxes) {
+		return "-".repeat(maxes.maxOldL() + maxes.maxNewL() + 3);
 	}
 
 	private boolean isRowChanged(DiffRow row) {
