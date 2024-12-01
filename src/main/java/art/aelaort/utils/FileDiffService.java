@@ -75,6 +75,27 @@ public class FileDiffService {
 						.forEach(changedRowsIndexes::add);
 			}
 		}
+		MaxLengths maxes = getMaxLengths(rows, changedRowsIndexes);
+
+		StringBuilder sb = new StringBuilder(getTableHeader(maxes.maxOldL(), maxes.maxNewL()));
+		for (int i = 0; i < rows.size(); i++) {
+			if (changedRowsIndexes.contains(i)) {
+				DiffRow row = rows.get(i);
+				sb.append("|")
+						.append(row.getOldLine())
+						.append(" ".repeat(maxes.maxOldL() - cleanedRow(row.getOldLine()).length()))
+						.append("|")
+						.append(row.getNewLine())
+						.append(" ".repeat(maxes.maxNewL() - cleanedRow(row.getNewLine()).length()))
+						.append("|\n");
+			}
+		}
+		sb.deleteCharAt(sb.length() - 1);
+
+		return sb.toString();
+	}
+
+	private MaxLengths getMaxLengths(List<DiffRow> rows, Set<Integer> changedRowsIndexes) {
 		int maxOldL = 0;
 		int maxNewL = 0;
 		for (int i = 0; i < rows.size(); i++) {
@@ -84,27 +105,17 @@ public class FileDiffService {
 				maxNewL = Math.max(maxNewL, cleanedRow(row.getNewLine()).length());
 			}
 		}
+		return new MaxLengths(maxOldL, maxNewL);
+	}
 
+	private record MaxLengths(int maxOldL, int maxNewL) {
+	}
+
+	private static String getTableHeader(int maxOldL, int maxNewL) {
 		String repeatOld = " ".repeat(maxOldL / 2 - 2);
 		String repeatNew = " ".repeat(maxNewL / 2 - 2);
 		String dashes = "-".repeat(maxOldL + maxNewL + 3);
-		String formatted = "|%s old%s|%s new%s|\n%s\n".formatted(repeatOld, repeatOld, repeatNew, repeatNew, dashes);
-		StringBuilder sb = new StringBuilder(formatted);
-		for (int i = 0; i < rows.size(); i++) {
-			if (changedRowsIndexes.contains(i)) {
-				DiffRow row = rows.get(i);
-				sb.append("|")
-						.append(row.getOldLine())
-						.append(" ".repeat(maxOldL - cleanedRow(row.getOldLine()).length()))
-						.append("|")
-						.append(row.getNewLine())
-						.append(" ".repeat(maxNewL - cleanedRow(row.getNewLine()).length()))
-						.append("|\n");
-			}
-		}
-		sb.deleteCharAt(sb.length() - 1);
-
-		return sb.toString();
+		return "|%s old%s|%s new%s|\n%s\n".formatted(repeatOld, repeatOld, repeatNew, repeatNew, dashes);
 	}
 
 	private boolean isRowChanged(DiffRow row) {
