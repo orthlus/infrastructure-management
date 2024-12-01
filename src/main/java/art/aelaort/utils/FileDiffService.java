@@ -67,9 +67,7 @@ public class FileDiffService {
 		int rangeRowsAroundChanged = 10;
 		Set<Integer> changedRowsIndexes = new HashSet<>();
 		for (int i = 0; i < rows.size(); i++) {
-			DiffRow row = rows.get(i);
-			if (isRowChanged(row)) {
-//				changedRowsIndexes.add(i);
+			if (isRowChanged(rows.get(i))) {
 				IntStream.range(i - rangeRowsAroundChanged, i + rangeRowsAroundChanged)
 						.filter(a -> a > 0)
 						.forEach(changedRowsIndexes::add);
