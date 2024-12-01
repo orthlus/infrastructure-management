@@ -36,13 +36,13 @@ public class FileDiffService {
 		if (rows instanceof ArrayList<DiffRow>) {
 			for (int i = rows.size() - 1; i >= 0; i--) {
 				DiffRow row = rows.get(i);
-				if (!row.getOldLine().equals(row.getNewLine())) {
+				if (isRowChanged(row)) {
 					return true;
 				}
 			}
 		} else {
 			for (DiffRow row : rows) {
-				if (!row.getOldLine().equals(row.getNewLine())) {
+				if (isRowChanged(row)) {
 					return true;
 				}
 			}
@@ -85,6 +85,10 @@ public class FileDiffService {
 		sb.deleteCharAt(sb.length() - 1);
 
 		return sb.toString();
+	}
+
+	private boolean isRowChanged(DiffRow row) {
+		return !row.getNewLine().equals(row.getOldLine());
 	}
 
 	private String cleanedRow(String row) {
