@@ -77,7 +77,7 @@ public class FileDiffService {
 		}
 		MaxLengths maxes = getMaxLengths(rows, changedRowsIndexes);
 
-		StringBuilder sb = new StringBuilder(getTableHeader(maxes.maxOldL(), maxes.maxNewL()));
+		StringBuilder sb = new StringBuilder(getTableHeader(maxes));
 		for (int i = 0; i < rows.size(); i++) {
 			if (changedRowsIndexes.contains(i)) {
 				DiffRow row = rows.get(i);
@@ -111,10 +111,10 @@ public class FileDiffService {
 	private record MaxLengths(int maxOldL, int maxNewL) {
 	}
 
-	private static String getTableHeader(int maxOldL, int maxNewL) {
-		String repeatOld = " ".repeat(maxOldL / 2 - 2);
-		String repeatNew = " ".repeat(maxNewL / 2 - 2);
-		String dashes = "-".repeat(maxOldL + maxNewL + 3);
+	private static String getTableHeader(MaxLengths maxes) {
+		String repeatOld = " ".repeat(maxes.maxOldL() / 2 - 2);
+		String repeatNew = " ".repeat(maxes.maxNewL() / 2 - 2);
+		String dashes = "-".repeat(maxes.maxOldL() + maxes.maxNewL() + 3);
 		return "|%s old%s|%s new%s|\n%s\n".formatted(repeatOld, repeatOld, repeatNew, repeatNew, dashes);
 	}
 
