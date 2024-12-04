@@ -52,7 +52,7 @@ public class DockerService {
 				String coloredFilesDiff = fileDiffService.getColoredFilesDiff(oldFilePath, newFileLocalPath);
 				log("new file changes:\n" + coloredFilesDiff);
 
-				if (isApproved("replace file?: ")) {
+				if (isApproved("\nreplace file?: ")) {
 					sshClient.uploadFile(newFileLocalPath, defaultRemoteDir, sshServer);
 					log("new file uploaded!");
 				}
