@@ -112,12 +112,12 @@ public class FileDiffService {
 	private String getTableHeader(MaxLengths maxes) {
 		String repeatOld = " ".repeat(maxes.maxOldL() / 2 - 2);
 		String repeatNew = " ".repeat(maxes.maxNewL() / 2 - 2);
-		String dashes = getDashes(maxes);
+		String dashes = getRepeated(maxes, '-');
 		return "|%s old%s|%s new%s|\n%s\n".formatted(repeatOld, repeatOld, repeatNew, repeatNew, dashes);
 	}
 
-	private String getDashes(MaxLengths maxes) {
-		return "-".repeat(maxes.maxOldL() + maxes.maxNewL() + 3);
+	private String getRepeated(MaxLengths maxes, char ch) {
+		return String.valueOf(ch).repeat(maxes.maxOldL() + maxes.maxNewL() + 3);
 	}
 
 	private boolean isRowChanged(DiffRow row) {
