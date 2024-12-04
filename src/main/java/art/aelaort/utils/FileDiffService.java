@@ -64,7 +64,7 @@ public class FileDiffService {
 	}
 
 	private String getColoredTable(List<DiffRow> rows) {
-		int rangeRowsAroundChanged = 10;
+		int rangeRowsAroundChanged = 7;
 		Set<Integer> changedRowsIndexes = new HashSet<>();
 		for (int i = 0; i < rows.size(); i++) {
 			if (isRowChanged(rows.get(i))) {
@@ -76,8 +76,12 @@ public class FileDiffService {
 		MaxLengths maxes = getMaxLengths(rows, changedRowsIndexes);
 
 		StringBuilder sb = new StringBuilder(getTableHeader(maxes));
+		int prevPrinted = changedRowsIndexes.iterator().next();
 		for (int i = 0; i < rows.size(); i++) {
 			if (changedRowsIndexes.contains(i)) {
+				if (i - 1 > prevPrinted) {
+					sb.append(getRepeated(maxes, '=')).append("\n");
+				}
 				DiffRow row = rows.get(i);
 				sb.append("|")
 						.append(row.getOldLine())
@@ -86,6 +90,7 @@ public class FileDiffService {
 						.append(row.getNewLine())
 						.append(" ".repeat(maxes.maxNewL() - cleanedRow(row.getNewLine()).length()))
 						.append("|\n");
+				prevPrinted = i;
 			}
 		}
 		sb.deleteCharAt(sb.length() - 1);
