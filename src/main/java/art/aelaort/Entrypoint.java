@@ -67,7 +67,7 @@ public class Entrypoint implements CommandLineRunner {
 				case "vm" -> virtualBoxService.up(args);
 				case "vm-pause", "vmp" -> virtualBoxService.pause(args);
 				case "vm-stop", "vms" -> virtualBoxService.stop(args);
-				case "vml" -> log(virtualBoxService.list());
+				case "vml" -> virtualBoxService.vml();
 				default -> log("unknown args\n" + usage());
 			}
 		} else {
@@ -121,7 +121,7 @@ public class Entrypoint implements CommandLineRunner {
 					vm - start virtualbox
 					vm-pause or vmp - save state virtualbox
 					vm-stop or vms - shutdown virtualbox
-					vml - list machines"""
+					vml - list all machines and running machines"""
 				.formatted(dockerDefaultRemoteDir);
 	}
 

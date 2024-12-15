@@ -59,4 +59,18 @@ public class VirtualBoxService {
 	public String list() {
 		return String.join("\n", virtualboxNames);
 	}
+
+	public void vml() {
+		log("""
+				all vms:
+				%s
+				
+				running vms:
+				""".formatted(list()));
+		runningVms();
+	}
+
+	private void runningVms() {
+		systemProcess.callProcessInheritIO("vboxmanage list runningvms");
+	}
 }
