@@ -56,12 +56,21 @@ public class BuildService {
 	public void run(Job job, boolean isBuildDockerNoCache) {
 		if (isApproved(job)) {
 			Path tmpDir = utils.createTmpDir();
+			cleanSrcDir(job);
 			copySrcDirToTmpDir(job, tmpDir);
 			copyDefaultDockerfile(job, tmpDir);
 			fillSecretsToTmpDir(job, tmpDir);
 			runDbIfNeed(job);
 			build(job, tmpDir, isBuildDockerNoCache);
 			cleanTmp(tmpDir);
+		}
+	}
+
+	private void cleanSrcDir(Job job) {
+		switch (job.getBuildType()) {
+			case java_docker,
+				 java_local,
+				 java_graal_local -> run("mvn clean", getSrcDir(job));
 		}
 	}
 
