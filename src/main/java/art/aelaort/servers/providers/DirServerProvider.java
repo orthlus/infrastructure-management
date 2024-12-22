@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Component
@@ -27,28 +27,49 @@ public class DirServerProvider {
 	private String notScanFile;
 
 	public List<DirServer> scanServersDir() {
-		List<Path> serversDirs = scanLocalDirs();
-		List<DirServer> result = new ArrayList<>(serversDirs.size() * 2);
-
-		for (Path serverDir : serversDirs) {
-			for (Path ymlFile : findYmlFiles(serverDir)) {
-				String file = ymlFile.getFileName().toString();
-				if (file.contains("docker")) {
-					result.add(dockerComposeParser.parseDockerYmlFile(ymlFile));
-				} else if (file.equals(projectsYmlFileName)) {
-					result.add(customProjectYamlParser.parseCustomYmlFile(ymlFile));
-				}
-			}
-		}
-
-		return result;
+		return scanLocalDirs()
+				.stream()
+				.map(this::findYmlFile)
+				.filter(Optional::isPresent)
+				.map(Optional::get)
+				.map(this::parseYmlFile)
+				.filter(Optional::isPresent)
+				.map(Optional::get)
+				.toList();
 	}
 
-	private List<Path> findYmlFiles(Path dir) {
+	private Optional<DirServer> parseYmlFile(Path ymlFile) {
+		String file = ymlFile.getFileName().toString();
+		if (file.equals(projectsYmlFileName)) {
+			return Optional.of(customProjectYamlParser.parseCustomYmlFile(ymlFile));
+		} else if (file.contains("docker")) {
+			return Optional.of(dockerComposeParser.parseDockerYmlFile(ymlFile));
+		}
+		return Optional.empty();
+	}
+
+	private Optional<Path> findYmlFile(Path dir) {
 		try (Stream<Path> walk = Files.walk(dir, 1)) {
-			return walk
+			List<Path> paths = walk
 					.filter(path -> path.getFileName().toString().toLowerCase().endsWith(".yml"))
 					.toList();
+			if (paths.size() == 1) {
+				return Optional.of(paths.get(0));
+			}
+			if (paths.size() > 1) {
+				Optional<Path> pathNonDockerOp = paths.stream()
+						.filter(path -> path.getFileName().toString().equals(projectsYmlFileName))
+						.findFirst();
+				if (pathNonDockerOp.isPresent()) {
+					return pathNonDockerOp;
+				} else {
+					return paths.stream()
+							.filter(path -> path.getFileName().toString().contains("docker"))
+							.findFirst();
+				}
+			}
+
+			return Optional.empty();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
