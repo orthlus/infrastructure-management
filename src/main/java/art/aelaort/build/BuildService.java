@@ -99,7 +99,7 @@ public class BuildService {
 			}
 			case java_graal_local -> {
 				run("mvn clean native:compile -P native", tmpDir);
-				copyArtifactToBinDirectory(java_graal_local, tmpDir);
+				copyArtifactToBinDirectory(tmpDir);
 			}
 			case ya_func -> srcZipToS3(job, tmpDir);
 		}
@@ -121,24 +121,22 @@ public class BuildService {
 		return zipFile;
 	}
 
-	private void copyArtifactToBinDirectory(BuildType type, Path tmpDir) {
+	private void copyArtifactToBinDirectory(Path tmpDir) {
 		String graalvmArtifactName = buildProperties.graalvmArtifactName();
 		Path binDirectory = buildProperties.binDirectory();
 
-		if (type == java_graal_local) {
-			Path srcFile = tmpDir.resolve("target").resolve(graalvmArtifactName);
-			Path destFile = binDirectory.resolve(graalvmArtifactName);
+		Path srcFile = tmpDir.resolve("target").resolve(graalvmArtifactName);
+		Path destFile = binDirectory.resolve(graalvmArtifactName);
 
+		try {
+			FileUtils.copyFile(srcFile.toFile(), destFile.toFile(), false);
+		} catch (Exception e) {
+			log("error copy %s to %s, trying new name\n", srcFile, destFile);
+			Path newDestFile = binDirectory.resolve("new-" + graalvmArtifactName);
 			try {
-				FileUtils.copyFile(srcFile.toFile(), destFile.toFile(), false);
-			} catch (Exception e) {
-				log("error copy %s to %s, trying new name\n", srcFile, destFile);
-				Path newDestFile = binDirectory.resolve("new-" + graalvmArtifactName);
-				try {
-					FileUtils.copyFile(srcFile.toFile(), newDestFile.toFile(), false);
-				} catch (IOException ex) {
-					throw new RuntimeException(ex);
-				}
+				FileUtils.copyFile(srcFile.toFile(), newDestFile.toFile(), false);
+			} catch (IOException ex) {
+				throw new RuntimeException(ex);
 			}
 		}
 	}
