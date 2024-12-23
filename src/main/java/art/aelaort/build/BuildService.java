@@ -91,7 +91,7 @@ public class BuildService {
 				run("mvn clean package -DskipTests", tmpDir);
 				dockerBuildPush(job, tmpDir, isBuildDockerNoCache);
 			}
-			case java_local -> run("mvn clean install -DskipTests", tmpDir);
+			case java_local -> run("mvn clean source:jar install -DskipTests", tmpDir);
 			case frontend_vue -> {
 				run("yarn install", tmpDir);
 				run("yarn run build", tmpDir);
