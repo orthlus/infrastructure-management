@@ -1,8 +1,8 @@
 package art.aelaort.build;
 
 import art.aelaort.DatabaseManageService;
+import art.aelaort.exceptions.CopyBinFileException;
 import art.aelaort.exceptions.TooManyDockerFilesException;
-import art.aelaort.models.build.BuildType;
 import art.aelaort.models.build.Job;
 import art.aelaort.models.build.PomModel;
 import art.aelaort.properties.S3Properties;
@@ -31,7 +31,6 @@ import java.util.Scanner;
 import java.util.stream.Stream;
 
 import static art.aelaort.models.build.BuildType.java_docker;
-import static art.aelaort.models.build.BuildType.java_graal_local;
 import static art.aelaort.utils.Utils.log;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.chop;
@@ -99,7 +98,7 @@ public class BuildService {
 			}
 			case java_graal_local -> {
 				run("mvn clean native:compile -P native", tmpDir);
-				copyArtifactToBinDirectory(tmpDir);
+				copyArtifactToBinDirectory(job, tmpDir);
 			}
 			case ya_func -> srcZipToS3(job, tmpDir);
 		}
@@ -121,23 +120,40 @@ public class BuildService {
 		return zipFile;
 	}
 
-	private void copyArtifactToBinDirectory(Path tmpDir) {
-		String graalvmArtifactName = buildProperties.graalvmArtifactName();
-		Path binDirectory = buildProperties.binDirectory();
-
-		Path srcFile = tmpDir.resolve("target").resolve(graalvmArtifactName);
-		Path destFile = binDirectory.resolve(graalvmArtifactName);
-
+	private void copyArtifactToBinDirectory(Job job, Path tmpDir) {
+		Path srcFile = searchBinFile(tmpDir.resolve("target"));
+		Path destFile = buildProperties.binDirectory().resolve(job.getName() + ".exe");
 		try {
-			FileUtils.copyFile(srcFile.toFile(), destFile.toFile(), false);
-		} catch (Exception e) {
+			copyBinFile(srcFile, destFile, true);
+		} catch (CopyBinFileException e) {
 			log("error copy %s to %s, trying new name\n", srcFile, destFile);
-			Path newDestFile = binDirectory.resolve("new-" + graalvmArtifactName);
-			try {
-				FileUtils.copyFile(srcFile.toFile(), newDestFile.toFile(), false);
-			} catch (IOException ex) {
-				throw new RuntimeException(ex);
+			copyBinFile(srcFile, buildFileNewName(destFile), false);
+		}
+	}
+
+	private void copyBinFile(Path src, Path dst, boolean isThrow) {
+		try {
+			FileUtils.copyFile(src.toFile(), dst.toFile(), false);
+		} catch (IOException e) {
+			if (isThrow) {
+				throw new CopyBinFileException();
+			} else {
+				throw new RuntimeException(e);
 			}
+		}
+	}
+
+	private Path buildFileNewName(Path file) {
+		return file.getParent().resolve("new-" + file.getFileName());
+	}
+
+	private Path searchBinFile(Path dir) {
+		try (Stream<Path> target = Files.walk(dir)) {
+			return target.filter(path -> path.toString().endsWith(".exe"))
+					.findFirst()
+					.orElseThrow();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
