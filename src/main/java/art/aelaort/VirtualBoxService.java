@@ -1,10 +1,14 @@
 package art.aelaort;
 
 import art.aelaort.utils.system.SystemProcess;
+import com.google.common.io.Files;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.List;
 
 import static art.aelaort.utils.Utils.log;
@@ -13,8 +17,8 @@ import static art.aelaort.utils.Utils.log;
 @RequiredArgsConstructor
 public class VirtualBoxService {
 	private final SystemProcess systemProcess;
-	@Value("${virtualbox.names}")
-	private List<String> virtualboxNames;
+	@Value("${servers.management.vms}")
+	private Path virtualboxNamesFile;
 
 	public void up(String... args) {
 		if (existsArgs(args)) {
@@ -45,7 +49,7 @@ public class VirtualBoxService {
 	private String nameById(String... args) {
 		if (args.length > 1) {
 			try {
-				return virtualboxNames.get(Integer.parseInt(args[1]) - 1);
+				return readVirtualboxNames().get(Integer.parseInt(args[1]) - 1);
 			} catch (NumberFormatException | IndexOutOfBoundsException e) {
 				log("wrong number or not a number");
 				throw new RuntimeException(e);
@@ -57,7 +61,7 @@ public class VirtualBoxService {
 	}
 
 	public String list() {
-		return String.join("\n", virtualboxNames);
+		return String.join("\n", readVirtualboxNames());
 	}
 
 	public void vml() {
@@ -72,5 +76,13 @@ public class VirtualBoxService {
 
 	private void runningVms() {
 		systemProcess.callProcessInheritIO("vboxmanage list runningvms");
+	}
+
+	private List<String> readVirtualboxNames() {
+		try {
+			return Files.readLines(virtualboxNamesFile.toFile(), StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
