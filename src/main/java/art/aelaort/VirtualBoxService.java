@@ -23,18 +23,21 @@ public class VirtualBoxService {
 	public void up(String... args) {
 		if (existsArgs(args)) {
 			systemProcess.callProcessInheritIO("vboxmanage startvm %s --type headless".formatted(nameById(args)));
+			log("vm started");
 		}
 	}
 
 	public void pause(String... args) {
 		if (existsArgs(args)) {
 			systemProcess.callProcessInheritIO("vboxmanage controlvm %s savestate".formatted(nameById(args)));
+			log("vm paused");
 		}
 	}
 
 	public void stop(String... args) {
 		if (existsArgs(args)) {
 			systemProcess.callProcessInheritIO("vboxmanage controlvm %s acpipowerbutton".formatted(nameById(args)));
+			log("vm stopped");
 		}
 	}
 
