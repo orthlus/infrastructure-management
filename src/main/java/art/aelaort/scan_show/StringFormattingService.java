@@ -75,6 +75,7 @@ public class StringFormattingService {
 				"ip",
 				"port",
 				"monitoring",
+				"price",
 				"sshKey",
 				"services"
 		};
@@ -85,7 +86,7 @@ public class StringFormattingService {
 	}
 
 	private Object[][] convertServersToArrays(List<Server> servers) {
-		Object[][] result = new Object[servers.size()][7];
+		Object[][] result = new Object[servers.size()][8];
 		for (int i = 0; i < servers.size(); i++) {
 			Server server = servers.get(i);
 			result[i][0] = server.getId();
@@ -93,8 +94,9 @@ public class StringFormattingService {
 			result[i][2] = nullable(server.getIp());
 			result[i][3] = nullable(server.getPort());
 			result[i][4] = server.isMonitoring();
-			result[i][5] = nullable(server.getSshKey());
-			result[i][6] = Server.servicesStr(server.getServices());
+			result[i][5] = nullable(server.getPrice());
+			result[i][6] = nullable(server.getSshKey());
+			result[i][7] = Server.servicesStr(server.getServices());
 		}
 
 		appendSpaceToRight(result);

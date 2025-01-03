@@ -13,4 +13,5 @@ public class DirServer {
 	private String name;
 	private boolean monitoring;
 	private List<ServiceDto> services;
+	private Integer price;
 }

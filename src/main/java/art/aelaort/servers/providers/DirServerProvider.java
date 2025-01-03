@@ -11,8 +11,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static art.aelaort.utils.Utils.log;
+import static java.lang.Integer.parseInt;
 
 @Component
 @RequiredArgsConstructor
@@ -23,10 +28,14 @@ public class DirServerProvider {
 	private String projectsYmlFileName;
 	@Value("${servers.management.dir}")
 	private Path serversDir;
+	@Value("${servers.management.prices}")
+	private Path pricesPath;
 	@Value("${servers.management.files.not_scan}")
 	private String notScanFile;
+	private Map<String, Integer> pricesMap;
 
 	public List<DirServer> scanServersDir() {
+		fillPrices();
 		return scanLocalDirs()
 				.stream()
 				.map(this::findYmlFile)
@@ -35,7 +44,32 @@ public class DirServerProvider {
 				.map(this::parseYmlFile)
 				.filter(Optional::isPresent)
 				.map(Optional::get)
+				.map(this::enrich)
 				.toList();
+	}
+
+	private void fillPrices() {
+		try {
+			pricesMap = Files.readAllLines(pricesPath)
+					.stream()
+					.collect(Collectors.toMap(
+							s -> s.split(",")[0],
+							s -> parseInt(s.split(",")[1])
+					));
+		} catch (IOException e) {
+			log("prices file read error");
+			throw new RuntimeException(e);
+		}
+	}
+
+	private DirServer enrich(DirServer dirServer) {
+		if (pricesMap.containsKey(dirServer.name())) {
+			return dirServer
+					.toBuilder()
+					.price(pricesMap.get(dirServer.name()))
+					.build();
+		}
+		return dirServer;
 	}
 
 	private Optional<DirServer> parseYmlFile(Path ymlFile) {

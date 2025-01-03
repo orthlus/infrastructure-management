@@ -65,7 +65,8 @@ public class ServerProvider {
 			} else {
 				serverBuilder
 						.monitoring(dirServer.monitoring())
-						.services(dirServer.services());
+						.services(dirServer.services())
+						.price(dirServer.price());
 			}
 			result.add(serverBuilder.build());
 		}
@@ -77,6 +78,7 @@ public class ServerProvider {
 						.name(dirServer.name())
 						.monitoring(dirServer.monitoring())
 						.services(dirServer.services())
+						.price(dirServer.price())
 						.build();
 				result.add(server);
 			}

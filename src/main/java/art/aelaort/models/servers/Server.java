@@ -31,6 +31,8 @@ public class Server {
 	private boolean monitoring;
 	@JsonProperty
 	private List<ServiceDto> services;
+	@JsonProperty
+	private Integer price;
 
 	public static String servicesStr(List<ServiceDto> services) {
 		return join(", ", services.stream()
