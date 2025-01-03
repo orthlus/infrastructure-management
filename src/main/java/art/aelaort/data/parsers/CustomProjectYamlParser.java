@@ -32,7 +32,11 @@ public class CustomProjectYamlParser {
 						.ymlName(ymlFile.getFileName().toString())
 						.build());
 			}
-			return new DirServer(serverDir.getFileName().toString(), monitoring, services);
+			return DirServer.builder()
+					.name(serverDir.getFileName().toString())
+					.monitoring(monitoring)
+					.services(services)
+					.build();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

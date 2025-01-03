@@ -45,7 +45,11 @@ public class DockerComposeParser {
 				resultServices.add(getServiceDto(ymlFile, entry));
 			}
 
-			return new DirServer(serverDir.getFileName().toString(), monitoring, resultServices);
+			return DirServer.builder()
+					.name(serverDir.getFileName().toString())
+					.monitoring(monitoring)
+					.services(resultServices)
+					.build();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
