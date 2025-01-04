@@ -44,12 +44,12 @@ public class Entrypoint implements CommandLineRunner {
 			switch (args[0]) {
 				case "show" -> scanShow.show();
 				case "tbl-show" -> scanShow.showTable();
-				case "yml-show" -> scanShow.showTree();
+				case "yml-show" -> scanShow.showYml();
 				case "sync" -> scanShow.sync();
 				case "sync-all" -> scanShow.syncAll();
 				case "scan" -> scanShow.scan();
 				case "tbl-scan" -> scanShow.scanTable();
-				case "yml-scan" -> scanShow.scanTree();
+				case "yml-scan" -> scanShow.scanYml();
 				case "docker" -> dockerUpload(args);
 				case "build" -> build(args);
 				case "dblcl" -> databaseManageService.localUp();

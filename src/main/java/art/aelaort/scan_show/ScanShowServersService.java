@@ -29,7 +29,7 @@ public class ScanShowServersService {
 		List<Server> servers = serverProvider.scanAndJoinData();
 		log(stringFormattingService.getServersTableString(servers));
 		log();
-		log(stringFormattingService.servicesByServerFullTreeString(servers));
+		log(stringFormattingService.servicesByServerString(servers));
 	}
 
 	public void scanTable() {
@@ -37,9 +37,9 @@ public class ScanShowServersService {
 		log(stringFormattingService.getServersTableString(servers));
 	}
 
-	public void scanTree() {
+	public void scanYml() {
 		List<Server> servers = serverProvider.scanAndJoinData();
-		log(stringFormattingService.servicesByServerFullTreeString(servers));
+		log(stringFormattingService.servicesByServerString(servers));
 	}
 
 	/*
@@ -63,19 +63,19 @@ public class ScanShowServersService {
 
 	/*
 	 * read local json
-	 * print table
-	 * print tree
+	 * print table servers
+	 * print table services
 	 */
 	public void show() {
 		List<Server> servers = serverProvider.readLocalJsonData();
 		log(stringFormattingService.getServersTableString(servers));
 		log();
-		log(stringFormattingService.servicesByServerFullTreeString(servers));
+		log(stringFormattingService.servicesByServerString(servers));
 	}
 
-	public void showTree() {
+	public void showYml() {
 		List<Server> servers = serverProvider.readLocalJsonData();
-		log(stringFormattingService.servicesByServerFullTreeString(servers));
+		log(stringFormattingService.servicesByServerString(servers));
 	}
 
 	public void showTable() {

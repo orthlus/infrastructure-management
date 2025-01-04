@@ -7,19 +7,16 @@ import dnl.utils.text.table.TextTable;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static art.aelaort.utils.TablePrintingUtils.*;
 import static art.aelaort.utils.Utils.log;
-import static java.lang.String.join;
 import static java.lang.String.valueOf;
 import static org.apache.commons.lang3.StringUtils.*;
 
 @Component
 public class StringFormattingService {
-	public String servicesByServerFullTreeString(List<Server> servers) {
+	public String servicesByServerString(List<Server> servers) {
 		log("services:");
 		String[] columnNames = {"server", "app", "file"};
 		Object[][] data = convertServicesToArrays(mapToAppRows(servers));
