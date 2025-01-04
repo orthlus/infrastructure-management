@@ -20,47 +20,45 @@ import static org.apache.commons.lang3.StringUtils.*;
 @Component
 public class StringFormattingService {
 	public String servicesByServerFullTreeString(List<Server> servers) {
-		StringBuilder sb = new StringBuilder("services:\n");
+		log("services:");
+		String[] columnNames = {"server", "app", "file"};
+		Object[][] data = convertServicesToArrays(mapToAppRows(servers));
+		TextTable tt = new TextTable(columnNames, data);
+		return getTableString(tt);
+	}
+
+	private List<AppRow> mapToAppRows(List<Server> servers) {
+		List<AppRow> res = new ArrayList<>();
 		for (Server server : servers) {
-			if (server.getServices().isEmpty()) {
-				continue;
+			for (ServiceDto service : server.getServices()) {
+				AppRow appRow = new AppRow(server.getName(), getAppName(service), service.getYmlName());
+				res.add(appRow);
 			}
-			sb.append(server.getName())
-					.append("\n")
-					.append(servicesString(server.getServices()));
 		}
-		return sb.toString().trim();
+		return res;
 	}
 
-	private String servicesString(List<ServiceDto> services) {
-		if (services.isEmpty()) {
-			return "";
+	private Object[][] convertServicesToArrays(List<AppRow> appRows) {
+		Object[][] result = new Object[appRows.size()][3];
+		for (int i = 0; i < appRows.size(); i++) {
+			AppRow appRow = appRows.get(i);
+			result[i][0] = appRow.server();
+			result[i][1] = appRow.app();
+			result[i][2] = appRow.file();
 		}
 
-		StringBuilder sb = new StringBuilder();
-		for (Map.Entry<String, List<String>> servicesByYml : servicesMapList(services).entrySet()) {
-			String join = join("\n      ", servicesByYml.getValue());
-			sb.append("   ")
-					.append(servicesByYml.getKey())
-					.append("\n      ")
-					.append(join);
-		}
-		return sb.append("\n\n").toString();
+		appendSpaceToRight(result);
+
+		return result;
 	}
 
-	private Map<String, List<String>> servicesMapList(List<ServiceDto> services) {
-		Map<String, List<String>> servicesMap = new HashMap<>();
-		for (ServiceDto service : services) {
-			String ymlName = service.getYmlName();
-			String name = service.getDockerName() == null ?
-					service.getService() :
-					service.getDockerName() + " - " + service.getService();
-			servicesMap
-					.computeIfAbsent(ymlName, k -> new ArrayList<>())
-					.add(name);
-		}
-		return servicesMap;
+	private String getAppName(ServiceDto service) {
+		return service.getDockerName() == null ?
+				service.getService() :
+				service.getDockerName() + " - " + service.getService();
 	}
+
+	record AppRow(String server, String app, String file) {}
 
 	/*
 	 * ======================================================
