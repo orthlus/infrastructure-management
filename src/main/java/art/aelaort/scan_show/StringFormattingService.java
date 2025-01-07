@@ -21,6 +21,7 @@ public class StringFormattingService {
 		String[] columnNames = {"server", "app", "file"};
 		Object[][] data = convertServicesToArrays(mapToAppRows(servers));
 		TextTable tt = new TextTable(columnNames, data);
+		tt.setAddRowNumbering(true);
 		return getTableString(tt);
 	}
 
