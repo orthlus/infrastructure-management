@@ -10,6 +10,7 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.file.Files;
@@ -25,6 +26,7 @@ public class TabbyServerProvider {
 	private final YAMLMapper yamlMapper;
 	private final TabbyMapper tabbyMapper;
 	private final RestTemplate tabbyDecoder;
+	private final RestTemplate tabbyReserveDecoder;
 	@Value("${tabby.config.path}")
 	private Path tabbyConfigPath;
 	@Value("${tabby.decode.password}")
@@ -65,6 +67,10 @@ public class TabbyServerProvider {
 
 	private String decode(String data) {
 		String url = "/decrypt?password={decodePassword}";
-		return tabbyDecoder.postForObject(url, new HttpEntity<>(data), String.class, decodePassword);
+		try {
+			return tabbyDecoder.postForObject(url, new HttpEntity<>(data), String.class, decodePassword);
+		} catch (RestClientException e) {
+			return tabbyReserveDecoder.postForObject(url, new HttpEntity<>(data), String.class, decodePassword);
+		}
 	}
 }
