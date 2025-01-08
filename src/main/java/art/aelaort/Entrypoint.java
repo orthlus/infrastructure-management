@@ -58,8 +58,6 @@ public class Entrypoint implements CommandLineRunner {
 				case "db-prod-status" -> databaseManageService.remoteStatus();
 				case "db-prod-update" -> databaseManageService.remoteUpdate();
 				case "git-stat" -> gitStat(args);
-				case "proxy" -> externalUtilities.proxyUp();
-				case "proxy-d" -> externalUtilities.proxyDown();
 				case "dstat" -> dockerStats(args);
 				case "make" -> makeProject(args);
 				case "upld-ssh" -> uploadSshKey(args);
@@ -100,8 +98,6 @@ public class Entrypoint implements CommandLineRunner {
 					db-prod-update - execute prod migrations
 					git-stat - print git stat for all local repo
 						optional args: day, week, month
-					proxy - start socks5 proxy
-					proxy-d - stop socks5 proxy
 					dstat - docker stats, docker ps -a and df -h
 						by server id/name
 						or all servers if no arguments

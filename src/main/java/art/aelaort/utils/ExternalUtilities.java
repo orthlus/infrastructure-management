@@ -20,8 +20,6 @@ public class ExternalUtilities {
 	private String buildConfigBin;
 	@Value("${build.data.config.converter.path}")
 	private String buildConfigConverterPath;
-	@Value("${proxy.socks5.docker_compose.path}")
-	private String proxyDockerCompose;
 
 	public void dockerPs() {
 		systemProcess.callProcessInheritIO("docker ps -a");
@@ -54,13 +52,5 @@ public class ExternalUtilities {
 		if (gitRows > 0) {
 			log("also synced .git: %d paths\n", gitRows);
 		}
-	}
-
-	public void proxyUp() {
-		systemProcess.callProcessInheritIO("docker compose -f %s up -d".formatted(proxyDockerCompose));
-	}
-
-	public void proxyDown() {
-		systemProcess.callProcessInheritIO("docker compose -f %s down".formatted(proxyDockerCompose));
 	}
 }
