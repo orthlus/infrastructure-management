@@ -36,14 +36,14 @@ public class RemoteDb {
 
 	private void sshUp(Path dir) {
 		String command = "docker compose -f %s up -d --build"
-				.formatted(dir.resolve(props.getRemoteSshDockerComposeFilename()));
+				.formatted(dir.getParent().resolve(props.getRemoteSshDockerComposeFilename()));
 		systemProcess.callProcessInheritIO(command);
 		log("SSH tunnel - started");
 	}
 
 	private void sshDown(Path dir) {
 		String command = "docker compose -f %s down"
-				.formatted(dir.resolve(props.getRemoteSshDockerComposeFilename()));
+				.formatted(dir.getParent().resolve(props.getRemoteSshDockerComposeFilename()));
 		systemProcess.callProcessInheritIO(command);
 		log("SSH tunnel - stopped");
 	}
