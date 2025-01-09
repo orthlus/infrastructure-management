@@ -1,6 +1,6 @@
 package art.aelaort.build;
 
-import art.aelaort.DatabaseManageService;
+import art.aelaort.db.LocalDb;
 import art.aelaort.exceptions.CopyBinFileException;
 import art.aelaort.exceptions.TooManyDockerFilesException;
 import art.aelaort.models.build.Job;
@@ -41,7 +41,6 @@ import static org.apache.commons.lang3.StringUtils.chop;
 public class BuildService {
 	private final Utils utils;
 	private final SystemProcess systemProcess;
-	private final DatabaseManageService databaseManageService;
 	private final XmlMapper xmlMapper;
 	private final BuildFunctionsS3 buildFunctionsS3;
 	private final S3Properties s3Properties;
@@ -51,6 +50,7 @@ public class BuildService {
 
 	private final IOFileFilter dockerLookupFilter =
 			FileFilterUtils.suffixFileFilter("dockerfile", IOCase.INSENSITIVE);
+	private final LocalDb localDb;
 
 	public void run(Job job, boolean isBuildDockerNoCache) {
 		if (isApproved(job)) {
@@ -74,8 +74,8 @@ public class BuildService {
 	}
 
 	private void runDbIfNeed(Job job) {
-		if (job.isDb() && !databaseManageService.isLocalRunning()) {
-			databaseManageService.localUp();
+		if (job.isDb() && !localDb.isLocalRunning()) {
+			localDb.localUp();
 		}
 	}
 

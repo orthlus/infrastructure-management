@@ -2,6 +2,8 @@ package art.aelaort;
 
 import art.aelaort.build.BuildService;
 import art.aelaort.build.JobsProvider;
+import art.aelaort.db.LocalDb;
+import art.aelaort.db.RemoteDb;
 import art.aelaort.docker.DockerService;
 import art.aelaort.docker.DockerStatsService;
 import art.aelaort.exceptions.*;
@@ -25,7 +27,6 @@ public class Entrypoint implements CommandLineRunner {
 	private final ExternalUtilities externalUtilities;
 	private final DockerService dockerService;
 	private final BuildService buildService;
-	private final DatabaseManageService databaseManageService;
 	private final GitStatService gitStatService;
 	private final ScanShowServersService scanShow;
 	private final ProjectsMakerService projectsMakerService;
@@ -35,6 +36,8 @@ public class Entrypoint implements CommandLineRunner {
 	private final SshServerProvider sshServerProvider;
 	private final JobsProvider jobsProvider;
 	private final VirtualBoxService virtualBoxService;
+	private final LocalDb localDb;
+	private final RemoteDb remoteDb;
 	@Value("${docker.compose.remote.dir.default}")
 	private String dockerDefaultRemoteDir;
 
@@ -42,30 +45,30 @@ public class Entrypoint implements CommandLineRunner {
 	public void run(String... args) {
 		if (args.length >= 1) {
 			switch (args[0]) {
-				case "show" -> scanShow.show();
-				case "tbl-show" -> scanShow.showTable();
-				case "yml-show" -> scanShow.showYml();
-				case "sync" -> scanShow.sync();
-				case "sync-all" -> scanShow.syncAll();
-				case "scan" -> scanShow.scan();
-				case "tbl-scan" -> scanShow.scanTable();
-				case "yml-scan" -> scanShow.scanYml();
-				case "docker" -> dockerUpload(args);
-				case "build" -> build(args);
-				case "dblcl" -> databaseManageService.localUp();
-				case "dblcl-down" -> databaseManageService.localDown();
-				case "dps" -> externalUtilities.dockerPs();
-				case "db-prod-status" -> databaseManageService.remoteStatus();
-				case "db-prod-update" -> databaseManageService.remoteUpdate();
-				case "git-stat" -> gitStat(args);
-				case "dstat" -> dockerStats(args);
-				case "make" -> makeProject(args);
-				case "upld-ssh" -> uploadSshKey(args);
-				case "port" -> log(randomPortService.getRandomPort());
-				case "vm" -> virtualBoxService.up(args);
-				case "vm-pause", "vmp" -> virtualBoxService.pause(args);
-				case "vm-stop", "vms" -> virtualBoxService.stop(args);
-				case "vml" -> virtualBoxService.vml();
+				case "show" -> 				scanShow.show();
+				case "tbl-show", "tbl" -> 	scanShow.showTable();
+				case "yml-show", "yml" -> 	scanShow.showYml();
+				case "sync", "s" -> 		scanShow.sync();
+				case "sync-all", "sa" -> 	scanShow.syncAll();
+				case "scan" -> 				scanShow.scan();
+				case "tbl-scan" -> 			scanShow.scanTable();
+				case "yml-scan" -> 			scanShow.scanYml();
+				case "docker" -> 			dockerUpload(args);
+				case "build" -> 			build(args);
+				case "dbl" -> 				localDb.localUp(args);
+				case "dbl-down", "dbld" -> 	localDb.localDown();
+				case "dbp-status", "dbp" -> remoteDb.remoteStatus(args);
+				case "dbp-run", "dbpr" -> 	remoteDb.remoteRun(args);
+				case "dps" -> 				externalUtilities.dockerPs();
+				case "git-stat" -> 			gitStat(args);
+				case "dstat" -> 			dockerStats(args);
+				case "make" -> 				makeProject(args);
+				case "upld-ssh" -> 			uploadSshKey(args);
+				case "port" -> 				log(randomPortService.getRandomPort());
+				case "vm" -> 				virtualBoxService.up(args);
+				case "vm-pause", "vmp" -> 	virtualBoxService.pause(args);
+				case "vm-stop", "vms" -> 	virtualBoxService.stop(args);
+				case "vml" -> 				virtualBoxService.vml();
 				default -> log("unknown args\n" + usage());
 			}
 		} else {
@@ -78,46 +81,53 @@ public class Entrypoint implements CommandLineRunner {
 	private String usage() {
 		return """
 				usage:
-					sync - quick sync
-					sync-all - long sync all data
-					show - show all (tbl and yml)
-					tbl-show - show table with servers
-					yml-show - show list of services from yml files
-					scan - show with generate (for actual data)
-					tbl-scan - show table with generate (for actual data)
-					yml-scan - show tree with generate (for actual data)
+					sync, s 	   - quick sync
+					sync-all, sa   - long sync all data
+					show 		   - show all (tbl and yml)
+					tbl-show, tbl  - show table with servers
+					yml-show, yml  - show list of services from yml files
+					scan 		   - show with generate (for actual data)
+					tbl-scan	   - show table with generate (for actual data)
+					yml-scan	   - show tree with generate (for actual data)
+					\s
 					docker - upload docker-compose file to server (in %s)
-						by server id/name (required)
+								by server id/name (required)
+					\s
 					build - build and deploy apps
-						number of app (required for run)
-							without args - printing apps list
-					dblcl - start local postgres and run migrations
-					dblcl-down - down local postgres
-					dps - alias for 'docker ps -a'
-					db-prod-status - prod migrations status
-					db-prod-update - execute prod migrations
-					git-stat - print git stat for all local repo
-						optional args: day, week, month
-					dstat - docker stats, docker ps -a and df -h
-						by server id/name
-						or all servers if no arguments
-					make - create project folder
-						one arg required
-						`name` for make project by name (could be with sub directories)
-							or
-						`id` for make project with name from config by id
-						optional:
-							`no-git` - not init git
-							`jooq` - add jooq config and plugin
-					upld-ssh - upload ssh key to server
-						by server id/name
-						required key file path (2 arg)
-						required user name (3 arg)
-					port - generate random, not used, port for tcp. 5 digits
-					vm - start virtualbox
-					vm-pause or vmp - save state virtualbox
-					vm-stop or vms - shutdown virtualbox
-					vml - list all machines and running machines"""
+								number of app (required for run)
+									without args - printing apps list
+					\s
+					Databases (optional 1 arg - db name):
+					dbl 				- start local postgres and run migrations
+					dbl-down, dbld 		- down local postgres
+					dbp-status, dbps 	- prod migrations status
+					dbp-run, dbpr 		- execute prod migrations
+					\s
+					dps 		- alias for 'docker ps -a'
+					git-stat 	- print git stat for all local repo
+									optional args: day, week, month
+					dstat 		- docker stats, docker ps -a and df -h
+									by server id/name
+									or all servers if no arguments
+					make 		- create project folder
+									one arg required
+									`name` for make project by name (could be with sub directories)
+										or
+									`id` for make project with name from config by id
+									optional:
+										`no-git` - not init git
+										`jooq` - add jooq config and plugin
+					upld-ssh 	- upload ssh key to server
+									by server id/name
+									required key file path (2 arg)
+									required user name (3 arg)
+					port 		- generate random, not used, port for tcp. 5 digits
+					\s
+					VirtualBox:
+					vm 				- start virtualbox
+					vm-pause, vmp 	- save state virtualbox
+					vm-stop, vms 	- shutdown virtualbox
+					vml 			- list all machines and running machines"""
 				.formatted(dockerDefaultRemoteDir);
 	}
 
