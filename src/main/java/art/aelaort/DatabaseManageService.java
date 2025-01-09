@@ -2,12 +2,16 @@ package art.aelaort;
 
 import art.aelaort.utils.system.Response;
 import art.aelaort.utils.system.SystemProcess;
+import com.google.common.io.Files;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static art.aelaort.utils.Utils.log;
@@ -21,20 +25,14 @@ public class DatabaseManageService {
 	private String dbLocalDockerComposePath;
 	@Value("${db.local.migrations.dir}")
 	private Path dbLocalMigrationsDir;
-	@Value("${db.local.migrations.scripts}")
-	private String[] dbLocalMigrationsScripts;
 
-	@Value("${db.remote.ssh.docker_compose.path}")
-	private String dbRemoteSshDockerComposePath;
-	@Value("${db.remote.ssh.port}")
-	private String dbRemoteSshPort;
+	@Value("${db.remote.ssh.docker_compose.filename}")
+	private String dbSshDockerComposeFile;
 
 	@Value("${db.remote.migrations.dir}")
 	private Path dbRemoteMigrationsDir;
 	@Value("${db.remote.migrations.status}")
 	private String dbRemoteMigrationsStatus;
-	@Value("${db.remote.migrations.scripts}")
-	private String[] dbRemoteMigrationsScripts;
 
 	public void remoteStatus() {
 		sshUp();
@@ -45,21 +43,29 @@ public class DatabaseManageService {
 
 	public void remoteUpdate() {
 		sshUp();
-		for (String script : dbRemoteMigrationsScripts) {
+		for (String script : getFilesOrder(dbRemoteMigrationsDir)) {
 			String command = dbRemoteMigrationsDir.resolve(script).toString();
 			systemProcess.callProcessInheritIO(command, dbRemoteMigrationsDir);
 		}
 		sshDown();
 	}
 
+	private List<String> getFilesOrder(Path dir) {
+		try {
+			return Files.readLines(dir.resolve("order.txt").toFile(), StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	private void sshUp() {
-		String command = "docker compose -f %s up -d --build".formatted(dbRemoteSshDockerComposePath);
+		String command = "docker compose -f %s up -d --build".formatted(dbRemoteMigrationsDir.resolve(dbSshDockerComposeFile));
 		systemProcess.callProcessInheritIO(command);
-		log("SSH tunnel (%s) - started%n", dbRemoteSshPort);
+		log("SSH tunnel - started");
 	}
 
 	private void sshDown() {
-		String command = "docker compose -f %s down".formatted(dbRemoteSshDockerComposePath);
+		String command = "docker compose -f %s down".formatted(dbRemoteMigrationsDir.resolve(dbSshDockerComposeFile));
 		systemProcess.callProcessInheritIO(command);
 		log("SSH tunnel - stopped");
 	}
@@ -75,19 +81,19 @@ public class DatabaseManageService {
 	}
 
 	public void localUp() {
-		String command = "docker compose -f %s up -d --build".formatted(dbLocalDockerComposePath);
+		String command = "docker run -d -p 5433:5432 --env POSTGRES_PASSWORD=postgres --name pg-tmp-dev postgres:16";
 		systemProcess.callProcessInheritIO(command);
 		log("PostgreSQL (5433) - started");
 
 		sleep();
-		for (String script : dbLocalMigrationsScripts) {
+		for (String script : getFilesOrder(dbLocalMigrationsDir)) {
 			systemProcess.callProcessInheritIO(dbLocalMigrationsDir.resolve(script).toString(), dbLocalMigrationsDir);
 		}
 		log("Migrations - executed");
 	}
 
 	public void localDown() {
-		String command = "docker compose -f %s down".formatted(dbLocalDockerComposePath);
+		String command = "docker rm -f -v pg-tmp-dev";
 		systemProcess.callProcessInheritIO(command);
 		log("PostgreSQL (5433) - stopped");
 	}
