@@ -57,7 +57,7 @@ public class Entrypoint implements CommandLineRunner {
 				case "build" -> 			build(args);
 				case "dbl" -> 				localDb.localUp(args);
 				case "dbl-down", "dbld" -> 	localDb.localDown();
-				case "dbp-status", "dbp" -> remoteDb.remoteStatus(args);
+				case "dbp-status", "dbps" -> remoteDb.remoteStatus(args);
 				case "dbp-run", "dbpr" -> 	remoteDb.remoteRun(args);
 				case "dps" -> 				externalUtilities.dockerPs();
 				case "git-stat" -> 			gitStat(args);
