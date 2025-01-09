@@ -81,53 +81,53 @@ public class Entrypoint implements CommandLineRunner {
 	private String usage() {
 		return """
 				usage:
-					sync, s 	   - quick sync
+					sync, s        - quick sync
 					sync-all, sa   - long sync all data
-					show 		   - show all (tbl and yml)
+					show           - show all (tbl and yml)
 					tbl-show, tbl  - show table with servers
 					yml-show, yml  - show list of services from yml files
-					scan 		   - show with generate (for actual data)
-					tbl-scan	   - show table with generate (for actual data)
-					yml-scan	   - show tree with generate (for actual data)
+					scan           - show with generate (for actual data)
+					tbl-scan       - show table with generate (for actual data)
+					yml-scan       - show tree with generate (for actual data)
 					\s
 					docker - upload docker-compose file to server (in %s)
-								by server id/name (required)
+					            by server id/name (required)
 					\s
 					build - build and deploy apps
-								number of app (required for run)
-									without args - printing apps list
+					            number of app (required for run)
+					                without args - printing apps list
 					\s
 					Databases (optional 1 arg - db name):
-					dbl 				- start local postgres and run migrations
-					dbl-down, dbld 		- down local postgres
-					dbp-status, dbps 	- prod migrations status
-					dbp-run, dbpr 		- execute prod migrations
+					dbl                 - start local postgres and run migrations
+					dbl-down, dbld      - down local postgres
+					dbp-status, dbps    - prod migrations status
+					dbp-run, dbpr       - execute prod migrations
 					\s
-					dps 		- alias for 'docker ps -a'
-					git-stat 	- print git stat for all local repo
-									optional args: day, week, month
-					dstat 		- docker stats, docker ps -a and df -h
-									by server id/name
-									or all servers if no arguments
-					make 		- create project folder
-									one arg required
-									`name` for make project by name (could be with sub directories)
-										or
-									`id` for make project with name from config by id
-									optional:
-										`no-git` - not init git
-										`jooq` - add jooq config and plugin
-					upld-ssh 	- upload ssh key to server
-									by server id/name
-									required key file path (2 arg)
-									required user name (3 arg)
-					port 		- generate random, not used, port for tcp. 5 digits
+					dps         - alias for 'docker ps -a'
+					git-stat    - print git stat for all local repo
+					                optional args: day, week, month
+					dstat       - docker stats, docker ps -a and df -h
+					                by server id/name
+					                or all servers if no arguments
+					make        - create project folder
+					                one arg required
+					                `name` for make project by name (could be with sub directories)
+					                    or
+					                `id` for make project with name from config by id
+					                optional:
+					                    `no-git` - not init git
+					                    `jooq` - add jooq config and plugin
+					upld-ssh    - upload ssh key to server
+					                by server id/name
+					                required key file path (2 arg)
+					                required user name (3 arg)
+					port        - generate random, not used, port for tcp. 5 digits
 					\s
 					VirtualBox:
-					vm 				- start virtualbox
-					vm-pause, vmp 	- save state virtualbox
-					vm-stop, vms 	- shutdown virtualbox
-					vml 			- list all machines and running machines"""
+					vm              - start virtualbox
+					vm-pause, vmp   - save state virtualbox
+					vm-stop, vms    - shutdown virtualbox
+					vml             - list all machines and running machines"""
 				.formatted(dockerDefaultRemoteDir);
 	}
 
