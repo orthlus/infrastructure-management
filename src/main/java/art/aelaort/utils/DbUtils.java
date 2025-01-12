@@ -1,12 +1,11 @@
 package art.aelaort.utils;
 
 import art.aelaort.properties.DbManageProperties;
-import com.google.common.io.Files;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -16,18 +15,22 @@ public class DbUtils {
 	private final DbManageProperties props;
 
 	public String getName(String[] args) {
-		if (args == null) {
-			return props.getDefaultName();
+		try {
+			if (args == null) {
+				return Files.readString(props.getDefaultNameFile());
+			}
+			if (args.length > 1) {
+				return args[1];
+			}
+			return Files.readString(props.getDefaultNameFile());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
-		if (args.length > 1) {
-			return args[1];
-		}
-		return props.getDefaultName();
 	}
 
 	public List<String> getDbFilesOrder(Path dir) {
 		try {
-			return Files.readLines(dir.resolve("files.txt").toFile(), StandardCharsets.UTF_8);
+			return Files.readAllLines(dir.resolve("files.txt"));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

@@ -13,7 +13,7 @@ import java.nio.file.Path;
 @Setter
 public class DbManageProperties {
 	private Path migrationsDir;
-	private String defaultName;
+	private Path defaultNameFile;
 	private String remoteSshDockerComposeFilename;
 	private String statusFilename;
 }
