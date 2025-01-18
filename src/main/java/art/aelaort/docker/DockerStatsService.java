@@ -71,7 +71,7 @@ public class DockerStatsService {
 
 	private String filterOutput(Command command, String output) {
 		return switch (command.title()) {
-			case "df -h" -> Stream.of(output.split("\n"))
+			case "df -hT" -> Stream.of(output.split("\n"))
 					.filter(row -> !row.contains("/var/lib/docker/"))
 					.filter(row -> !row.contains("tmpfs"))
 					.collect(joining("\n"));
