@@ -61,7 +61,7 @@ public class Entrypoint implements CommandLineRunner {
 				case "dbp-run", "dbpr" -> 	remoteDb.remoteRun(args);
 				case "dps" -> 				externalUtilities.dockerPs();
 				case "git-stat" -> 			gitStat(args);
-				case "dstat" -> 			dockerStats(args);
+				case "dstat", "ds" -> 		dockerStats(args);
 				case "make" -> 				makeProject(args);
 				case "upld-ssh" -> 			uploadSshKey(args);
 				case "port" -> 				log(randomPortService.getRandomPort());
@@ -106,7 +106,7 @@ public class Entrypoint implements CommandLineRunner {
 					dps         - alias for 'docker ps -a'
 					git-stat    - print git stat for all local repo
 					                optional args: day, week, month
-					dstat       - docker stats, docker ps -a and df -h
+					dstat, ds   - docker stats, docker ps -a and df -h
 					                by server id/name
 					                or all servers if no arguments
 					make        - create project folder
