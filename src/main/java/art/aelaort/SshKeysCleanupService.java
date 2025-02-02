@@ -17,6 +17,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static art.aelaort.utils.Utils.log;
+
 @Component
 @RequiredArgsConstructor
 public class SshKeysCleanupService {
@@ -60,6 +62,7 @@ public class SshKeysCleanupService {
 			for (Path s : toDelete) {
 				Files.deleteIfExists(s);
 			}
+			log("deleted %d keys\n", toDelete.size());
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
