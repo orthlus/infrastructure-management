@@ -35,7 +35,7 @@ public class JobsProvider {
     }
 
     @SneakyThrows
-    List<Job> readBuildConfig() {
+    public List<Job> readBuildConfig() {
 		String jobsStr = externalUtilities.readBuildConfig();
 		Job[] jobs = jsonMapper.readValue(jobsStr, Job[].class);
 		return Job.addNumbers(Arrays.asList(jobs));

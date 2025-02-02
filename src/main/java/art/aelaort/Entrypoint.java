@@ -38,6 +38,7 @@ public class Entrypoint implements CommandLineRunner {
 	private final VirtualBoxService virtualBoxService;
 	private final LocalDb localDb;
 	private final RemoteDb remoteDb;
+	private final SshKeysCleanupService sshKeysCleanupService;
 	@Value("${docker.compose.remote.dir.default}")
 	private String dockerDefaultRemoteDir;
 
@@ -64,6 +65,7 @@ public class Entrypoint implements CommandLineRunner {
 				case "dstat", "ds" -> 		dockerStats(args);
 				case "make" -> 				makeProject(args);
 				case "upld-ssh" -> 			uploadSshKey(args);
+				case "clean-ssh" -> 		sshKeysCleanupService.cleanAll();
 				case "port" -> 				log(randomPortService.getRandomPort());
 				case "vm" -> 				virtualBoxService.up(args);
 				case "vm-pause", "vmp" -> 	virtualBoxService.pause(args);
@@ -121,6 +123,7 @@ public class Entrypoint implements CommandLineRunner {
 					                by server id/name
 					                required key file path (2 arg)
 					                required user name (3 arg)
+					clean-ssh   - clean unused ssh keys (local and in timeweb)
 					port        - generate random, not used, port for tcp. 5 digits
 					\s
 					VirtualBox:
