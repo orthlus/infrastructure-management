@@ -5,7 +5,7 @@ import art.aelaort.exceptions.NoDifferenceInFilesException;
 import art.aelaort.exceptions.SshNotFountFileException;
 import art.aelaort.exceptions.TooManyDockerFilesException;
 import art.aelaort.models.ssh.SshServer;
-import art.aelaort.ssh.SshClient;
+import art.aelaort.ssh.common.SshClient;
 import art.aelaort.utils.ExternalUtilities;
 import art.aelaort.utils.FileDiffService;
 import art.aelaort.utils.Utils;

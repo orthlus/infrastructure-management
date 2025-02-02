@@ -1,9 +1,9 @@
-package art.aelaort;
+package art.aelaort.ssh;
 
 import art.aelaort.exceptions.LocalFileNotFountException;
 import art.aelaort.exceptions.SshNotFountFileException;
 import art.aelaort.models.ssh.SshServer;
-import art.aelaort.ssh.SshClient;
+import art.aelaort.ssh.common.SshClient;
 import art.aelaort.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

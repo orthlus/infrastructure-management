@@ -1,4 +1,4 @@
-package art.aelaort.ssh;
+package art.aelaort.ssh.common;
 
 import art.aelaort.exceptions.SshNotFountFileException;
 import art.aelaort.models.ssh.SshServer;

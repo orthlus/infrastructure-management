@@ -1,4 +1,4 @@
-package art.aelaort;
+package art.aelaort.ssh;
 
 import art.aelaort.build.JobsProvider;
 import art.aelaort.models.build.Job;

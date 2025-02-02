@@ -4,7 +4,7 @@ import art.aelaort.mappers.ServerMapper;
 import art.aelaort.models.servers.Server;
 import art.aelaort.models.ssh.SshServer;
 import art.aelaort.servers.providers.ServerProvider;
-import art.aelaort.ssh.SshClient;
+import art.aelaort.ssh.common.SshClient;
 import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
