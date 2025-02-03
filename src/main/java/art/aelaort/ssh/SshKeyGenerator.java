@@ -2,6 +2,7 @@ package art.aelaort.ssh;
 
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.KeyPair;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -11,9 +12,9 @@ import java.nio.file.Path;
 import static art.aelaort.utils.Utils.log;
 
 @Component
+@RequiredArgsConstructor
 public class SshKeyGenerator {
-	@Value("${ssh.keys.generated.dir}")
-	private Path keysDir;
+	private final SshKeyLocalResolver sshKeyLocalResolver;
 	@Value("${ssh.keys.generated.default-comment}")
 	private String defaultComment;
 
@@ -26,8 +27,8 @@ public class SshKeyGenerator {
 	}
 
 	public void generateKey(String title, String comment) {
-		Path privateKeyPath = keysDir.resolve(title);
-		Path publicKeyPath = keysDir.resolve(title + ".pub");
+		Path privateKeyPath = sshKeyLocalResolver.getPrivateKeyPath(title);
+		Path publicKeyPath = sshKeyLocalResolver.getPublicKeyPath(title);
 		try {
 			JSch jsch = new JSch();
 			KeyPair keyPair = KeyPair.genKeyPair(jsch, KeyPair.RSA, 4096);

@@ -12,6 +12,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestTemplate;
 
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
@@ -66,9 +67,8 @@ public class Config {
 	}
 
 	@Bean
-	public RestTemplate tabbyDecoder(
-			RestTemplateBuilder restTemplateBuilder,
-			@Value("${tabby.decode.service.url}") String url) {
+	public RestTemplate tabbyDecoder(RestTemplateBuilder restTemplateBuilder,
+									 @Value("${tabby.decode.service.url}") String url) {
 		return restTemplateBuilder
 				.rootUri(url)
 				.defaultHeader(CONTENT_TYPE, TEXT_PLAIN_VALUE)
@@ -76,12 +76,21 @@ public class Config {
 	}
 
 	@Bean
-	public RestTemplate tabbyReserveDecoder(
-			RestTemplateBuilder restTemplateBuilder,
-			@Value("${tabby.decode.service.reserve.url}") String url) {
+	public RestTemplate tabbyReserveDecoder(RestTemplateBuilder restTemplateBuilder,
+											@Value("${tabby.decode.service.reserve.url}") String url) {
 		return restTemplateBuilder
 				.rootUri(url)
 				.defaultHeader(CONTENT_TYPE, TEXT_PLAIN_VALUE)
+				.build();
+	}
+
+	@Bean
+	public RestTemplate tw(RestTemplateBuilder restTemplateBuilder,
+						   @Value("${tw.url}") String url,
+						   @Value("${tw.token}") String token) {
+		return restTemplateBuilder
+				.rootUri(url)
+				.defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token)
 				.build();
 	}
 }

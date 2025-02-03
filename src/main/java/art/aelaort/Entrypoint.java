@@ -12,6 +12,7 @@ import art.aelaort.models.build.Job;
 import art.aelaort.models.ssh.SshServer;
 import art.aelaort.scan_show.ScanShowServersService;
 import art.aelaort.servers.providers.SshServerProvider;
+import art.aelaort.ssh.SshKeyCloudUploader;
 import art.aelaort.ssh.SshKeyGenerator;
 import art.aelaort.ssh.SshKeyUploader;
 import art.aelaort.ssh.SshKeysCleanupService;
@@ -44,6 +45,7 @@ public class Entrypoint implements CommandLineRunner {
 	private final RemoteDb remoteDb;
 	private final SshKeysCleanupService sshKeysCleanupService;
 	private final SshKeyGenerator sshKeyGenerator;
+	private final SshKeyCloudUploader sshKeyCloudUploader;
 	@Value("${docker.compose.remote.dir.default}")
 	private String dockerDefaultRemoteDir;
 
@@ -72,6 +74,8 @@ public class Entrypoint implements CommandLineRunner {
 				case "upld-ssh" -> 			 uploadSshKey(args);
 				case "clean-ssh" -> 		 sshKeysCleanupService.cleanAll();
 				case "gen-ssh", "gen" ->     sshKeyGenerator.generateKey(slice(args, 1));
+				case "gen-ssh-upload",
+					 "gsu" ->                genSshUpload(args);
 				case "port" -> 				 log(randomPortService.getRandomPort());
 				case "vm" -> 				 virtualBoxService.up(args);
 				case "vm-pause", "vmp" -> 	 virtualBoxService.pause(args);
@@ -133,6 +137,10 @@ public class Entrypoint implements CommandLineRunner {
 					gen-ssh, gen - generate local ssh key
 					                 1 arg - name
 					                 2 arg (optional) - comment
+					gen-ssh-upload, gsu
+					             - generate ssh key and upload
+					                 1 arg - name
+					                 2 arg (optional) - comment
 					port         - generate random, not used, port for tcp. 5 digits
 					\s
 					VirtualBox:
@@ -141,6 +149,12 @@ public class Entrypoint implements CommandLineRunner {
 					vm-stop, vms    - shutdown virtualbox
 					vml             - list all machines and running machines"""
 				.formatted(dockerDefaultRemoteDir);
+	}
+
+	private void genSshUpload(String[] args) {
+		String[] sliced = slice(args, 1);
+		sshKeyGenerator.generateKey(sliced);
+		sshKeyCloudUploader.uploadKey(sliced);
 	}
 
 	private void dockerStats(String[] args) {
