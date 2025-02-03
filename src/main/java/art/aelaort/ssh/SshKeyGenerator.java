@@ -39,6 +39,7 @@ public class SshKeyGenerator {
 			log("saved in " + privateKeyPath);
 			log();
 			log(Files.readString(publicKeyPath).strip());
+			log();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

@@ -21,6 +21,7 @@ public class SshKeyCloudUploader {
 	public void uploadKey(String[] args) {
 		if (args.length >= 1) {
 			tw.postForObject("/v1/ssh-keys", getBody(args[0]), Void.class);
+			log("uploaded");
 		} else {
 			log("not found key name");
 		}

@@ -154,7 +154,11 @@ public class Entrypoint implements CommandLineRunner {
 	private void genSshUpload(String[] args) {
 		String[] sliced = slice(args, 1);
 		sshKeyGenerator.generateKey(sliced);
-		sshKeyCloudUploader.uploadKey(sliced);
+		try {
+			sshKeyCloudUploader.uploadKey(sliced);
+		} catch (Exception e) {
+			log("error when upload: %s", e);
+		}
 	}
 
 	private void dockerStats(String[] args) {
