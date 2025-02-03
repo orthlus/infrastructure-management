@@ -117,22 +117,22 @@ public class Entrypoint implements CommandLineRunner {
 					dstat, ds   - docker stats, docker ps -a and df -h
 					                by server id/name
 					                or all servers if no arguments
-					make        - create project folder
-					                one arg required
-					                `name` for make project by name (could be with sub directories)
-					                    or
-					                `id` for make project with name from config by id
-					                optional:
-					                    `no-git` - not init git
-					                    `jooq` - add jooq config and plugin
-					upld-ssh    - upload ssh key to server
-					                by server id/name
-					                required key file path (2 arg)
-					                required user name (3 arg)
+					make         - create project folder
+					                 one arg required
+					                 `name` for make project by name (could be with sub directories)
+					                     or
+					                 `id` for make project with name from config by id
+					                 optional:
+					                     `no-git` - not init git
+					                     `jooq` - add jooq config and plugin
+					upld-ssh     - upload ssh key to server
+					                 by server id/name
+					                 required key file path (2 arg)
+					                 required user name (3 arg)
 					clean-ssh    - clean unused ssh keys (local and in timeweb)
 					gen-ssh, gen - generate local ssh key
-					                1 arg - name
-					                2 arg (optional) - comment
+					                 1 arg - name
+					                 2 arg (optional) - comment
 					port         - generate random, not used, port for tcp. 5 digits
 					\s
 					VirtualBox:
