@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -55,5 +56,13 @@ public class Utils {
 
 	public static void log() {
 		System.out.println();
+	}
+
+	public static String[] slice(String[] arr, int start) {
+		return Arrays.copyOfRange(arr, start, arr.length);
+	}
+
+	public static String[] slice(String[] arr, int start, int end) {
+		return Arrays.copyOfRange(arr, start, end);
 	}
 }

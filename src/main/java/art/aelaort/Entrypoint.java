@@ -12,6 +12,7 @@ import art.aelaort.models.build.Job;
 import art.aelaort.models.ssh.SshServer;
 import art.aelaort.scan_show.ScanShowServersService;
 import art.aelaort.servers.providers.SshServerProvider;
+import art.aelaort.ssh.SshKeyGenerator;
 import art.aelaort.ssh.SshKeyUploader;
 import art.aelaort.ssh.SshKeysCleanupService;
 import art.aelaort.utils.ExternalUtilities;
@@ -21,6 +22,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import static art.aelaort.utils.Utils.log;
+import static art.aelaort.utils.Utils.slice;
 import static java.lang.Integer.parseInt;
 
 @Component
@@ -41,6 +43,7 @@ public class Entrypoint implements CommandLineRunner {
 	private final LocalDb localDb;
 	private final RemoteDb remoteDb;
 	private final SshKeysCleanupService sshKeysCleanupService;
+	private final SshKeyGenerator sshKeyGenerator;
 	@Value("${docker.compose.remote.dir.default}")
 	private String dockerDefaultRemoteDir;
 
@@ -48,31 +51,32 @@ public class Entrypoint implements CommandLineRunner {
 	public void run(String... args) {
 		if (args.length >= 1) {
 			switch (args[0]) {
-				case "show" -> 				scanShow.show();
-				case "tbl-show", "tbl" -> 	scanShow.showTable();
-				case "yml-show", "yml" -> 	scanShow.showYml();
-				case "sync", "s" -> 		scanShow.sync();
-				case "sync-all", "sa" -> 	scanShow.syncAll();
-				case "scan" -> 				scanShow.scan();
-				case "tbl-scan" -> 			scanShow.scanTable();
-				case "yml-scan" -> 			scanShow.scanYml();
-				case "docker" -> 			dockerUpload(args);
-				case "build" -> 			build(args);
-				case "dbl" -> 				localDb.localUp(args);
-				case "dbl-down", "dbld" -> 	localDb.localDown();
+				case "show" -> 				 scanShow.show();
+				case "tbl-show", "tbl" -> 	 scanShow.showTable();
+				case "yml-show", "yml" -> 	 scanShow.showYml();
+				case "sync", "s" -> 		 scanShow.sync();
+				case "sync-all", "sa" -> 	 scanShow.syncAll();
+				case "scan" -> 				 scanShow.scan();
+				case "tbl-scan" -> 			 scanShow.scanTable();
+				case "yml-scan" -> 			 scanShow.scanYml();
+				case "docker" -> 			 dockerUpload(args);
+				case "build" -> 			 build(args);
+				case "dbl" -> 				 localDb.localUp(args);
+				case "dbl-down", "dbld" -> 	 localDb.localDown();
 				case "dbp-status", "dbps" -> remoteDb.remoteStatus(args);
-				case "dbp-run", "dbpr" -> 	remoteDb.remoteRun(args);
-				case "dps" -> 				externalUtilities.dockerPs();
-				case "git-stat" -> 			gitStat(args);
-				case "dstat", "ds" -> 		dockerStats(args);
-				case "make" -> 				makeProject(args);
-				case "upld-ssh" -> 			uploadSshKey(args);
-				case "clean-ssh" -> 		sshKeysCleanupService.cleanAll();
-				case "port" -> 				log(randomPortService.getRandomPort());
-				case "vm" -> 				virtualBoxService.up(args);
-				case "vm-pause", "vmp" -> 	virtualBoxService.pause(args);
-				case "vm-stop", "vms" -> 	virtualBoxService.stop(args);
-				case "vml" -> 				virtualBoxService.vml();
+				case "dbp-run", "dbpr" -> 	 remoteDb.remoteRun(args);
+				case "dps" -> 				 externalUtilities.dockerPs();
+				case "git-stat" -> 			 gitStat(args);
+				case "dstat", "ds" -> 		 dockerStats(args);
+				case "make" -> 				 makeProject(args);
+				case "upld-ssh" -> 			 uploadSshKey(args);
+				case "clean-ssh" -> 		 sshKeysCleanupService.cleanAll();
+				case "gen-ssh", "gen" ->     sshKeyGenerator.generateKey(slice(args, 1));
+				case "port" -> 				 log(randomPortService.getRandomPort());
+				case "vm" -> 				 virtualBoxService.up(args);
+				case "vm-pause", "vmp" -> 	 virtualBoxService.pause(args);
+				case "vm-stop", "vms" -> 	 virtualBoxService.stop(args);
+				case "vml" -> 				 virtualBoxService.vml();
 				default -> log("unknown args\n" + usage());
 			}
 		} else {
@@ -125,8 +129,11 @@ public class Entrypoint implements CommandLineRunner {
 					                by server id/name
 					                required key file path (2 arg)
 					                required user name (3 arg)
-					clean-ssh   - clean unused ssh keys (local and in timeweb)
-					port        - generate random, not used, port for tcp. 5 digits
+					clean-ssh    - clean unused ssh keys (local and in timeweb)
+					gen-ssh, gen - generate local ssh key
+					                1 arg - name
+					                2 arg (optional) - comment
+					port         - generate random, not used, port for tcp. 5 digits
 					\s
 					VirtualBox:
 					vm              - start virtualbox
