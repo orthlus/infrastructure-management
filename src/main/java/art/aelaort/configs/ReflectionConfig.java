@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 		art.aelaort.models.servers.yaml.CustomFile.class,
 		art.aelaort.models.servers.yaml.DockerComposeFile.class,
 		com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.class,
+		art.aelaort.ssh.tw.SshKeyPost.class,
 })
 public class ReflectionConfig {
 }
