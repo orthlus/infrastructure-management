@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.With;
 import lombok.extern.jackson.Jacksonized;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -39,7 +40,8 @@ public class Server {
 				.map(s -> s.getDockerName() != null ? s.getDockerName() : s.getService())
 				.toList();
 		if (list.size() > 10) {
-			list = list.subList(0, 10);
+			list = new ArrayList<>(list.subList(0, 10));
+			list.add("etc...");
 		}
 		return join(", ", list);
 	}
