@@ -18,7 +18,7 @@ import static org.apache.commons.lang3.StringUtils.*;
 public class StringFormattingService {
 	public String servicesByServerString(List<Server> servers) {
 		log("services:");
-		String[] columnNames = {"server", "app", "file"};
+		String[] columnNames = {"server", "image", "app", "file"};
 		Object[][] data = convertServicesToArrays(mapToAppRows(servers));
 		TextTable tt = new TextTable(columnNames, data);
 		tt.setAddRowNumbering(true);
@@ -29,7 +29,7 @@ public class StringFormattingService {
 		List<AppRow> res = new ArrayList<>();
 		for (Server server : servers) {
 			for (ServiceDto service : server.getServices()) {
-				AppRow appRow = new AppRow(server.getName(), getAppName(service), service.getYmlName());
+				AppRow appRow = new AppRow(server.getName(), service.getDockerImageName(), getAppName(service), service.getYmlName());
 				res.add(appRow);
 			}
 		}
@@ -37,12 +37,13 @@ public class StringFormattingService {
 	}
 
 	private Object[][] convertServicesToArrays(List<AppRow> appRows) {
-		Object[][] result = new Object[appRows.size()][3];
+		Object[][] result = new Object[appRows.size()][4];
 		for (int i = 0; i < appRows.size(); i++) {
 			AppRow appRow = appRows.get(i);
 			result[i][0] = appRow.server();
-			result[i][1] = appRow.app();
-			result[i][2] = appRow.file();
+			result[i][1] = nullable(appRow.image());
+			result[i][2] = appRow.app();
+			result[i][3] = appRow.file();
 		}
 
 		appendSpaceToRight(result);
@@ -56,7 +57,7 @@ public class StringFormattingService {
 				service.getDockerName() + " - " + service.getService();
 	}
 
-	record AppRow(String server, String app, String file) {}
+	record AppRow(String server, String image, String app, String file) {}
 
 	/*
 	 * ======================================================
