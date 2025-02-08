@@ -35,9 +35,13 @@ public class Server {
 	private Integer price;
 
 	public static String servicesStr(List<ServiceDto> services) {
-		return join(", ", services.stream()
+		List<String> list = services.stream()
 				.map(s -> s.getDockerName() != null ? s.getDockerName() : s.getService())
-				.toList());
+				.toList();
+		if (list.size() > 10) {
+			list = list.subList(0, 10);
+		}
+		return join(", ", list);
 	}
 
 	public static List<Server> addNumbers(List<Server> servers) {
