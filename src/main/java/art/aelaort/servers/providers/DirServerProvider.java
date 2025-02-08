@@ -38,12 +38,8 @@ public class DirServerProvider {
 		fillPrices();
 		return scanLocalDirs()
 				.stream()
-				.map(this::findYmlFile)
-				.filter(Optional::isPresent)
-				.map(Optional::get)
-				.map(this::parseYmlFile)
-				.filter(Optional::isPresent)
-				.map(Optional::get)
+				.map(this::findYmlFile).filter(Optional::isPresent).map(Optional::get)
+				.map(this::parseYmlFile).filter(Optional::isPresent).map(Optional::get)
 				.map(this::enrich)
 				.toList();
 	}
