@@ -34,6 +34,12 @@ public class JobsProvider {
                 .collect(Collectors.toMap(Job::getId, Function.identity()));
     }
 
+	public Map<String, Job> getJobsMapByName() {
+		return readBuildConfig()
+				.stream()
+				.collect(Collectors.toMap(Job::getName, Function.identity(), (job, job2) -> job));
+	}
+
     @SneakyThrows
     public List<Job> readBuildConfig() {
 		String jobsStr = externalUtilities.readBuildConfig();

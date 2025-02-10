@@ -1,6 +1,8 @@
 package art.aelaort.scan_show;
 
 import art.aelaort.ServersManagementService;
+import art.aelaort.build.JobsProvider;
+import art.aelaort.models.build.Job;
 import art.aelaort.models.servers.Server;
 import art.aelaort.servers.providers.ServerProvider;
 import art.aelaort.utils.ExternalUtilities;
@@ -8,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 import static art.aelaort.utils.Utils.log;
 
@@ -18,6 +21,7 @@ public class ScanShowServersService {
 	private final StringFormattingService stringFormattingService;
 	private final ExternalUtilities externalUtilities;
 	private final ServerProvider serverProvider;
+	private final JobsProvider jobsProvider;
 
 	/*
 	 * download tabby
@@ -45,14 +49,16 @@ public class ScanShowServersService {
 	 */
 	public void show() {
 		List<Server> servers = serverProvider.readLocalJsonData();
+		Map<String, Job> jobs = jobsProvider.getJobsMapByName();
 		log(stringFormattingService.getServersTableString(servers));
 		log();
-		log(stringFormattingService.servicesByServerString(servers));
+		log(stringFormattingService.servicesByServerString(servers, jobs));
 	}
 
 	public void showYml() {
 		List<Server> servers = serverProvider.readLocalJsonData();
-		log(stringFormattingService.servicesByServerString(servers));
+		Map<String, Job> jobs = jobsProvider.getJobsMapByName();
+		log(stringFormattingService.servicesByServerString(servers, jobs));
 	}
 
 	public void showTable() {

@@ -1,5 +1,7 @@
 package art.aelaort.scan_show;
 
+import art.aelaort.models.build.BuildType;
+import art.aelaort.models.build.Job;
 import art.aelaort.models.servers.Server;
 import art.aelaort.models.servers.ServerDataLength;
 import art.aelaort.models.servers.ServiceDto;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static art.aelaort.utils.TablePrintingUtils.*;
 import static art.aelaort.utils.Utils.log;
@@ -16,20 +19,24 @@ import static org.apache.commons.lang3.StringUtils.*;
 
 @Component
 public class StringFormattingService {
-	public String servicesByServerString(List<Server> servers) {
+	public String servicesByServerString(List<Server> servers, Map<String, Job> jobs) {
 		log("services:");
-		String[] columnNames = {"server", "image", "app", "file"};
-		Object[][] data = convertServicesToArrays(mapToAppRows(servers));
+		String[] columnNames = {"server", "image", "type", "app", "file"};
+		Object[][] data = convertServicesToArrays(mapToAppRows(servers, jobs));
 		TextTable tt = new TextTable(columnNames, data);
 		tt.setAddRowNumbering(true);
 		return getTableString(tt);
 	}
 
-	private List<AppRow> mapToAppRows(List<Server> servers) {
+	private List<AppRow> mapToAppRows(List<Server> servers, Map<String, Job> jobs) {
 		List<AppRow> res = new ArrayList<>();
 		for (Server server : servers) {
 			for (ServiceDto service : server.getServices()) {
-				AppRow appRow = new AppRow(server.getName(), service.getDockerImageName(), getAppName(service), service.getYmlName());
+				String image = service.getDockerImageName();
+				Job job = image != null ? jobs.get(image.split(":")[0]) : null;
+				String type = job != null ? job.getBuildType().toString() : null;
+				String appName = getAppName(service);
+				AppRow appRow = new AppRow(server.getName(), image, type, appName, service.getYmlName());
 				res.add(appRow);
 			}
 		}
@@ -37,13 +44,14 @@ public class StringFormattingService {
 	}
 
 	private Object[][] convertServicesToArrays(List<AppRow> appRows) {
-		Object[][] result = new Object[appRows.size()][4];
+		Object[][] result = new Object[appRows.size()][5];
 		for (int i = 0; i < appRows.size(); i++) {
 			AppRow appRow = appRows.get(i);
 			result[i][0] = appRow.server();
 			result[i][1] = nullable(appRow.image());
-			result[i][2] = appRow.app();
-			result[i][3] = appRow.file();
+			result[i][2] = nullable(appRow.type());
+			result[i][3] = appRow.app();
+			result[i][4] = appRow.file();
 		}
 
 		appendSpaceToRight(result);
@@ -57,7 +65,7 @@ public class StringFormattingService {
 				service.getDockerName() + " - " + service.getService();
 	}
 
-	record AppRow(String server, String image, String app, String file) {}
+	record AppRow(String server, String image, String type, String app, String file) {}
 
 	/*
 	 * ======================================================
