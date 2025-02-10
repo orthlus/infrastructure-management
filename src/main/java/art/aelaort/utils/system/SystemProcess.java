@@ -57,7 +57,11 @@ public class SystemProcess {
 				pb.directory(dir.toFile());
 			}
 
-			pb.start().waitFor();
+			int code = pb.start().waitFor();
+			if (code != 0) {
+				log("java system process exit code " + code);
+				System.exit(1);
+			}
 		} catch (Exception e) {
 			System.err.println("java system process call error: " + e.getLocalizedMessage());
 			System.exit(1);
