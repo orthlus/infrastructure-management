@@ -54,8 +54,8 @@ public class Entrypoint implements CommandLineRunner {
 		if (args.length >= 1) {
 			switch (args[0]) {
 				case "show" -> 				 scanShow.show();
-				case "tbl-show", "tbl" -> 	 scanShow.showTable();
-				case "yml-show", "yml" -> 	 scanShow.showYml();
+				case "tbl" ->				 scanShow.showTable();
+				case "yml", "svc" ->		 scanShow.showYml();
 				case "sync", "s" -> 		 scanShow.sync();
 				case "sync-all", "sa" -> 	 scanShow.syncAll();
 				case "docker" -> 			 dockerUpload(args);
@@ -93,8 +93,8 @@ public class Entrypoint implements CommandLineRunner {
 					sync, s        - quick sync
 					sync-all, sa   - long sync all data
 					show           - show all (tbl and yml)
-					tbl-show, tbl  - show table with servers
-					yml-show, yml  - show list of services from yml files
+					tbl            - show table with servers
+					yml, svc       - show list of services from yml files
 					\s
 					docker - upload docker-compose file to server (in %s)
 					            by server id/name (required)
