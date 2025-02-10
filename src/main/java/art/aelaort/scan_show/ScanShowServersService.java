@@ -20,29 +20,6 @@ public class ScanShowServersService {
 	private final ServerProvider serverProvider;
 
 	/*
-	 * scan dirs
-	 * download tabby
-	 * scan tabby
-	 * print
-	 */
-	public void scan() {
-		List<Server> servers = serverProvider.scanAndJoinData();
-		log(stringFormattingService.getServersTableString(servers));
-		log();
-		log(stringFormattingService.servicesByServerString(servers));
-	}
-
-	public void scanTable() {
-		List<Server> servers = serverProvider.scanAndJoinData();
-		log(stringFormattingService.getServersTableString(servers));
-	}
-
-	public void scanYml() {
-		List<Server> servers = serverProvider.scanAndJoinData();
-		log(stringFormattingService.servicesByServerString(servers));
-	}
-
-	/*
 	 * download tabby
 	 * generate json
 	 * save data to local
