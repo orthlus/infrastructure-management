@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Stream;
 
@@ -260,6 +261,14 @@ public class BuildService {
 
 	public boolean isBuildDockerNoCache(String[] args) {
 		return Arrays.asList(args).contains("clean");
+	}
+
+	public void printConfig(String typeAlias) {
+		List<Job> jobs = jobsProvider.readBuildConfig();
+		jobs = jobs.stream()
+						.filter(job -> job.getBuildType().alias.equals(typeAlias))
+								.toList();
+		log(jobsTextTable.getJobsTableString(jobs));
 	}
 
 	public void printConfig() {

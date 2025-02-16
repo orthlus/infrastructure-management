@@ -60,6 +60,7 @@ public class Entrypoint implements CommandLineRunner {
 				case "sync-all", "sa" -> 	 scanShow.syncAll();
 				case "docker" -> 			 dockerUpload(args);
 				case "build" -> 			 build(args);
+				case "build-ls-type" ->		 buildListByType(args);
 				case "dbl" -> 				 localDb.localUp(args);
 				case "dbl-down", "dbld" -> 	 localDb.localDown();
 				case "dbp-status", "dbps" -> remoteDb.remoteStatus(args);
@@ -102,6 +103,7 @@ public class Entrypoint implements CommandLineRunner {
 					build - build and deploy apps
 					            number of app (required for run)
 					                without args - printing apps list
+					build-ls-type - apps list by build type alias
 					\s
 					Databases (optional 1 arg - db name):
 					dbl                 - start local postgres and run migrations
@@ -196,6 +198,12 @@ public class Entrypoint implements CommandLineRunner {
 			log(gitStatService.readStatForDay());
 		} else {
 			log(gitStatService.readStatWithInterval(args[1]));
+		}
+	}
+
+	private void buildListByType(String[] args) {
+		if (args.length > 1) {
+			buildService.printConfig(args[1]);
 		}
 	}
 
