@@ -204,6 +204,8 @@ public class Entrypoint implements CommandLineRunner {
 	private void buildListByType(String[] args) {
 		if (args.length > 1) {
 			buildService.printConfig(args[1]);
+		} else {
+			buildService.printConfig();
 		}
 	}
 
