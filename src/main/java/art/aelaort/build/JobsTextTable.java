@@ -19,7 +19,8 @@ public class JobsTextTable {
 				"sub_directory",
 				"project_dir",
 				"secrets_directory",
-				"db"
+				"db",
+				"deprecated"
 		};
 		Object[][] data = convertServersToArrays(jobs);
 		TextTable tt = new TextTable(columnNames, data);
@@ -29,7 +30,7 @@ public class JobsTextTable {
 	private Object[][] convertServersToArrays(List<Job> jobs) {
 		List<Job> sorted = jobs.stream().sorted(Comparator.comparing(Job::getId)).toList();
 
-		Object[][] result = new Object[sorted.size()][7];
+		Object[][] result = new Object[sorted.size()][8];
 		for (int i = 0; i < sorted.size(); i++) {
 			Job job = sorted.get(i);
 			result[i][0] = job.getId();
@@ -39,6 +40,7 @@ public class JobsTextTable {
 			result[i][4] = nullable(job.getProjectDir());
 			result[i][5] = nullable(job.getSecretsDirectory());
 			result[i][6] = String.valueOf(job.isDb());
+			result[i][7] = String.valueOf(job.isDeprecated());
 		}
 
 		appendSpaceToRight(result);
