@@ -32,7 +32,8 @@ public class DockerStatsService {
 					"docker stats --no-stream --format " + dockerCommandTableFormat("Name", "CPUPerc", "MemUsage", "MemPerc", "NetIO")
 			),
 			new Command("df -hT", "df -hT"),
-			new Command("docker system df", "docker system df")
+			new Command("docker system df", "docker system df"),
+			new Command("free -h", "free -h")
 	);
 
 	public String statByServer(SshServer server) {
