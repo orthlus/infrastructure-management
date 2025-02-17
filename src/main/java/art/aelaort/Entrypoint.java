@@ -104,6 +104,7 @@ public class Entrypoint implements CommandLineRunner {
 					            number of app (required for run)
 					                without args - printing apps list
 					build-ls-type - apps list by build type alias
+					                no args print all (also with deprecated)
 					\s
 					Databases (optional 1 arg - db name):
 					dbl                 - start local postgres and run migrations
@@ -205,7 +206,7 @@ public class Entrypoint implements CommandLineRunner {
 		if (args.length > 1) {
 			buildService.printConfig(args[1]);
 		} else {
-			buildService.printConfig();
+			buildService.printConfigWithDeprecated();
 		}
 	}
 

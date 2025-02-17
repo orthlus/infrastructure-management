@@ -267,12 +267,19 @@ public class BuildService {
 		List<Job> jobs = jobsProvider.readBuildConfig();
 		jobs = jobs.stream()
 						.filter(job -> job.getBuildType().alias.equals(typeAlias))
+						.filter(job -> !job.isDeprecated())
 								.toList();
 		log(jobsTextTable.getJobsTableString(jobs));
 	}
 
-	public void printConfig() {
+	public void printConfigWithDeprecated() {
 		log(jobsTextTable.getJobsTableString(jobsProvider.readBuildConfig()));
+	}
+
+	public void printConfig() {
+		List<Job> jobs = jobsProvider.readBuildConfig();
+		jobs = jobs.stream().filter(job -> !job.isDeprecated()).toList();
+		log(jobsTextTable.getJobsTableString(jobs));
 	}
 
 	@SneakyThrows

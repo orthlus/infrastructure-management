@@ -33,6 +33,8 @@ public class Job {
 	private String secretsDirectory;
 	@JsonProperty
 	private boolean db;
+	@JsonProperty
+	private boolean deprecated;
 
 	@JsonProperty("project_dir")
 	public void setProjectDir(String projectDir) {
