@@ -55,6 +55,7 @@ public class RandomPortService {
 			return walk
 					.filter(p -> !p.toString().contains(".git"))
 					.filter(p -> !p.toString().contains(".idea"))
+					.filter(p -> !p.toString().endsWith(".csv"))
 					.filter(Files::isRegularFile)
 					.map(Path::toFile)
 					.collect(Collectors.toSet());
