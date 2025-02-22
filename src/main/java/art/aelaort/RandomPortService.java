@@ -14,6 +14,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
@@ -44,17 +46,18 @@ public class RandomPortService {
 
 	private File[] files() {
 		return dirs.stream()
-				.flatMap(this::files)
+				.flatMap(subDir -> files(subDir).stream())
 				.toArray(File[]::new);
 	}
 
-	private Stream<File> files(String subDir) {
+	private Set<File> files(String subDir) {
 		try (Stream<Path> walk = Files.walk(root.resolve(subDir))) {
 			return walk
 					.filter(p -> !p.toString().contains(".git"))
 					.filter(p -> !p.toString().contains(".idea"))
 					.filter(Files::isRegularFile)
-					.map(Path::toFile);
+					.map(Path::toFile)
+					.collect(Collectors.toSet());
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
