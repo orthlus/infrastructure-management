@@ -12,16 +12,17 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
-
-import static art.aelaort.utils.Utils.log;
 
 @Component
 @RequiredArgsConstructor
 public class RandomPortService {
-	@Value("${cicd.dir}")
-	private Path rootDir;
+	@Value("${port.scanning.root}")
+	private Path root;
+	@Value("${port.scanning-dirs}")
+	private List<String> dirs;
 
 	private final Random random = new Random();
 	private final int minPort = 10000;
@@ -42,13 +43,18 @@ public class RandomPortService {
 	}
 
 	private File[] files() {
-		try (Stream<Path> walk = Files.walk(rootDir)) {
+		return dirs.stream()
+				.flatMap(this::files)
+				.toArray(File[]::new);
+	}
+
+	private Stream<File> files(String subDir) {
+		try (Stream<Path> walk = Files.walk(root.resolve(subDir))) {
 			return walk
 					.filter(p -> !p.toString().contains(".git"))
 					.filter(p -> !p.toString().contains(".idea"))
 					.filter(Files::isRegularFile)
-					.map(Path::toFile)
-					.toArray(File[]::new);
+					.map(Path::toFile);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
