@@ -79,7 +79,7 @@ public class ProjectsMakerService {
 		}
 
 		Set<BuildType> javaTypes = Set.of(BuildType.java_local, BuildType.java_docker);
-		if (job.getSubDirectory().equals("java") && javaTypes.contains(job.getBuildType())) {
+		if (job.getSubDirectory().startsWith("java") && javaTypes.contains(job.getBuildType())) {
 			Project.ProjectBuilder newProjectBuilder = Project.builder()
 					.name(job.getName())
 					.hasJooq(job.isDb())
