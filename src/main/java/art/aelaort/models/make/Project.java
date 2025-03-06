@@ -11,4 +11,5 @@ public class Project {
 	private boolean hasGit;
 	private boolean hasJooq;
 	private boolean isMavenBuildForLocal;
+	private String dir;
 }

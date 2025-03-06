@@ -43,7 +43,7 @@ public class ProjectsMakerService {
 
 	public void makeJavaProject(String nameOrId, boolean hasGit, boolean hasJooq) {
 		Project project = buildProject(nameOrId, hasGit, hasJooq);
-		Path dir = mkdirForJava("java", project.getName());
+		Path dir = mkdirForJava(project);
 
 		generateMavenFile(dir, project);
 		generateGitignoreFile(dir);
@@ -83,7 +83,8 @@ public class ProjectsMakerService {
 			Project.ProjectBuilder newProjectBuilder = Project.builder()
 					.name(job.getName())
 					.hasJooq(job.isDb())
-					.hasGit(project.isHasGit());
+					.hasGit(project.isHasGit())
+					.dir(job.getSubDirectory());
 
 			if (job.getBuildType() == BuildType.java_local) {
 				newProjectBuilder.isMavenBuildForLocal(true);
@@ -194,8 +195,13 @@ public class ProjectsMakerService {
 	}
 
 	@SneakyThrows
-	private Path mkdirForJava(String subdir, String name) {
-		Path path = mainSrcDir.resolve(subdir).resolve(name);
+	private Path mkdirForJava(Project project) {
+		String[] splitDir = project.getDir().split("/");
+		Path path = mainSrcDir;
+		for (String s : splitDir) {
+			path = path.resolve(s);
+		}
+		path = path.resolve(project.getName());
 		if (!Files.exists(path)) {
 			Files.createDirectories(path);
 			log("created dir: " + path);
