@@ -16,20 +16,28 @@ public class RemoteDb {
 	private final SystemProcess systemProcess;
 	private final DbManageProperties props;
 	private final DbUtils dbUtils;
+	private final LiquibaseService liquibaseService;
 
 	public void remoteStatus(String[] args) {
 		Path dir = dbUtils.getDbDir(dbUtils.getName(args), "prod");
+		String url = dbUtils.readDbUrl(dir);
 		sshUp(dir);
-		String command = dir.resolve(props.getStatusFilename()).toString();
-		systemProcess.callProcessInheritIO(command, dir);
+		for (String changeSetFile : dbUtils.getChangeSetsFiles(dir)) {
+			if (!liquibaseService.statusCli(dir.resolve(changeSetFile), url)) {
+				break;
+			}
+		}
 		sshDown(dir);
 	}
 
 	public void remoteRun(String[] args) {
 		Path dir = dbUtils.getDbDir(dbUtils.getName(args), "prod");
+		String url = dbUtils.readDbUrl(dir);
 		sshUp(dir);
-		for (String script : dbUtils.getDbFilesOrder(dir)) {
-			systemProcess.callProcessInheritIO(dir.resolve(script).toString(), dir);
+		for (String changeSetFile : dbUtils.getChangeSetsFiles(dir)) {
+			if (!liquibaseService.updateCli(dir.resolve(changeSetFile), url)) {
+				break;
+			}
 		}
 		sshDown(dir);
 	}

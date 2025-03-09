@@ -15,5 +15,6 @@ public class DbManageProperties {
 	private Path migrationsDir;
 	private Path defaultNameFile;
 	private String remoteSshDockerComposeFilename;
-	private String statusFilename;
+	private String filesListFilename;
+	private String urlFilename;
 }

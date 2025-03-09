@@ -28,9 +28,17 @@ public class DbUtils {
 		}
 	}
 
-	public List<String> getDbFilesOrder(Path dir) {
+	public String readDbUrl(Path dbDir) {
 		try {
-			return Files.readAllLines(dir.resolve("files.txt"));
+			return Files.readString(dbDir.resolve(props.getUrlFilename()));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public List<String> getChangeSetsFiles(Path dir) {
+		try {
+			return Files.readAllLines(dir.resolve(props.getFilesListFilename()));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

@@ -19,6 +19,7 @@ public class LocalDb {
 
 	private final String dbContainerName = "pg-tmp-dev";
 	private final DbUtils dbUtils;
+	private final LiquibaseService liquibaseService;
 
 	public boolean isLocalRunning() {
 		String command = "docker ps -q --filter name=" + dbContainerName;
@@ -41,8 +42,13 @@ public class LocalDb {
 
 		sleep();
 		Path dir = dbUtils.getDbDir(dbUtils.getName(args), "local");
-		for (String script : dbUtils.getDbFilesOrder(dir)) {
-			systemProcess.callProcessInheritIO(dir.resolve(script).toString(), dir);
+		String url = dbUtils.readDbUrl(dir);
+		for (String changeSetFile : dbUtils.getChangeSetsFiles(dir)) {
+			Path changeSet = dir.resolve(changeSetFile);
+			boolean updated = liquibaseService.updateCli(changeSet, url);
+			if (!updated) {
+				break;
+			}
 		}
 		log("Migrations - executed");
 	}
