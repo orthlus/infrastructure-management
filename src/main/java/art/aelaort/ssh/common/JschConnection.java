@@ -3,14 +3,14 @@ package art.aelaort.ssh.common;
 import art.aelaort.models.ssh.SshServer;
 import com.jcraft.jsch.*;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-@Slf4j
+import static art.aelaort.utils.Utils.log;
+
 @RequiredArgsConstructor
 public class JschConnection implements AutoCloseable {
 	private Session jschSession;
@@ -42,7 +42,7 @@ public class JschConnection implements AutoCloseable {
 			IOUtils.copy(out, System.out);
 			IOUtils.copy(err, System.err);
 		} catch (JSchException | IOException e) {
-			log.error("ssh execInheritIO error", e);
+			log("ssh execInheritIO error", e);
 			throw new RuntimeException(e);
 		}
 	}

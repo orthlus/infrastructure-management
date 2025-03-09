@@ -12,7 +12,6 @@ import art.aelaort.utils.system.SystemProcess;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -36,7 +35,6 @@ import static art.aelaort.utils.Utils.log;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.chop;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class BuildService {
