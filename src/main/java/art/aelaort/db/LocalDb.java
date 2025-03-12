@@ -78,7 +78,7 @@ public class LocalDb {
 			Job job = jobsProvider.getJobById(parseInt(args[1]));
 			Path srcDir = job.resolveSrcDir(buildProperties.srcRootDir());
 			String jooqCommand = "mvn clean jooq-codegen:generate";
-			systemProcess.callProcessInheritIO(jooqCommand, srcDir);
+			systemProcess.callProcessForBuild(jooqCommand, srcDir);
 		}
 	}
 }
