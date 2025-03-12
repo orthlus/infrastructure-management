@@ -63,6 +63,8 @@ public class Entrypoint implements CommandLineRunner {
 				case "build-ls-type" ->		 buildListByType(args);
 				case "dbl" -> 				 localDb.localUp(args);
 				case "dbl-down", "dbld" -> 	 localDb.localDown();
+				case "dbl-rerun-jooq",
+					 "dblrrj" -> 			 localDb.localRerunAndGenJooq(args);
 				case "dbp-status", "dbps" -> remoteDb.remoteStatus(args);
 				case "dbp-run", "dbpr" -> 	 remoteDb.remoteRun(args);
 				case "dps" -> 				 externalUtilities.dockerPs();
@@ -109,6 +111,8 @@ public class Entrypoint implements CommandLineRunner {
 					Databases (optional 1 arg - db name):
 					dbl                 - start local postgres and run migrations
 					dbl-down, dbld      - down local postgres
+					dbl-rerun-jooq,     - local down and up, if passed app id - run jooq
+					dblrrj
 					dbp-status, dbps    - prod migrations status
 					dbp-run, dbpr       - execute prod migrations
 					\s

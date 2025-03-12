@@ -1,5 +1,8 @@
 package art.aelaort.db;
 
+import art.aelaort.build.BuildService;
+import art.aelaort.build.JobsProvider;
+import art.aelaort.models.build.Job;
 import art.aelaort.utils.DbUtils;
 import art.aelaort.utils.system.Response;
 import art.aelaort.utils.system.SystemProcess;
@@ -11,6 +14,7 @@ import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
 import static art.aelaort.utils.Utils.log;
+import static java.lang.Integer.parseInt;
 
 @Component
 @RequiredArgsConstructor
@@ -20,6 +24,8 @@ public class LocalDb {
 	private final String dbContainerName = "pg-tmp-dev";
 	private final DbUtils dbUtils;
 	private final LiquibaseService liquibaseService;
+	private final JobsProvider jobsProvider;
+	private final BuildService buildService;
 
 	public boolean isLocalRunning() {
 		String command = "docker ps -q --filter name=" + dbContainerName;
@@ -62,5 +68,17 @@ public class LocalDb {
 	@SneakyThrows
 	private void sleep() {
 		TimeUnit.SECONDS.sleep(1);
+	}
+
+	public void localRerunAndGenJooq(String[] args) {
+		localDown();
+		localUp();
+
+		if (args.length > 0) {
+			Job job = jobsProvider.getJobById(parseInt(args[1]));
+			Path srcDir = buildService.getSrcDir(job);
+			String jooqCommand = "mvn clean jooq-codegen:generate";
+			systemProcess.callProcessInheritIO(jooqCommand, srcDir);
+		}
 	}
 }
