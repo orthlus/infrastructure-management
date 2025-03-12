@@ -1,6 +1,6 @@
 package art.aelaort.db;
 
-import art.aelaort.build.BuildService;
+import art.aelaort.build.BuildProperties;
 import art.aelaort.build.JobsProvider;
 import art.aelaort.models.build.Job;
 import art.aelaort.utils.DbUtils;
@@ -25,7 +25,7 @@ public class LocalDb {
 	private final DbUtils dbUtils;
 	private final LiquibaseService liquibaseService;
 	private final JobsProvider jobsProvider;
-	private final BuildService buildService;
+	private final BuildProperties buildProperties;
 
 	public boolean isLocalRunning() {
 		String command = "docker ps -q --filter name=" + dbContainerName;
@@ -76,7 +76,7 @@ public class LocalDb {
 
 		if (args.length > 0) {
 			Job job = jobsProvider.getJobById(parseInt(args[1]));
-			Path srcDir = buildService.getSrcDir(job);
+			Path srcDir = job.resolveSrcDir(buildProperties.srcRootDir());
 			String jooqCommand = "mvn clean jooq-codegen:generate";
 			systemProcess.callProcessInheritIO(jooqCommand, srcDir);
 		}

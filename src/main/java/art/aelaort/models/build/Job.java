@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.With;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -103,5 +104,10 @@ public class Job {
 	@Override
 	public int hashCode() {
 		return name.hashCode();
+	}
+
+	public Path resolveSrcDir(Path srcRootDir) {
+		String dirName = projectDir == null ? name : projectDir;
+		return srcRootDir.resolve(subDirectory).resolve(dirName);
 	}
 }

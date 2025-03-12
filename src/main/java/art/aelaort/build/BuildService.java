@@ -241,8 +241,7 @@ public class BuildService {
 	}
 
 	public Path getSrcDir(Job job) {
-		String name = job.getProjectDir() == null ? job.getName() : job.getProjectDir();
-		return buildProperties.srcRootDir().resolve(job.getSubDirectory()).resolve(name);
+		return job.resolveSrcDir(buildProperties.srcRootDir());
 	}
 
 	public void fillSecretsToTmpDir(Job job, Path tmpDir) {
