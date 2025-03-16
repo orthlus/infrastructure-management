@@ -2,6 +2,7 @@ package art.aelaort.build;
 
 import art.aelaort.db.LocalDb;
 import art.aelaort.exceptions.CopyBinFileException;
+import art.aelaort.exceptions.LocalDbMigrationsFailedException;
 import art.aelaort.exceptions.TooManyDockerFilesException;
 import art.aelaort.models.build.Job;
 import art.aelaort.models.build.PomModel;
@@ -31,6 +32,7 @@ import java.util.Scanner;
 import java.util.stream.Stream;
 
 import static art.aelaort.models.build.BuildType.java_docker;
+import static art.aelaort.utils.ColoredConsoleTextUtils.wrapRed;
 import static art.aelaort.utils.Utils.log;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.chop;
@@ -52,15 +54,19 @@ public class BuildService {
 	private final LocalDb localDb;
 
 	public void run(Job job, boolean isBuildDockerNoCache) {
-		if (isApproved(job)) {
-			Path tmpDir = utils.createTmpDir();
-			cleanSrcDir(job);
-			copySrcDirToTmpDir(job, tmpDir);
-			copyDefaultDockerfile(job, tmpDir);
-			fillSecretsToTmpDir(job, tmpDir);
-			runDbIfNeed(job);
-			build(job, tmpDir, isBuildDockerNoCache);
-			cleanTmp(tmpDir);
+		try {
+			if (isApproved(job)) {
+				Path tmpDir = utils.createTmpDir();
+				cleanSrcDir(job);
+				copySrcDirToTmpDir(job, tmpDir);
+				copyDefaultDockerfile(job, tmpDir);
+				fillSecretsToTmpDir(job, tmpDir);
+				runDbIfNeed(job);
+				build(job, tmpDir, isBuildDockerNoCache);
+				cleanTmp(tmpDir);
+			}
+		} catch (LocalDbMigrationsFailedException e) {
+			log(wrapRed("миграции упали(("));
 		}
 	}
 

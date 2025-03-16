@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 
+import static art.aelaort.utils.ColoredConsoleTextUtils.wrapRed;
 import static art.aelaort.utils.Utils.log;
 
 @Component
@@ -24,6 +25,7 @@ public class RemoteDb {
 		sshUp(dir);
 		for (String changeSetFile : dbUtils.getChangeSetsFiles(dir)) {
 			if (!liquibaseService.statusCli(dir.resolve(changeSetFile), url)) {
+				log(wrapRed("миграции упали(((((((("));
 				break;
 			}
 		}
@@ -36,6 +38,7 @@ public class RemoteDb {
 		sshUp(dir);
 		for (String changeSetFile : dbUtils.getChangeSetsFiles(dir)) {
 			if (!liquibaseService.updateCli(dir.resolve(changeSetFile), url)) {
+				log(wrapRed("миграции упали(((((((("));
 				break;
 			}
 		}

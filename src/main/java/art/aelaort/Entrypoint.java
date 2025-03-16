@@ -61,7 +61,7 @@ public class Entrypoint implements CommandLineRunner {
 				case "docker" -> 			 dockerUpload(args);
 				case "build" -> 			 build(args);
 				case "build-ls-type" ->		 buildListByType(args);
-				case "dbl" -> 				 localDb.localUp(args);
+				case "dbl" -> 				 localDb.localUpFromEntry(args);
 				case "dbl-down", "dbld" -> 	 localDb.localDown();
 				case "dbl-rerun-jooq",
 					 "dblrrj" -> 			 localDb.localRerunAndGenJooq(args);

@@ -2,6 +2,7 @@ package art.aelaort.db;
 
 import art.aelaort.build.BuildProperties;
 import art.aelaort.build.JobsProvider;
+import art.aelaort.exceptions.LocalDbMigrationsFailedException;
 import art.aelaort.models.build.Job;
 import art.aelaort.utils.DbUtils;
 import art.aelaort.utils.system.Response;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
+import static art.aelaort.utils.ColoredConsoleTextUtils.wrapRed;
 import static art.aelaort.utils.Utils.log;
 import static java.lang.Integer.parseInt;
 
@@ -37,11 +39,19 @@ public class LocalDb {
 		throw new RuntimeException(response.stderr());
 	}
 
+	public void localUpFromEntry(String[] args) {
+		try {
+			localUp(args);
+		} catch (LocalDbMigrationsFailedException e) {
+			log(wrapRed("миграции упали(("));
+		}
+	}
+
 	public void localUp() {
 		localUp(null);
 	}
 
-	public void localUp(String[] args) {
+	private void localUp(String[] args) {
 		String command = "docker run -d -p 5433:5432 --env POSTGRES_PASSWORD=postgres --name %s postgres:16".formatted(dbContainerName);
 		systemProcess.callProcessInheritIO(command);
 		log("PostgreSQL (5433) - started");
@@ -53,7 +63,7 @@ public class LocalDb {
 			Path changeSet = dir.resolve(changeSetFile);
 			boolean updated = liquibaseService.updateCli(changeSet, url);
 			if (!updated) {
-				break;
+				throw new LocalDbMigrationsFailedException();
 			}
 		}
 		log("Migrations - executed");
@@ -71,14 +81,18 @@ public class LocalDb {
 	}
 
 	public void localRerunAndGenJooq(String[] args) {
-		localDown();
-		localUp();
+		try {
+			localDown();
+			localUp();
 
-		if (args.length > 0) {
-			Job job = jobsProvider.getJobById(parseInt(args[1]));
-			Path srcDir = job.resolveSrcDir(buildProperties.srcRootDir());
-			String jooqCommand = "mvn clean jooq-codegen:generate";
-			systemProcess.callProcessForBuild(jooqCommand, srcDir);
+			if (args.length > 0) {
+				Job job = jobsProvider.getJobById(parseInt(args[1]));
+				Path srcDir = job.resolveSrcDir(buildProperties.srcRootDir());
+				String jooqCommand = "mvn clean jooq-codegen:generate";
+				systemProcess.callProcessForBuild(jooqCommand, srcDir);
+			}
+		} catch (LocalDbMigrationsFailedException e) {
+			log(wrapRed("миграции упали(("));
 		}
 	}
 }
