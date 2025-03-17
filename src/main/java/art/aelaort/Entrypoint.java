@@ -123,6 +123,7 @@ public class Entrypoint implements CommandLineRunner {
 					                      2. cluster name is optional.
 					k8s-docker-login    - generate base64 secret with docker login info for k8s
 					                      args: registry, login, password
+					                      or string in docker login format
 					\s
 					dps         - alias for 'docker ps -a'
 					git-stat    - print git stat for all local repo
