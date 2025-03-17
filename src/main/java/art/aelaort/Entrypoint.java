@@ -59,8 +59,7 @@ public class Entrypoint implements CommandLineRunner {
 				case "sync", "s" -> 		 scanShow.sync();
 				case "sync-all", "sa" -> 	 scanShow.syncAll();
 				case "docker" -> 			 dockerUpload(args);
-				case "build" -> 			 build(args);
-				case "build-ls-type" ->		 buildListByType(args);
+				case "build" -> 			 build(slice(args, 1));
 				case "dbl" -> 				 localDb.localUpFromEntry(args);
 				case "dbl-down", "dbld" -> 	 localDb.localDown();
 				case "dbl-rerun-jooq",
@@ -106,8 +105,6 @@ public class Entrypoint implements CommandLineRunner {
 					build - build and deploy apps
 					            number of app (required for run)
 					                without args - printing apps list
-					build-ls-type - apps list by build type alias
-					                no args print all (also with deprecated)
 					\s
 					Databases (optional 1 arg - db name):
 					dbl                 - start local postgres and run migrations
@@ -208,20 +205,22 @@ public class Entrypoint implements CommandLineRunner {
 		}
 	}
 
-	private void buildListByType(String[] args) {
-		if (args.length > 1) {
-			buildService.printConfig(args[1]);
-		} else {
-			buildService.printConfigWithDeprecated();
-		}
-	}
-
 	private void build(String[] args) {
-		if (args.length < 2) {
-			buildService.printConfig();
+		if (args.length == 0) {
+			buildService.printConfigWithDeprecated();
 		} else {
+			int id;
+
 			try {
-				Job job = jobsProvider.getJobById(parseInt(args[1]));
+				id = parseInt(args[0]);
+			} catch (NumberFormatException ignored) {
+				String type = args[0];
+				buildService.printConfig(type);
+				return;
+			}
+
+			try {
+				Job job = jobsProvider.getJobById(id);
 				boolean isBuildDockerNoCache = buildService.isBuildDockerNoCache(args);
 				buildService.run(job, isBuildDockerNoCache);
 			} catch (TooManyDockerFilesException e) {
