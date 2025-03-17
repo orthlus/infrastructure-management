@@ -30,8 +30,7 @@ public class K8sService {
 		}
 		String auth = Base64.getEncoder().encodeToString((cred.login() + ":" + cred.password()).getBytes());
 		String json = """
-				{"auths":{"%s":{"username":"%s","password":"%s","auth":"%s"}}}"""
-				.formatted(cred.registry(), cred.login(), cred.password(), auth);
+				{"auths":{"%s":{"auth":"%s"}}}""".formatted(cred.registry(), auth);
 		String encoded = Base64.getEncoder().encodeToString(json.getBytes());
 		log(encoded);
 	}
