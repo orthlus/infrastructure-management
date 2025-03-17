@@ -119,8 +119,8 @@ public class Entrypoint implements CommandLineRunner {
 					dbp-run, dbpr       - execute prod migrations
 					\s
 					kub, k              - apply yaml for cluster.
-					                      1. yaml file name required
-					                      2. cluster name is optional.
+					                      1. yaml file name is optional (by default apply all files)
+					                      2. cluster name is optional (default name in file)
 					k8s-docker-login    - generate base64 secret with docker login info for k8s
 					                      args: registry, login, password
 					                      or string in docker login format
