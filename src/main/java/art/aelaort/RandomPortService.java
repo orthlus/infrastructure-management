@@ -27,13 +27,19 @@ public class RandomPortService {
 	private List<String> dirs;
 
 	private final Random random = new Random();
-	private final int minPort = 10000;
-	private final int maxPort = 65535;
+
+	public String getRandomPortK8s() {
+		int port = random.nextInt(30001, 32767);
+		while (isPortUsed(port)) {
+			port = random.nextInt(30001, 32767);
+		}
+		return String.valueOf(port);
+	}
 
 	public String getRandomPort() {
-		int port = random.nextInt(minPort, maxPort);
+		int port = random.nextInt(10000, 65535);
 		while (isPortUsed(port)) {
-			port = random.nextInt(minPort, maxPort);
+			port = random.nextInt(10000, 65535);
 		}
 		return String.valueOf(port);
 	}

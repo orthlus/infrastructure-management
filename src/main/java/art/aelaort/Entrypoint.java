@@ -77,6 +77,7 @@ public class Entrypoint implements CommandLineRunner {
 				case "gen-ssh-upload",
 					 "gsu" ->                genSshUpload(args);
 				case "port" -> 				 log(randomPortService.getRandomPort());
+				case "portk" ->				 log(randomPortService.getRandomPortK8s());
 				case "vm" -> 				 virtualBoxService.up(args);
 				case "vm-pause", "vmp" -> 	 virtualBoxService.pause(args);
 				case "vm-stop", "vms" -> 	 virtualBoxService.stop(args);
@@ -143,6 +144,7 @@ public class Entrypoint implements CommandLineRunner {
 					                 1 arg - name
 					                 2 arg (optional) - comment
 					port         - generate random, not used, port for tcp. 5 digits
+					portk        - generate port for k8s (30001, 32767), not used.
 					\s
 					VirtualBox:
 					vm              - start virtualbox
