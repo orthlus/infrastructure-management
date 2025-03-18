@@ -3,6 +3,7 @@ package art.aelaort.servers.providers;
 import art.aelaort.data.parsers.CustomProjectYamlParser;
 import art.aelaort.data.parsers.DockerComposeParser;
 import art.aelaort.models.servers.DirServer;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -34,8 +35,12 @@ public class DirServerProvider {
 	private String notScanFile;
 	private Map<String, Integer> pricesMap;
 
-	public List<DirServer> scanServersDir() {
+	@PostConstruct
+	private void init() {
 		fillPrices();
+	}
+
+	public List<DirServer> scanServersDir() {
 		return scanLocalDirs()
 				.stream()
 				.map(this::findYmlFile).filter(Optional::isPresent).map(Optional::get)
@@ -81,7 +86,10 @@ public class DirServerProvider {
 	private Optional<Path> findYmlFile(Path dir) {
 		try (Stream<Path> walk = Files.walk(dir, 1)) {
 			List<Path> paths = walk
-					.filter(path -> path.getFileName().toString().toLowerCase().endsWith(".yml"))
+					.filter(path -> {
+						String lowerCase = path.getFileName().toString().toLowerCase();
+						return lowerCase.endsWith(".yml") || lowerCase.endsWith(".yaml");
+					})
 					.toList();
 			if (paths.size() == 1) {
 				return Optional.of(paths.get(0));
