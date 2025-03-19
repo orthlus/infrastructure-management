@@ -1,6 +1,5 @@
 package art.aelaort.scan_show;
 
-import art.aelaort.models.build.BuildType;
 import art.aelaort.models.build.Job;
 import art.aelaort.models.servers.Server;
 import art.aelaort.models.servers.ServerDataLength;
@@ -13,19 +12,17 @@ import java.util.List;
 import java.util.Map;
 
 import static art.aelaort.utils.TablePrintingUtils.*;
-import static art.aelaort.utils.Utils.log;
 import static java.lang.String.valueOf;
 import static org.apache.commons.lang3.StringUtils.*;
 
 @Component
 public class StringFormattingService {
 	public String servicesByServerString(List<Server> servers, Map<String, Job> jobs) {
-		log("services:");
 		String[] columnNames = {"server", "image", "type", "app", "file"};
 		Object[][] data = convertServicesToArrays(mapToAppRows(servers, jobs));
 		TextTable tt = new TextTable(columnNames, data);
 		tt.setAddRowNumbering(true);
-		return getTableString(tt);
+		return "services:\n" + getTableString(tt);
 	}
 
 	private List<AppRow> mapToAppRows(List<Server> servers, Map<String, Job> jobs) {
@@ -73,7 +70,6 @@ public class StringFormattingService {
 	 */
 
 	public String getServersTableString(List<Server> servers) {
-		log("servers:");
 		String[] columnNames = {
 				"id",
 				"name",
@@ -87,7 +83,7 @@ public class StringFormattingService {
 
 		Object[][] data = convertServersToArrays(servers);
 		TextTable tt = new TextTable(columnNames, data);
-		return getTableString(tt);
+		return "servers:\n" + getTableString(tt);
 	}
 
 	private Object[][] convertServersToArrays(List<Server> servers) {
