@@ -54,15 +54,17 @@ public class ScanShowServersService {
 	public void show() {
 		List<Server> servers = serverProvider.readLocalJsonData();
 		Map<String, Job> jobs = jobsProvider.getJobsMapByName();
+		List<K8sCluster> clusters = k8sClusterProvider.getClustersFromLocalConfig();
 		log(stringFormattingService.getServersTableString(servers));
 		log();
-		log(stringFormattingService.servicesByServerString(servers, jobs));
+		log(stringFormattingService.servicesByServerString(servers, jobs, clusters));
 	}
 
 	public void showYml() {
 		List<Server> servers = serverProvider.readLocalJsonData();
 		Map<String, Job> jobs = jobsProvider.getJobsMapByName();
-		log(stringFormattingService.servicesByServerString(servers, jobs));
+		List<K8sCluster> clusters = k8sClusterProvider.getClustersFromLocalConfig();
+		log(stringFormattingService.servicesByServerString(servers, jobs, clusters));
 	}
 
 	public void showTable() {
