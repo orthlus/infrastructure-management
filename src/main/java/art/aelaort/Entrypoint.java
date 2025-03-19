@@ -5,7 +5,7 @@ import art.aelaort.build.JobsProvider;
 import art.aelaort.db.LocalDb;
 import art.aelaort.db.RemoteDb;
 import art.aelaort.docker.DockerService;
-import art.aelaort.docker.DockerStatsService;
+import art.aelaort.docker.HostStatsService;
 import art.aelaort.exceptions.*;
 import art.aelaort.k8s.K8sService;
 import art.aelaort.make.ProjectsMakerService;
@@ -36,7 +36,7 @@ public class Entrypoint implements CommandLineRunner {
 	private final GitStatService gitStatService;
 	private final ScanShowServersService scanShow;
 	private final ProjectsMakerService projectsMakerService;
-	private final DockerStatsService dockerStatsService;
+	private final HostStatsService hostStatsService;
 	private final SshKeyUploader sshKeyUploader;
 	private final RandomPortService randomPortService;
 	private final SshServerProvider sshServerProvider;
@@ -176,14 +176,14 @@ public class Entrypoint implements CommandLineRunner {
 		if (args.length >= 2) {
 			try {
 				SshServer sshServer = sshServerProvider.findServer(args[1]);
-				log(dockerStatsService.statByServer(sshServer));
+				log(hostStatsService.statByServer(sshServer));
 			} catch (ServerNotFoundException e) {
 				log("server not found");
 			} catch (ServerByPortTooManyServersException e) {
 				log("too many servers found, need more uniq param or fix data");
 			}
 		} else {
-			log(dockerStatsService.statAllServers());
+			log(hostStatsService.statAllServers());
 		}
 	}
 

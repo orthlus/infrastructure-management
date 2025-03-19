@@ -19,7 +19,7 @@ import static java.util.stream.Collectors.joining;
 
 @Component
 @RequiredArgsConstructor
-public class DockerStatsService {
+public class HostStatsService {
 	private final SshClient sshClient;
 	private final ServerProvider serverProvider;
 	private final ServerMapper serverMapper;
