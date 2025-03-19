@@ -3,8 +3,8 @@ package art.aelaort.data.parsers;
 import art.aelaort.models.servers.DirServer;
 import art.aelaort.models.servers.ServiceDto;
 import art.aelaort.models.servers.yaml.DockerComposeFile;
+import art.aelaort.utils.Utils;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -21,16 +21,9 @@ import static art.aelaort.utils.Utils.log;
 @RequiredArgsConstructor
 public class DockerComposeParser {
 	private final YAMLMapper yamlMapper;
+	private final Utils utils;
 	@Value("${servers.management.files.monitoring}")
 	private String monitoringFile;
-	@Value("${servers.management.docker.image.pattern}")
-	private String dockerImagePattern;
-	private String[] dockerImagePatternSplit;
-
-	@PostConstruct
-	private void init() {
-		dockerImagePatternSplit = dockerImagePattern.split("%%");
-	}
 
 	public DirServer parseDockerYmlFile(Path ymlFile) {
 		try {
@@ -80,15 +73,9 @@ public class DockerComposeParser {
 
 		String image = service.getImage();
 		if (image != null) {
-			serviceDtoBuilder.dockerImageName(dockerImageClean(image));
+			serviceDtoBuilder.dockerImageName(utils.dockerImageClean(image));
 		}
 
 		return serviceDtoBuilder.build();
-	}
-
-	private String dockerImageClean(String dockerImage) {
-		return dockerImage
-				.replace(dockerImagePatternSplit[0], "")
-				.replace(dockerImagePatternSplit[1], "");
 	}
 }
