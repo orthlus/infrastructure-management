@@ -16,7 +16,7 @@ import static art.aelaort.utils.TablePrintingUtils.*;
 public class StringFormattingService {
 	public String servicesByServerString(List<Server> servers, Map<String, Job> jobs) {
 		String[] columnNames = {"server", "image", "type", "app", "file"};
-		Object[][] data = convertServicesToArrays(mapToAppRows(servers, jobs));
+		Object[][] data = convertServicesToArrays(mapToAppRows(servers, jobs), columnNames);
 		TextTable tt = new TextTable(columnNames, data);
 		tt.setAddRowNumbering(true);
 		return "services:\n" + getTableString(tt);
@@ -37,8 +37,8 @@ public class StringFormattingService {
 		return res;
 	}
 
-	private Object[][] convertServicesToArrays(List<AppRow> appRows) {
-		Object[][] result = new Object[appRows.size()][5];
+	private Object[][] convertServicesToArrays(List<AppRow> appRows, String[] columnNames) {
+		Object[][] result = new Object[appRows.size()][columnNames.length];
 		for (int i = 0; i < appRows.size(); i++) {
 			AppRow appRow = appRows.get(i);
 			result[i][0] = appRow.server();
@@ -78,13 +78,13 @@ public class StringFormattingService {
 				"services"
 		};
 
-		Object[][] data = convertServersToArrays(servers);
+		Object[][] data = convertServersToArrays(servers, columnNames);
 		TextTable tt = new TextTable(columnNames, data);
 		return "servers:\n" + getTableString(tt);
 	}
 
-	private Object[][] convertServersToArrays(List<Server> servers) {
-		Object[][] result = new Object[servers.size()][8];
+	private Object[][] convertServersToArrays(List<Server> servers, String[] columnNames) {
+		Object[][] result = new Object[servers.size()][columnNames.length];
 		for (int i = 0; i < servers.size(); i++) {
 			Server server = servers.get(i);
 			result[i][0] = server.getId();
