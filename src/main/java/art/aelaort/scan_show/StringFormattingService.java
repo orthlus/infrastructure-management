@@ -79,7 +79,7 @@ public class StringFormattingService {
 
 		Object[][] data = convertClustersToArrays(mapToClusterAppRows(clusters), columnNames);
 		TextTable tt = new TextTable(columnNames, data);
-		return "clusters:\n" + getTableString(tt);
+		return "k8s clusters and apps:\n" + getTableString(tt);
 	}
 
 	private List<ClusterAppRow> mapToClusterAppRows(List<K8sCluster> clusters) {
