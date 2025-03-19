@@ -1,5 +1,6 @@
 package art.aelaort.models.servers;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.With;
@@ -13,7 +14,9 @@ import java.util.List;
 @Accessors(fluent = true)
 @Jacksonized
 public class K8sCluster {
+	@JsonProperty
 	@With
 	private String name;
+	@JsonProperty
 	private List<K8sApp> apps;
 }
