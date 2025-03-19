@@ -1,5 +1,7 @@
 package art.aelaort;
 
+import art.aelaort.k8s.K8sProps;
+import art.aelaort.models.servers.K8sCluster;
 import art.aelaort.models.servers.Server;
 import art.aelaort.s3.ServersManagementS3;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -20,6 +22,7 @@ import static art.aelaort.utils.Utils.log;
 public class ServersManagementService {
 	private final ServersManagementS3 serversManagementS3;
 	private final JsonMapper jsonMapper;
+	private final K8sProps k8sProps;
 	@Value("${servers.management.json_path}")
 	private Path jsonDataPath;
 
@@ -33,11 +36,17 @@ public class ServersManagementService {
 		log("ips uploaded");
 	}
 
-	public void saveData(List<Server> servers) {
+	public void saveData(List<Server> servers, List<K8sCluster> clusters) {
 		String json = toJson(servers);
 		saveJsonToLocal(json);
+
+		String jsonK8s = toJsonK8s(clusters);
+		saveK8sJsonToLocal(jsonK8s);
+
 		log("saved data to local");
+
 		serversManagementS3.uploadData(json);
+		serversManagementS3.uploadK8sData(jsonK8s);
 		log("saved data to s3");
 	}
 
@@ -49,5 +58,15 @@ public class ServersManagementService {
 	@SneakyThrows
 	private void saveJsonToLocal(String jsonStr) {
 		Files.writeString(jsonDataPath, jsonStr);
+	}
+
+	@SneakyThrows
+	private String toJsonK8s(List<K8sCluster> clusters) {
+		return jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(clusters);
+	}
+
+	@SneakyThrows
+	private void saveK8sJsonToLocal(String jsonStr) {
+		Files.writeString(k8sProps.getSyncFile(), jsonStr);
 	}
 }

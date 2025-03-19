@@ -3,7 +3,9 @@ package art.aelaort.scan_show;
 import art.aelaort.ServersManagementService;
 import art.aelaort.build.JobsProvider;
 import art.aelaort.models.build.Job;
+import art.aelaort.models.servers.K8sCluster;
 import art.aelaort.models.servers.Server;
+import art.aelaort.servers.providers.K8sClusterProvider;
 import art.aelaort.servers.providers.ServerProvider;
 import art.aelaort.utils.ExternalUtilities;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ public class ScanShowServersService {
 	private final ExternalUtilities externalUtilities;
 	private final ServerProvider serverProvider;
 	private final JobsProvider jobsProvider;
+	private final K8sClusterProvider k8sClusterProvider;
 
 	/*
 	 * download tabby
@@ -32,7 +35,8 @@ public class ScanShowServersService {
 	 */
 	public void sync() {
 		List<Server> servers = serverProvider.scanAndJoinData();
-		serversManagementService.saveData(servers);
+		List<K8sCluster> clusters = k8sClusterProvider.getClusters();
+		serversManagementService.saveData(servers, clusters);
 		serversManagementService.saveIps(servers);
 		log("sync done");
 	}
@@ -64,5 +68,10 @@ public class ScanShowServersService {
 	public void showTable() {
 		List<Server> servers = serverProvider.readLocalJsonData();
 		log(stringFormattingService.getServersTableString(servers));
+	}
+
+	public void showK8s() {
+		List<K8sCluster> clusters = k8sClusterProvider.getClustersFromLocalConfig();
+		log(stringFormattingService.getK8sTableString(clusters));
 	}
 }

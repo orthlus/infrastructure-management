@@ -1,6 +1,8 @@
 package art.aelaort.scan_show;
 
 import art.aelaort.models.build.Job;
+import art.aelaort.models.servers.K8sApp;
+import art.aelaort.models.servers.K8sCluster;
 import art.aelaort.models.servers.Server;
 import art.aelaort.models.servers.ServiceDto;
 import dnl.utils.text.table.TextTable;
@@ -60,6 +62,54 @@ public class StringFormattingService {
 	}
 
 	record AppRow(String server, String image, String type, String app, String file) {}
+
+	/*
+	 * ======================================================
+	 * ======================================================
+	 */
+
+	public String getK8sTableString(List<K8sCluster> clusters) {
+		String[] columnNames = {
+				"cluster",
+				"image",
+				"name",
+				"kind",
+				"schedule",
+		};
+
+		Object[][] data = convertClustersToArrays(mapToClusterAppRows(clusters), columnNames);
+		TextTable tt = new TextTable(columnNames, data);
+		return "clusters:\n" + getTableString(tt);
+	}
+
+	private List<ClusterAppRow> mapToClusterAppRows(List<K8sCluster> clusters) {
+		List<ClusterAppRow> res = new ArrayList<>();
+		for (K8sCluster cluster : clusters) {
+			for (K8sApp app : cluster.apps()) {
+				ClusterAppRow clusterAppRow = new ClusterAppRow(cluster.name(), app.getImage(), app.getName(), app.getKind(), app.getSchedule());
+				res.add(clusterAppRow);
+			}
+		}
+		return res;
+	}
+
+	private Object[][] convertClustersToArrays(List<ClusterAppRow> clusters, String[] columnNames) {
+		Object[][] result = new Object[clusters.size()][columnNames.length];
+		for (int i = 0; i < clusters.size(); i++) {
+			ClusterAppRow app = clusters.get(i);
+			result[i][0] = app.cluster();
+			result[i][1] = nullable(app.image());
+			result[i][2] = nullable(app.name());
+			result[i][3] = app.kind();
+			result[i][4] = nullable(app.schedule());
+		}
+
+		appendSpaceToRight(result);
+
+		return result;
+	}
+
+	record ClusterAppRow(String cluster, String image, String name, String kind, String schedule) {}
 
 	/*
 	 * ======================================================

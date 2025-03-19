@@ -58,6 +58,7 @@ public class Entrypoint implements CommandLineRunner {
 				case "show" -> 				 scanShow.show();
 				case "tbl" ->				 scanShow.showTable();
 				case "yml", "svc" ->		 scanShow.showYml();
+				case "k8s-list", "kl" ->	 scanShow.showK8s();
 				case "sync", "s" -> 		 scanShow.sync();
 				case "sync-all", "sa" -> 	 scanShow.syncAll();
 				case "docker" -> 			 dockerUpload(args);

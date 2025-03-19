@@ -44,4 +44,14 @@ public class ServersManagementS3 {
 					.build(), requestBody);
 		}
 	}
+
+	public void uploadK8sData(String jsonStr) {
+		try (S3Client client = client(serversManagementS3Params)) {
+			RequestBody requestBody = RequestBody.fromString(jsonStr);
+			client.putObject(PutObjectRequest.builder()
+					.bucket(s3Properties.getServersManagement().getBucket())
+					.key("k8s-data.json")
+					.build(), requestBody);
+		}
+	}
 }
