@@ -33,7 +33,7 @@ public class DockerStatsService {
 			),
 			new Command("df -hT", "df -hT"),
 			new Command("docker system df", "docker system df"),
-			new Command("free -h", "free -h")
+			new Command("free -h", "free -h | awk '{print (NR==1?\"Type\":\"\"), $1, $2, $3, $6, (NR==1?\"\":$4)}' | column -t")
 	);
 
 	public String statByServer(SshServer server) {
