@@ -34,7 +34,7 @@ public class K8sYamlParser {
 			} else if (k8sObject instanceof V1CronJob o) {
 				obj = convert(o);
 			} else {
-				throw new RuntimeException();
+				continue;
 			}
 			result.add(clean(obj));
 		}
