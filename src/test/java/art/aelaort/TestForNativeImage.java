@@ -25,5 +25,6 @@ public class TestForNativeImage {
 	@Test
 	public void testAllForReflection() {
 		assertThat(k8sClusterProvider.getClusters()).isNotEmpty();
+		assertThat(k8sClusterProvider.getClustersFromLocalConfig()).isNotEmpty();
 	}
 }
