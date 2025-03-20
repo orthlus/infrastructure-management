@@ -102,8 +102,9 @@ public class BuildService {
 				dockerBuildPush(job, tmpDir, isBuildDockerNoCache);
 			}
 			case java_graal_local -> {
+				run("mvn clean test", tmpDir);
 				copyGraalvmConfig(tmpDir);
-				run("mvn clean native:compile -P native", tmpDir);
+				run("mvn native:compile -P native -DskipTests", tmpDir);
 				copyArtifactToBinDirectory(job, tmpDir);
 			}
 			case ya_func -> srcZipToS3(job, tmpDir);
@@ -112,7 +113,7 @@ public class BuildService {
 
 	private void copyGraalvmConfig(Path tmpDir) {
 		Path targetDir = tmpDir.resolve("target").resolve("native-image-config");
-		if (!Files.exists(targetDir)) {
+		if (Files.notExists(targetDir)) {
 			log(wrapRed("not found '%s', skipping copyGraalvmConfig\n".formatted(targetDir)));
 			return;
 		}
