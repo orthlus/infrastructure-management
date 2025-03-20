@@ -112,16 +112,24 @@ public class BuildService {
 
 	private void copyGraalvmConfig(Path tmpDir) {
 		Path targetDir = tmpDir.resolve("target").resolve("native-image-config");
-		if (Files.exists(targetDir)) {
-			try {
+		if (!Files.exists(targetDir)) {
+			log(wrapRed("not found '%s', skipping copyGraalvmConfig\n".formatted(targetDir)));
+			return;
+		}
+
+		Path srcPath = tmpDir.resolve(Path.of("src", "main", "resources", "META-INF", "native-image"));
+		try {
+			if (Files.notExists(srcPath)) {
 				FileUtils.copyDirectory(
 						targetDir.toFile(),
-						tmpDir.resolve(Path.of("src", "main", "resources", "META-INF")).toFile());
-			} catch (IOException e) {
-				throw new RuntimeException(e);
+						srcPath.toFile());
+			} else {
+				String command = "native-image-configure generate --input-dir=%s --input-dir=%s --output-dir=%s"
+						.formatted(targetDir, srcPath, srcPath);
+				run(command, tmpDir);
 			}
-		} else {
-			log(wrapRed("not found '%s', skipping copyGraalvmConfig\n".formatted(targetDir)));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -285,9 +293,9 @@ public class BuildService {
 	public void printConfig(String typeAlias) {
 		List<Job> jobs = jobsProvider.readBuildConfig();
 		jobs = jobs.stream()
-						.filter(job -> job.getBuildType().alias.equals(typeAlias))
-						.filter(job -> !job.isDeprecated())
-								.toList();
+				.filter(job -> job.getBuildType().alias.equals(typeAlias))
+				.filter(job -> !job.isDeprecated())
+				.toList();
 		log(jobsTextTable.getJobsTableString(jobs));
 	}
 
