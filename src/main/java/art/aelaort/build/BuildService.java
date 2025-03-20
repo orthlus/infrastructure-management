@@ -103,9 +103,25 @@ public class BuildService {
 			}
 			case java_graal_local -> {
 				run("mvn clean native:compile -P native", tmpDir);
+				copyGraalvmConfig(tmpDir);
 				copyArtifactToBinDirectory(job, tmpDir);
 			}
 			case ya_func -> srcZipToS3(job, tmpDir);
+		}
+	}
+
+	private void copyGraalvmConfig(Path tmpDir) {
+		Path targetDir = tmpDir.resolve("target").resolve("native-image-config");
+		if (Files.exists(targetDir)) {
+			try {
+				FileUtils.copyDirectory(
+						targetDir.toFile(),
+						tmpDir.resolve(Path.of("src", "main", "resources", "META-INF")).toFile());
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			log(wrapRed("not found '%s', skipping copyGraalvmConfig\n".formatted(targetDir)));
 		}
 	}
 
