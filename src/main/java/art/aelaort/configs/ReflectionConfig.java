@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Configuration;
 		art.aelaort.models.servers.yaml.TabbyFile.class,
 		art.aelaort.models.servers.yaml.CustomFile.class,
 		art.aelaort.models.servers.yaml.DockerComposeFile.class,
+		art.aelaort.models.servers.K8sCluster.class,
+		art.aelaort.models.servers.K8sApp.class,
 		com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.class,
 		art.aelaort.ssh.tw.SshKeyPost.class,
 		liquibase.AbstractExtensibleObject.class,
