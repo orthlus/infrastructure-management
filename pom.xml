@@ -140,7 +140,7 @@
                 <version>3.0.0</version>
                 <configuration>
                     <argLine>
-                        -agentlib:native-image-agent=config-output-dir=src/main/resources/META-INF/native-image/native-image-config
+                        -agentlib:native-image-agent=config-output-dir=target/native-image-config
                     </argLine>
                 </configuration>
             </plugin>
