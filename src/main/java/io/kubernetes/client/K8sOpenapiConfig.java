@@ -1,10 +1,17 @@
 package io.kubernetes.client;
 
 import io.kubernetes.client.openapi.models.*;
+import io.kubernetes.client.util.generic.dynamic.*;
+import lombok.SneakyThrows;
+import org.springframework.aot.hint.MemberCategory;
+import org.springframework.aot.hint.ReflectionHints;
+import org.springframework.aot.hint.RuntimeHints;
+import org.springframework.aot.hint.RuntimeHintsRegistrar;
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+//@ImportRuntimeHints(K8sOpenapiConfig.KubernetesHints.class)
 @RegisterReflectionForBinding({
 		AdmissionregistrationV1ServiceReference.class,
 		AdmissionregistrationV1WebhookClientConfig.class,
@@ -631,6 +638,26 @@ import org.springframework.context.annotation.Configuration;
 		V2ResourceMetricSource.class,
 		V2ResourceMetricStatus.class,
 		VersionInfo.class,
+		DynamicKubernetesApi.class,
+		DynamicKubernetesListObject.class,
+		DynamicKubernetesObject.class,
+		DynamicKubernetesTypeAdaptorFactory.class,
+		Dynamics.class,
 })
 public class K8sOpenapiConfig {
+	/*static class KubernetesHints implements RuntimeHintsRegistrar {
+
+		@SneakyThrows
+		@Override
+		public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
+			ReflectionHints reflection = hints.reflection();
+			reflection.registerType(
+					io.kubernetes.client.openapi.models.V1JSONSchemaProps.class,
+					hint -> hint.withMembers(MemberCategory.INVOKE_PUBLIC_METHODS)
+			);
+			reflection.registerField(
+					io.kubernetes.client.openapi.models.V1JSONSchemaProps.class.getDeclaredField("xKubernetesEmbeddedResource")
+			);
+		}
+	}*/
 }
