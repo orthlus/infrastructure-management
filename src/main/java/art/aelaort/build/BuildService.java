@@ -102,8 +102,8 @@ public class BuildService {
 				dockerBuildPush(job, tmpDir, isBuildDockerNoCache);
 			}
 			case java_graal_local -> {
-				run("mvn clean native:compile -P native", tmpDir);
 				copyGraalvmConfig(tmpDir);
+				run("mvn clean native:compile -P native", tmpDir);
 				copyArtifactToBinDirectory(job, tmpDir);
 			}
 			case ya_func -> srcZipToS3(job, tmpDir);
