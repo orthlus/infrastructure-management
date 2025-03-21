@@ -16,15 +16,15 @@ import static art.aelaort.utils.TablePrintingUtils.*;
 
 @Component
 public class StringFormattingService {
-	public String servicesByServerString(List<Server> servers, Map<String, Job> jobs, List<K8sCluster> clusters) {
-		String[] columnNames = {"server", "k8sCluster", "image", "type", "app", "file"};
-		Object[][] data = convertServicesToArrays(mapToAppRows(servers, jobs, clusters), columnNames);
+	public String servicesByServerString(List<Server> servers, Map<String, Job> jobs) {
+		String[] columnNames = {"server", "image", "type", "app", "file"};
+		Object[][] data = convertServicesToArrays(mapToAppRows(servers, jobs), columnNames);
 		TextTable tt = new TextTable(columnNames, data);
 		tt.setAddRowNumbering(true);
 		return "services:\n" + getTableString(tt);
 	}
 
-	private List<AppRow> mapToAppRows(List<Server> servers, Map<String, Job> jobs, List<K8sCluster> clusters) {
+	private List<AppRow> mapToAppRows(List<Server> servers, Map<String, Job> jobs) {
 		List<AppRow> res = new ArrayList<>();
 		for (Server server : servers) {
 			for (ServiceDto service : server.getServices()) {
@@ -32,13 +32,7 @@ public class StringFormattingService {
 				Job job = image != null ? jobs.get(image.split(":")[0]) : null;
 				String type = job != null ? job.getBuildType().toString() : null;
 				String appName = getAppName(service);
-				AppRow appRow = new AppRow(server.getName(), null, image, type, appName, service.getYmlName());
-				res.add(appRow);
-			}
-		}
-		for (K8sCluster cluster : clusters) {
-			for (K8sApp app : cluster.apps()) {
-				AppRow appRow = new AppRow(null, cluster.name(), app.getImage(), null, app.getName(), null);
+				AppRow appRow = new AppRow(server.getName(), image, type, appName, service.getYmlName());
 				res.add(appRow);
 			}
 		}
@@ -49,12 +43,11 @@ public class StringFormattingService {
 		Object[][] result = new Object[appRows.size()][columnNames.length];
 		for (int i = 0; i < appRows.size(); i++) {
 			AppRow appRow = appRows.get(i);
-			result[i][0] = nullable(appRow.server());
-			result[i][1] = nullable(appRow.k8sCluster());
-			result[i][2] = nullable(appRow.image());
-			result[i][3] = nullable(appRow.type());
-			result[i][4] = nullable(appRow.app());
-			result[i][5] = nullable(appRow.file());
+			result[i][0] = appRow.server();
+			result[i][1] = nullable(appRow.image());
+			result[i][2] = nullable(appRow.type());
+			result[i][3] = appRow.app();
+			result[i][4] = appRow.file();
 		}
 
 		appendSpaceToRight(result);
@@ -68,7 +61,7 @@ public class StringFormattingService {
 				service.getDockerName() + " - " + service.getService();
 	}
 
-	record AppRow(String server, String k8sCluster, String image, String type, String app, String file) {}
+	record AppRow(String server, String image, String type, String app, String file) {}
 
 	/*
 	 * ======================================================
@@ -86,6 +79,7 @@ public class StringFormattingService {
 
 		Object[][] data = convertClustersToArrays(mapToClusterAppRows(clusters), columnNames);
 		TextTable tt = new TextTable(columnNames, data);
+		tt.setAddRowNumbering(true);
 		return "k8s clusters and apps:\n" + getTableString(tt);
 	}
 
