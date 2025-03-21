@@ -13,6 +13,7 @@ public class FillerMakeJavaProperties {
 	private Placeholder placeholder;
 	private Value value;
 	private String jooqPluginFilepath;
+	private String jooqDependencyFilepath;
 	private String pomFilepath;
 	private String classFile;
 	private String jooqFile;
@@ -33,6 +34,7 @@ public class FillerMakeJavaProperties {
 		private String projectName;
 		private String mainPackage;
 		private String jooqPlugin;
+		private String jooqDependency;
 	}
 
 	@Getter

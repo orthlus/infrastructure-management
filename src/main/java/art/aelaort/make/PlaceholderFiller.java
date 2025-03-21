@@ -27,12 +27,18 @@ public class PlaceholderFiller {
 				.replace(placeholder.getJavaVersion(), value.getJavaVersion())
 				.replace(placeholder.getProjectName(), getNameWithoutDir(project))
 				.replace(placeholder.getMainPackage(), value.getMainPackage())
-				.replace(placeholder.getJooqPlugin(), project.isHasJooq() ? readJooqPluginContent() : "");
+				.replace(placeholder.getJooqPlugin(), project.isHasJooq() ? readJooqPluginContent() : "")
+				.replace(placeholder.getJooqDependency(), project.isHasJooq() ? readJooqDependencyContent() : "");
 	}
 
 	@SneakyThrows
 	private String readJooqPluginContent() {
 		return Files.readString(defaultFilesDir.resolve(properties.getJooqPluginFilepath()));
+	}
+
+	@SneakyThrows
+	private String readJooqDependencyContent() {
+		return Files.readString(defaultFilesDir.resolve(properties.getJooqDependencyFilepath()));
 	}
 
 	private String getNameWithoutDir(Project project) {
