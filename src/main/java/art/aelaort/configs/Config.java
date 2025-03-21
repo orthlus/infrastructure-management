@@ -76,15 +76,6 @@ public class Config {
 	}
 
 	@Bean
-	public RestTemplate tabbyReserveDecoder(RestTemplateBuilder restTemplateBuilder,
-											@Value("${tabby.decode.service.reserve.url}") String url) {
-		return restTemplateBuilder
-				.rootUri(url)
-				.defaultHeader(CONTENT_TYPE, TEXT_PLAIN_VALUE)
-				.build();
-	}
-
-	@Bean
 	public RestTemplate tw(RestTemplateBuilder restTemplateBuilder,
 						   @Value("${tw.url}") String url,
 						   @Value("${tw.token}") String token) {
