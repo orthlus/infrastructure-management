@@ -23,12 +23,14 @@ public class RemoteDb {
 		Path dir = dbUtils.getDbDir(dbUtils.getName(args), "prod");
 		String url = dbUtils.readDbUrl(dir);
 		sshUp(dir);
+		log("\n\n");
 		for (String changeSetFile : dbUtils.getChangeSetsFiles(dir)) {
 			if (!liquibaseService.statusCli(dir.resolve(changeSetFile), url)) {
 				log(wrapRed("миграции упали(((((((("));
 				break;
 			}
 		}
+		log("\n\n");
 		sshDown(dir);
 	}
 
@@ -36,12 +38,14 @@ public class RemoteDb {
 		Path dir = dbUtils.getDbDir(dbUtils.getName(args), "prod");
 		String url = dbUtils.readDbUrl(dir);
 		sshUp(dir);
+		log("\n\n");
 		for (String changeSetFile : dbUtils.getChangeSetsFiles(dir)) {
 			if (!liquibaseService.updateCli(dir.resolve(changeSetFile), url)) {
 				log(wrapRed("миграции упали(((((((("));
 				break;
 			}
 		}
+		log("\n\n");
 		sshDown(dir);
 	}
 
