@@ -75,6 +75,7 @@ public class StringFormattingService {
 				"name",
 				"kind",
 				"schedule",
+				"strategy",
 		};
 
 		Object[][] data = convertClustersToArrays(mapToClusterAppRows(clusters), columnNames);
@@ -87,7 +88,12 @@ public class StringFormattingService {
 		List<ClusterAppRow> res = new ArrayList<>();
 		for (K8sCluster cluster : clusters) {
 			for (K8sApp app : cluster.apps()) {
-				ClusterAppRow clusterAppRow = new ClusterAppRow(cluster.name(), app.getImage(), app.getName(), app.getKind(), app.getSchedule());
+				ClusterAppRow clusterAppRow = new ClusterAppRow(cluster.name(),
+						app.getImage(),
+						app.getName(),
+						app.getKind(),
+						app.getSchedule(),
+						app.getStrategyType());
 				res.add(clusterAppRow);
 			}
 		}
@@ -103,6 +109,7 @@ public class StringFormattingService {
 			result[i][2] = nullable(app.name());
 			result[i][3] = app.kind();
 			result[i][4] = nullable(app.schedule());
+			result[i][5] = nullable(app.strategy());
 		}
 
 		appendSpaceToRight(result);
@@ -110,7 +117,7 @@ public class StringFormattingService {
 		return result;
 	}
 
-	record ClusterAppRow(String cluster, String image, String name, String kind, String schedule) {}
+	record ClusterAppRow(String cluster, String image, String name, String kind, String schedule, String strategy) {}
 
 	/*
 	 * ======================================================

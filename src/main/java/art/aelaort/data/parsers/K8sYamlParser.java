@@ -5,6 +5,7 @@ import art.aelaort.utils.Utils;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.api.model.apps.DeploymentStrategy;
 import io.fabric8.kubernetes.api.model.batch.v1.CronJob;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
@@ -53,10 +54,12 @@ public class K8sYamlParser {
 	}
 
 	private K8sApp convert(Deployment deployment) {
+		DeploymentStrategy strategy = deployment.getSpec().getStrategy();
 		return K8sApp.builder()
 				.image(deployment.getSpec().getTemplate().getSpec().getContainers().get(0).getImage())
 				.name(deployment.getMetadata().getName())
 				.kind(deployment.getKind())
+				.strategyType(strategy == null ? null : strategy.getType())
 				.build();
 	}
 

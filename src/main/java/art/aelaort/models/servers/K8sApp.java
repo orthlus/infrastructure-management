@@ -19,4 +19,6 @@ public class K8sApp {
 	private String kind;
 	@JsonProperty
 	private String schedule;
+	@JsonProperty
+	private String strategyType;
 }
