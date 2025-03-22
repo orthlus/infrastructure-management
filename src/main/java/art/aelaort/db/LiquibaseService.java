@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 
+import static art.aelaort.utils.ColoredConsoleTextUtils.*;
 import static art.aelaort.utils.Utils.log;
 
 @Component
@@ -14,25 +15,24 @@ import static art.aelaort.utils.Utils.log;
 public class LiquibaseService {
 	public boolean statusCli(Path file, String url) {
 		String[] args = ArrayUtils.add(baseArgs(file, url), "status");
-		int execute = new LiquibaseCommandLine().execute(args);
-		if (execute == 0) {
-			log("migration success");
-			return true;
-		} else {
-			log("migration error");
-			return false;
-		}
+		return execute(args);
 	}
 
-	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	public boolean updateCli(Path file, String url) {
 		String[] args = ArrayUtils.add(baseArgs(file, url), "update");
+		return execute(args);
+	}
+
+	private boolean execute(String[] args) {
+		log(wrapBlue("liquibase starting..."));
 		int execute = new LiquibaseCommandLine().execute(args);
 		if (execute == 0) {
-			log("migration success");
+			log(wrapGreen("migration success"));
+			log();
 			return true;
 		} else {
-			log("migration error");
+			log(wrapRed("migration error"));
+			log();
 			return false;
 		}
 	}
@@ -42,7 +42,8 @@ public class LiquibaseService {
 				"--changelog-file=" + file.getFileName(),
 				"--searchPath=" + file.getParent(),
 				"--url=" + url,
-				"--driver=org.postgresql.Driver"
+				"--driver=org.postgresql.Driver",
+				"--show-banner", "false"
 		};
 	}
 }
