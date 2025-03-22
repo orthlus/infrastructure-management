@@ -38,7 +38,10 @@ public class DbUtils {
 
 	public List<String> getChangeSetsFiles(Path dir) {
 		try {
-			return Files.readAllLines(dir.resolve(props.getFilesListFilename()));
+			return Files.readAllLines(dir.resolve(props.getFilesListFilename()))
+					.stream()
+					.filter(s -> !s.startsWith("#"))
+					.toList();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
