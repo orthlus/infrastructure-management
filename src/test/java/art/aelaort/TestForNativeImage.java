@@ -1,6 +1,6 @@
 package art.aelaort;
 
-import art.aelaort.servers.providers.K8sClusterProvider;
+import art.aelaort.k8s.K8sClusterProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

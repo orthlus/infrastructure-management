@@ -1,4 +1,4 @@
-package art.aelaort.data.parsers;
+package art.aelaort.k8s;
 
 import art.aelaort.models.servers.K8sApp;
 import art.aelaort.utils.Utils;

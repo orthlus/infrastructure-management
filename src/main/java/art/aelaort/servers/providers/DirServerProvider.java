@@ -1,7 +1,7 @@
 package art.aelaort.servers.providers;
 
-import art.aelaort.data.parsers.CustomProjectYamlParser;
-import art.aelaort.data.parsers.DockerComposeParser;
+import art.aelaort.servers.CustomProjectYamlParser;
+import art.aelaort.docker.DockerComposeParser;
 import art.aelaort.models.servers.DirServer;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;

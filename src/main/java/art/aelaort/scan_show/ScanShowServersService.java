@@ -5,7 +5,7 @@ import art.aelaort.build.JobsProvider;
 import art.aelaort.models.build.Job;
 import art.aelaort.models.servers.K8sCluster;
 import art.aelaort.models.servers.Server;
-import art.aelaort.servers.providers.K8sClusterProvider;
+import art.aelaort.k8s.K8sClusterProvider;
 import art.aelaort.servers.providers.ServerProvider;
 import art.aelaort.utils.ExternalUtilities;
 import lombok.RequiredArgsConstructor;

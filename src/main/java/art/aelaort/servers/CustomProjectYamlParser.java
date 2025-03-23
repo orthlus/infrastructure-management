@@ -1,4 +1,4 @@
-package art.aelaort.data.parsers;
+package art.aelaort.servers;
 
 import art.aelaort.models.servers.DirServer;
 import art.aelaort.models.servers.ServiceDto;
