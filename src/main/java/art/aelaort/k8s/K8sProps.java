@@ -16,4 +16,5 @@ public class K8sProps {
 	private Path defaultFile;
 	private String pathFiles;
 	private Path syncFile;
+	private String nodesFile;
 }

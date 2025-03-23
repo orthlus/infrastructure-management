@@ -12,9 +12,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Component
@@ -35,6 +33,16 @@ public class K8sClusterProvider {
 		return List.of(jsonMapper.readValue(jsonPath.toFile(), K8sCluster[].class));
 	}
 
+	public Map<String, String> getMapClusterNameByNode(List<K8sCluster> clusters) {
+		Map<String, String> res = new HashMap<>();
+		for (K8sCluster cluster : clusters) {
+			for (String node : cluster.nodes()) {
+				res.put(node, cluster.name());
+			}
+		}
+		return res;
+	}
+
 	public List<K8sCluster> getClusters() {
 		List<K8sCluster> result = new ArrayList<>();
 
@@ -48,11 +56,20 @@ public class K8sClusterProvider {
 							.map(k8sYamlParser::parseK8sYmlFile)
 							.flatMap(Collection::stream)
 							.toList())
+					.nodes(readNodes(clustersDir))
 					.build();
 
 			result.add(k8sCluster);
 		}
 		return result;
+	}
+
+	private List<String> readNodes(Path cluster) {
+		try {
+			return Files.readAllLines(cluster.resolve(k8sProps.getNodesFile()));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private List<Path> getYamlFiles(Path dir) {

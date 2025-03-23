@@ -34,8 +34,11 @@ public class ScanShowServersService {
 	 * save ips to s3
 	 */
 	public void sync() {
-		List<Server> servers = serverProvider.scanAndJoinData();
 		List<K8sCluster> clusters = k8sClusterProvider.getClusters();
+
+		Map<String, String> mapNodesByClusterName = k8sClusterProvider.getMapClusterNameByNode(clusters);
+		List<Server> servers = serverProvider.scanAndJoinData(mapNodesByClusterName);
+
 		serversManagementService.saveData(servers, clusters);
 		serversManagementService.saveIps(servers);
 		log("sync done");

@@ -1,6 +1,7 @@
 package art.aelaort.utils;
 
 import dnl.utils.text.table.TextTable;
+import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -14,7 +15,11 @@ public class TablePrintingUtils {
 	}
 
 	public static String nullable(Object obj) {
-		return obj == null ? " - " : String.valueOf(obj);
+		if (obj == null) {
+			return " - ";
+		}
+		String s = String.valueOf(obj);
+		return StringUtils.hasText(s) ? s : " - ";
 	}
 
 	public static void appendSpaceToRight(Object[][] result) {

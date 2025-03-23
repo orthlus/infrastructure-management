@@ -34,6 +34,9 @@ public class Server {
 	private List<ServiceDto> services;
 	@JsonProperty
 	private Integer price;
+	@JsonProperty
+	@With
+	private String k8s;
 
 	public static String servicesStr(List<ServiceDto> services) {
 		List<String> list = services.stream()

@@ -132,6 +132,7 @@ public class StringFormattingService {
 				"port",
 				"monitoring",
 				"price",
+				"k8s",
 				"sshKey",
 				"services"
 		};
@@ -151,8 +152,9 @@ public class StringFormattingService {
 			result[i][3] = nullable(server.getPort());
 			result[i][4] = server.isMonitoring();
 			result[i][5] = nullable(server.getPrice());
-			result[i][6] = nullable(server.getSshKey());
-			result[i][7] = Server.servicesStr(server.getServices());
+			result[i][6] = nullable(server.getK8s());
+			result[i][7] = nullable(server.getSshKey());
+			result[i][8] = Server.servicesStr(server.getServices());
 		}
 
 		appendSpaceToRight(result);

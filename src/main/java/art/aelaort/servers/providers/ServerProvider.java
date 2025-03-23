@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -32,13 +33,13 @@ public class ServerProvider {
 	public List<Server> scanOnlyLocalData() {
 		List<DirServer> dirServers = dirServerProvider.scanServersDir();
 		List<TabbyServer> tabbyServers = tabbyServerProvider.readLocal();
-		return joinDirAndTabbyServers(dirServers, tabbyServers);
+		return joinDirAndTabbyServers(dirServers, tabbyServers, Map.of());
 	}
 
-	public List<Server> scanAndJoinData() {
+	public List<Server> scanAndJoinData(Map<String, String> mapNodesByClusterName) {
 		List<DirServer> dirServers = dirServerProvider.scanServersDir();
 		List<TabbyServer> tabbyServers = tabbyServerProvider.readRemote();
-		return joinDirAndTabbyServers(dirServers, tabbyServers);
+		return joinDirAndTabbyServers(dirServers, tabbyServers, mapNodesByClusterName);
 	}
 
 	@SneakyThrows
@@ -46,7 +47,7 @@ public class ServerProvider {
 		return List.of(jsonMapper.readValue(jsonPath.toFile(), Server[].class));
 	}
 
-	private List<Server> joinDirAndTabbyServers(List<DirServer> dirServers, List<TabbyServer> tabbyServers) {
+	private List<Server> joinDirAndTabbyServers(List<DirServer> dirServers, List<TabbyServer> tabbyServers, Map<String, String> mapNodesByClusterName) {
 		Map<String, DirServer> dirServersByName = serverMapper.toMapServers(dirServers);
 		List<Server> result = new ArrayList<>(tabbyServers.size());
 
@@ -82,6 +83,12 @@ public class ServerProvider {
 						.build();
 				result.add(server);
 			}
+		}
+
+		if (!mapNodesByClusterName.isEmpty()) {
+			result = result.stream()
+					.map(s -> s.withK8s(mapNodesByClusterName.get(s.getName())))
+					.collect(Collectors.toList());
 		}
 
 		return Server.addNumbers(result);

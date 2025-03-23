@@ -19,4 +19,6 @@ public class K8sCluster {
 	private String name;
 	@JsonProperty
 	private List<K8sApp> apps;
+	@JsonProperty
+	private List<String> nodes;
 }
