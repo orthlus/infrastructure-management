@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import static art.aelaort.k8s.K8sUtils.unwrap;
 import static art.aelaort.utils.ColoredConsoleTextUtils.wrapRed;
 import static art.aelaort.utils.Utils.log;
 
@@ -70,18 +71,10 @@ public class K8sYamlParser {
 			builder.nodePort(port.getNodePort());
 		}
 
-		if (port.getTargetPort().getValue() == null) {
+		if (port.getTargetPort() == null || port.getTargetPort().getValue() == null) {
 			builder.portString(String.valueOf(port.getPort()));
 		} else {
 			builder.portString("%s:%d".formatted(unwrap(port.getTargetPort()), port.getPort()));
-		}
-	}
-
-	private String unwrap(IntOrString intOrString) {
-		if (intOrString.getStrVal() != null) {
-			return intOrString.getStrVal();
-		} else {
-			return String.valueOf(intOrString.getIntVal());
 		}
 	}
 
@@ -119,6 +112,7 @@ public class K8sYamlParser {
 		DeploymentStrategy strategy = deployment.getSpec().getStrategy();
 		return K8sApp.builder()
 				.image(deployment.getSpec().getTemplate().getSpec().getContainers().get(0).getImage())
+				.podName(deployment.getSpec().getTemplate().getMetadata().getLabels().get("app"))
 				.name(deployment.getMetadata().getName())
 				.kind(deployment.getKind())
 				.strategyType(strategy == null ? null : strategy.getType())
@@ -129,6 +123,7 @@ public class K8sYamlParser {
 		return K8sApp.builder()
 				.image(pod.getSpec().getContainers().get(0).getImage())
 				.name(pod.getMetadata().getName())
+				.podName(pod.getMetadata().getName())
 				.kind(pod.getKind())
 				.build();
 	}

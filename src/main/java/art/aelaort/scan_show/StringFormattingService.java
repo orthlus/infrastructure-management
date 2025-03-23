@@ -1,10 +1,10 @@
 package art.aelaort.scan_show;
 
 import art.aelaort.models.build.Job;
-import art.aelaort.models.servers.K8sApp;
 import art.aelaort.models.servers.K8sCluster;
 import art.aelaort.models.servers.Server;
 import art.aelaort.models.servers.ServiceDto;
+import art.aelaort.models.servers.display.ClusterAppRow;
 import dnl.utils.text.table.TextTable;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static art.aelaort.k8s.K8sUtils.mapToClusterAppRows;
 import static art.aelaort.utils.TablePrintingUtils.*;
 
 @Component
@@ -74,6 +75,7 @@ public class StringFormattingService {
 				"image",
 				"name",
 				"kind",
+				"ports",
 				"schedule",
 				"strategy",
 		};
@@ -84,22 +86,6 @@ public class StringFormattingService {
 		return "k8s clusters and apps:\n" + getTableString(tt);
 	}
 
-	private List<ClusterAppRow> mapToClusterAppRows(List<K8sCluster> clusters) {
-		List<ClusterAppRow> res = new ArrayList<>();
-		for (K8sCluster cluster : clusters) {
-			for (K8sApp app : cluster.apps()) {
-				ClusterAppRow clusterAppRow = new ClusterAppRow(cluster.name(),
-						app.getImage(),
-						app.getName(),
-						app.getKind(),
-						app.getSchedule(),
-						app.getStrategyType());
-				res.add(clusterAppRow);
-			}
-		}
-		return res;
-	}
-
 	private Object[][] convertClustersToArrays(List<ClusterAppRow> clusters, String[] columnNames) {
 		Object[][] result = new Object[clusters.size()][columnNames.length];
 		for (int i = 0; i < clusters.size(); i++) {
@@ -108,16 +94,15 @@ public class StringFormattingService {
 			result[i][1] = nullable(app.image());
 			result[i][2] = nullable(app.name());
 			result[i][3] = app.kind();
-			result[i][4] = nullable(app.schedule());
-			result[i][5] = nullable(app.strategy());
+			result[i][4] = nullable(app.ports());
+			result[i][5] = nullable(app.schedule());
+			result[i][6] = nullable(app.strategy());
 		}
 
 		appendSpaceToRight(result);
 
 		return result;
 	}
-
-	record ClusterAppRow(String cluster, String image, String name, String kind, String schedule, String strategy) {}
 
 	/*
 	 * ======================================================
