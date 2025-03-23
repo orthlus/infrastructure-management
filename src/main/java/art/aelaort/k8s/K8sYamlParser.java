@@ -1,9 +1,9 @@
 package art.aelaort.k8s;
 
 import art.aelaort.models.servers.K8sApp;
+import art.aelaort.models.servers.K8sService;
 import art.aelaort.utils.Utils;
-import io.fabric8.kubernetes.api.model.HasMetadata;
-import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentStrategy;
 import io.fabric8.kubernetes.api.model.batch.v1.CronJob;
@@ -18,12 +18,74 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import static art.aelaort.utils.ColoredConsoleTextUtils.wrapRed;
+import static art.aelaort.utils.Utils.log;
+
 @Component
 @RequiredArgsConstructor
 public class K8sYamlParser {
 	private final Utils utils;
 
-	public List<K8sApp> parseK8sYmlFile(Path ymlFile) {
+	public List<K8sService> parseK8sYmlFileForServices(Path ymlFile) {
+		List<HasMetadata> k8sObjects = parse(ymlFile);
+		List<K8sService> result = new ArrayList<>(k8sObjects.size());
+
+		for (HasMetadata k8sObject : k8sObjects) {
+			K8sService obj;
+			if (k8sObject instanceof Service o) {
+				obj = convert(o);
+			} else {
+				continue;
+			}
+			result.add(obj);
+		}
+
+		return result;
+	}
+
+	private K8sService convert(Service service) {
+		K8sService.K8sServiceBuilder builder = K8sService.builder()
+				.name(service.getMetadata().getName())
+				.kind(service.getKind())
+				.type(service.getSpec().getType())
+				.appSelector(service.getSpec().getSelector().get("app"));
+		enrichWithPorts(builder, service);
+		return builder
+				.build();
+	}
+
+	private void enrichWithPorts(K8sService.K8sServiceBuilder builder, Service service) {
+		List<ServicePort> ports = service.getSpec().getPorts();
+		if (ports == null || ports.isEmpty()) {
+			return;
+		}
+
+		if (ports.size() > 1) {
+			log(wrapRed("several ports find in service %s, not supported".formatted(service.getMetadata().getName())));
+		}
+
+		ServicePort port = ports.get(0);
+
+		if (port.getNodePort() != null) {
+			builder.nodePort(port.getNodePort());
+		}
+
+		if (port.getTargetPort().getValue() == null) {
+			builder.portString(String.valueOf(port.getPort()));
+		} else {
+			builder.portString("%s:%d".formatted(unwrap(port.getTargetPort()), port.getPort()));
+		}
+	}
+
+	private String unwrap(IntOrString intOrString) {
+		if (intOrString.getStrVal() != null) {
+			return intOrString.getStrVal();
+		} else {
+			return String.valueOf(intOrString.getIntVal());
+		}
+	}
+
+	public List<K8sApp> parseK8sYmlFileForApps(Path ymlFile) {
 		List<HasMetadata> k8sObjects = parse(ymlFile);
 		List<K8sApp> result = new ArrayList<>(k8sObjects.size());
 
@@ -72,6 +134,9 @@ public class K8sYamlParser {
 	}
 
 	private K8sApp clean(K8sApp k8sApp) {
+		if (k8sApp.getImage() == null) {
+			return k8sApp;
+		}
 		return k8sApp.withImage(utils.dockerImageClean(k8sApp.getImage()));
 	}
 
