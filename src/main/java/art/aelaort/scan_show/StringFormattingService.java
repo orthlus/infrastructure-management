@@ -76,6 +76,7 @@ public class StringFormattingService {
 				"name",
 				"kind",
 				"ports",
+				"service",
 				"schedule",
 				"strategy",
 		};
@@ -95,8 +96,9 @@ public class StringFormattingService {
 			result[i][2] = nullable(app.name());
 			result[i][3] = app.kind();
 			result[i][4] = nullable(app.ports());
-			result[i][5] = nullable(app.schedule());
-			result[i][6] = nullable(app.strategy());
+			result[i][5] = nullable(app.service());
+			result[i][6] = nullable(app.schedule());
+			result[i][7] = nullable(app.strategy());
 		}
 
 		appendSpaceToRight(result);

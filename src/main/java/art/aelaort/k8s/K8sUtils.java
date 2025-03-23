@@ -36,6 +36,7 @@ public class K8sUtils {
 						app.getName(),
 						app.getKind(),
 						servicePortsString(serviceByPodNameMap.get(app.getPodName())),
+						serviceType(serviceByPodNameMap.get(app.getPodName())),
 						app.getSchedule(),
 						app.getStrategyType());
 				res.add(clusterAppRow);
@@ -56,6 +57,13 @@ public class K8sUtils {
 			}
 		}
 		return res;
+	}
+
+	private static String serviceType(K8sService service) {
+		if (service == null) {
+			return null;
+		}
+		return service.getType();
 	}
 
 	private static String servicePortsString(K8sService service) {
