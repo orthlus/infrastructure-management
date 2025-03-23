@@ -67,13 +67,13 @@ public class K8sUtils {
 			if (hasText(service.getTargetPort())) {
 				return "%s:%s".formatted(service.getTargetPort(), service.getPort());
 			} else {
-				return String.valueOf(service.getPort());
+				return "%s:%s".formatted(service.getPort(), service.getPort());
 			}
 		} else {
 			if (hasText(service.getTargetPort())) {
 				return "%s:%s:%s".formatted(service.getNodePort(), service.getTargetPort(), service.getPort());
 			} else {
-				return "%s::%s".formatted(service.getNodePort(), service.getPort());
+				return "%s:%s:%s".formatted(service.getNodePort(), service.getPort(), service.getPort());
 			}
 		}
 	}
