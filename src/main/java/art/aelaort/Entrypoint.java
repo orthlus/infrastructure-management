@@ -7,7 +7,7 @@ import art.aelaort.db.RemoteDb;
 import art.aelaort.docker.DockerService;
 import art.aelaort.docker.HostStatsService;
 import art.aelaort.exceptions.*;
-import art.aelaort.k8s.K8sService;
+import art.aelaort.k8s.K8sApplyService;
 import art.aelaort.make.ProjectsMakerService;
 import art.aelaort.models.build.Job;
 import art.aelaort.models.ssh.SshServer;
@@ -47,7 +47,7 @@ public class Entrypoint implements CommandLineRunner {
 	private final SshKeysCleanupService sshKeysCleanupService;
 	private final SshKeyGenerator sshKeyGenerator;
 	private final SshKeyCloudUploader sshKeyCloudUploader;
-	private final K8sService k8sService;
+	private final K8sApplyService k8SApplyService;
 	@Value("${docker.compose.remote.dir.default}")
 	private String dockerDefaultRemoteDir;
 
@@ -70,8 +70,8 @@ public class Entrypoint implements CommandLineRunner {
 				case "dbp-status", "dbps" -> remoteDb.remoteStatus(args);
 				case "dbp-run", "dbpr" -> 	 remoteDb.remoteRun(args);
 				case "dps" -> 				 externalUtilities.dockerPs();
-				case "kub", "k" -> 			 k8sService.apply(slice(args, 1));
-				case "k8s-docker-login" ->   k8sService.printDockerConfigJson(slice(args, 1));
+				case "kub", "k" -> 			 k8SApplyService.apply(slice(args, 1));
+				case "k8s-docker-login" ->   k8SApplyService.printDockerConfigJson(slice(args, 1));
 				case "git-stat" -> 			 gitStat(args);
 				case "host-stat", "hs" ->	 hostStats(args);
 				case "make" -> 				 makeProject(args);

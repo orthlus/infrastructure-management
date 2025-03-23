@@ -9,7 +9,7 @@ import static art.aelaort.utils.Utils.log;
 
 @Component
 @RequiredArgsConstructor
-public class K8sService {
+public class K8sApplyService {
 	private final K8sProps k8sProps;
 
 	public void apply(String[] args) {
