@@ -59,14 +59,22 @@ public class K8sUtils {
 	}
 
 	private static String servicePortsString(K8sService service) {
-		if (service == null || !hasText(service.getPortString())) {
+		if (service == null || service.getPort() == null) {
 			return null;
 		}
 
 		if (service.getNodePort() == null) {
-			return service.getPortString();
+			if (hasText(service.getTargetPort())) {
+				return "%s:%s".formatted(service.getTargetPort(), service.getPort());
+			} else {
+				return String.valueOf(service.getPort());
+			}
 		} else {
-			return "%s:%s".formatted(service.getNodePort(), service.getPortString());
+			if (hasText(service.getTargetPort())) {
+				return "%s:%s:%s".formatted(service.getNodePort(), service.getTargetPort(), service.getPort());
+			} else {
+				return "%s::%s".formatted(service.getNodePort(), service.getPort());
+			}
 		}
 	}
 }

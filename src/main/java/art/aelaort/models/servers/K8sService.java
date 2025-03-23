@@ -18,7 +18,9 @@ public class K8sService {
 	@JsonProperty
 	private String appSelector;
 	@JsonProperty
-	private String portString;
+	private Integer port;
+	@JsonProperty
+	private String targetPort;
 	@JsonProperty
 	private Integer nodePort;
 }

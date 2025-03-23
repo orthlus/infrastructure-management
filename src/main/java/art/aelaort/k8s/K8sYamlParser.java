@@ -67,14 +67,14 @@ public class K8sYamlParser {
 
 		ServicePort port = ports.get(0);
 
-		if (port.getNodePort() != null) {
-			builder.nodePort(port.getNodePort());
+		builder.port(port.getPort());
+
+		if (port.getTargetPort() != null && port.getTargetPort().getValue() != null) {
+			builder.targetPort(unwrap(port.getTargetPort()));
 		}
 
-		if (port.getTargetPort() == null || port.getTargetPort().getValue() == null) {
-			builder.portString(String.valueOf(port.getPort()));
-		} else {
-			builder.portString("%s:%d".formatted(unwrap(port.getTargetPort()), port.getPort()));
+		if (port.getNodePort() != null) {
+			builder.nodePort(port.getNodePort());
 		}
 	}
 
