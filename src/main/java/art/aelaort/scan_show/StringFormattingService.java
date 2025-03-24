@@ -9,6 +9,7 @@ import dnl.utils.text.table.TextTable;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -81,7 +82,9 @@ public class StringFormattingService {
 				"strategy",
 		};
 
-		Object[][] data = convertClustersToArrays(mapToClusterAppRows(clusters), columnNames);
+		List<ClusterAppRow> clusterAppRows = mapToClusterAppRows(clusters);
+		Collections.sort(clusterAppRows);
+		Object[][] data = convertClustersToArrays(clusterAppRows, columnNames);
 		TextTable tt = new TextTable(columnNames, data);
 		tt.setAddRowNumbering(true);
 		return "k8s clusters and apps:\n" + getTableString(tt);
