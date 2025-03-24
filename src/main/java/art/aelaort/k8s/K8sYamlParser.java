@@ -138,16 +138,17 @@ public class K8sYamlParser {
 
 	private List<HasMetadata> parse(Path ymlFile) {
 		try {
-			return parse(Files.readString(ymlFile));
+			return parse(Files.readString(ymlFile), ymlFile.toString());
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private List<HasMetadata> parse(String ymlFileContent) {
+	private List<HasMetadata> parse(String ymlFileContent, String filename) {
 		try (KubernetesClient client = new KubernetesClientBuilder().build()) {
 			return client.load(new ByteArrayInputStream(ymlFileContent.getBytes())).items();
-		} catch (Exception ignored) {
+		} catch (Exception e) {
+			log(wrapRed("k8s file '%s' parse error: %s".formatted(filename, e.getMessage())));
 			return List.of();
 		}
 	}
