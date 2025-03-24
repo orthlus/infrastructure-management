@@ -42,8 +42,8 @@ public class Server {
 		List<String> list = services.stream()
 				.map(s -> s.getDockerName() != null ? s.getDockerName() : s.getService())
 				.toList();
-		if (list.size() > 10) {
-			list = new ArrayList<>(list.subList(0, 10));
+		if (list.size() > 6) {
+			list = new ArrayList<>(list.subList(0, 6));
 			list.add("etc...");
 		}
 		return join(", ", list);
