@@ -3,7 +3,10 @@ package art.aelaort.k8s;
 import art.aelaort.models.servers.K8sApp;
 import art.aelaort.models.servers.K8sService;
 import art.aelaort.utils.Utils;
-import io.fabric8.kubernetes.api.model.*;
+import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.Service;
+import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentStrategy;
 import io.fabric8.kubernetes.api.model.batch.v1.CronJob;
@@ -12,7 +15,6 @@ import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -137,19 +139,10 @@ public class K8sYamlParser {
 	}
 
 	private List<HasMetadata> parse(Path ymlFile) {
-		try {
-			return parse(Files.readString(ymlFile), ymlFile.toString());
+		try (KubernetesClient client = new KubernetesClientBuilder().build()) {
+			return client.load(Files.newInputStream(ymlFile)).items();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
-		}
-	}
-
-	private List<HasMetadata> parse(String ymlFileContent, String filename) {
-		try (KubernetesClient client = new KubernetesClientBuilder().build()) {
-			return client.load(new ByteArrayInputStream(ymlFileContent.getBytes())).items();
-		} catch (Exception e) {
-			log(wrapRed("k8s file '%s' parse error: %s".formatted(filename, e.getMessage())));
-			return List.of();
 		}
 	}
 }
