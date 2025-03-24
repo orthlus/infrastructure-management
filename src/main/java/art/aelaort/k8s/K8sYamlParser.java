@@ -12,6 +12,7 @@ import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -136,10 +137,18 @@ public class K8sYamlParser {
 	}
 
 	private List<HasMetadata> parse(Path ymlFile) {
-		try (KubernetesClient client = new KubernetesClientBuilder().build()) {
-			return client.load(Files.newInputStream(ymlFile)).items();
+		try {
+			return parse(Files.readString(ymlFile));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	private List<HasMetadata> parse(String ymlFileContent) {
+		try (KubernetesClient client = new KubernetesClientBuilder().build()) {
+			return client.load(new ByteArrayInputStream(ymlFileContent.getBytes())).items();
+		} catch (Exception ignored) {
+			return List.of();
 		}
 	}
 }
