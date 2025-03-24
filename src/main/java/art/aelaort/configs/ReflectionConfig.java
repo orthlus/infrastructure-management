@@ -116,6 +116,7 @@ import org.springframework.context.annotation.Configuration;
 		liquibase.report.ShowSummaryGeneratorFactory.class,
 		liquibase.resource.PathHandlerFactory.class,
 		liquibase.ui.ConsoleUIService.class,
+		io.fabric8.kubernetes.api.model.GenericKubernetesResource.class,
 })
 public class ReflectionConfig {
 }
