@@ -75,18 +75,13 @@ public class K8sClusterProvider {
 	}
 
 	private void validateAndLog(List<K8sCluster> clusters) {
-		List<String> duplicates = new ArrayList<>();
-		Set<String> set = new HashSet<>();
-		for (K8sCluster cluster : clusters) {
-			for (K8sApp app : cluster.apps()) {
-				String s = app.getContainerName();
-				if (set.contains(s)) {
-					duplicates.add(s);
-				} else {
-					set.add(s);
-				}
-			}
-		}
+		Set<String> elements = new HashSet<>();
+		List<String> duplicates = clusters
+				.stream()
+				.flatMap(cluster -> cluster.apps().stream())
+				.map(K8sApp::getContainerName)
+				.filter(n -> !elements.add(n))
+				.toList();
 
 		if (!duplicates.isEmpty()) {
 			log(wrapRed("containers names is duplicated:"));
