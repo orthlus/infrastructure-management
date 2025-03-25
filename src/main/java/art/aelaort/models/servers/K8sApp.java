@@ -23,4 +23,5 @@ public class K8sApp {
 	private String schedule;
 	@JsonProperty
 	private String strategyType;
+	private String containerName;
 }

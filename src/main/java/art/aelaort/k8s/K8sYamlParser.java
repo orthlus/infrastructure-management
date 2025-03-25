@@ -105,6 +105,7 @@ public class K8sYamlParser {
 	private K8sApp convert(CronJob cronJob) {
 		return K8sApp.builder()
 				.image(cronJob.getSpec().getJobTemplate().getSpec().getTemplate().getSpec().getContainers().get(0).getImage())
+				.containerName(cronJob.getSpec().getJobTemplate().getSpec().getTemplate().getSpec().getContainers().get(0).getName())
 				.name(cronJob.getMetadata().getName())
 				.kind(cronJob.getKind())
 				.schedule(cronJob.getSpec().getSchedule())
@@ -115,6 +116,7 @@ public class K8sYamlParser {
 		DeploymentStrategy strategy = deployment.getSpec().getStrategy();
 		return K8sApp.builder()
 				.image(deployment.getSpec().getTemplate().getSpec().getContainers().get(0).getImage())
+				.containerName(deployment.getSpec().getTemplate().getSpec().getContainers().get(0).getName())
 				.podName(deployment.getSpec().getTemplate().getMetadata().getLabels().get("app"))
 				.name(deployment.getMetadata().getName())
 				.kind(deployment.getKind())
@@ -125,6 +127,7 @@ public class K8sYamlParser {
 	private K8sApp convert(Pod pod) {
 		return K8sApp.builder()
 				.image(pod.getSpec().getContainers().get(0).getImage())
+				.containerName(pod.getSpec().getContainers().get(0).getName())
 				.name(pod.getMetadata().getName())
 				.podName(pod.getMetadata().getName())
 				.kind(pod.getKind())

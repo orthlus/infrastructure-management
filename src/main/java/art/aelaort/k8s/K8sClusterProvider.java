@@ -1,5 +1,6 @@
 package art.aelaort.k8s;
 
+import art.aelaort.models.servers.K8sApp;
 import art.aelaort.models.servers.K8sCluster;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Stream;
+
+import static art.aelaort.utils.ColoredConsoleTextUtils.wrapRed;
+import static art.aelaort.utils.Utils.log;
 
 @Component
 @RequiredArgsConstructor
@@ -64,7 +68,30 @@ public class K8sClusterProvider {
 
 			result.add(k8sCluster);
 		}
+
+		validateAndLog(result);
+
 		return result;
+	}
+
+	private void validateAndLog(List<K8sCluster> clusters) {
+		List<String> duplicates = new ArrayList<>();
+		Set<String> set = new HashSet<>();
+		for (K8sCluster cluster : clusters) {
+			for (K8sApp app : cluster.apps()) {
+				String s = app.getContainerName();
+				if (set.contains(s)) {
+					duplicates.add(s);
+				} else {
+					set.add(s);
+				}
+			}
+		}
+
+		if (!duplicates.isEmpty()) {
+			log(wrapRed("containers names is duplicated:"));
+			duplicates.forEach(s -> log(wrapRed(s)));
+		}
 	}
 
 	private List<String> readNodes(Path cluster) {
