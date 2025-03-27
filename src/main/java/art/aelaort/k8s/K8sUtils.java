@@ -73,13 +73,13 @@ public class K8sUtils {
 
 		if (service.getNodePort() == null) {
 			if (hasText(service.getTargetPort())) {
-				return "%s:%s".formatted(service.getTargetPort(), service.getPort());
+				return "%s:%s".formatted(service.getPort(), service.getTargetPort());
 			} else {
 				return "%s:%s".formatted(service.getPort(), service.getPort());
 			}
 		} else {
 			if (hasText(service.getTargetPort())) {
-				return "%s:%s:%s".formatted(service.getNodePort(), service.getTargetPort(), service.getPort());
+				return "%s:%s:%s".formatted(service.getNodePort(), service.getPort(), service.getTargetPort());
 			} else {
 				return "%s:%s:%s".formatted(service.getNodePort(), service.getPort(), service.getPort());
 			}
