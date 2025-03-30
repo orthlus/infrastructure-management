@@ -27,4 +27,6 @@ public class K8sApp {
 	private String strategyType;
 	@JsonProperty
 	private String containerName;
+	@JsonProperty
+	private String imagePullPolicy;
 }

@@ -8,6 +8,7 @@ public record ClusterAppRow(
 		String image,
 		String name,
 		String kind,
+		String imagePullPolicy,
 		String ports,
 		String service,
 		String schedule,

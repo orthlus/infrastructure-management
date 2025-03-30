@@ -36,6 +36,7 @@ public class K8sUtils {
 						app.getImage(),
 						app.getName(),
 						app.getKind(),
+						app.getImagePullPolicy(),
 						servicePortsString(serviceByPodNameMap.get(app.getPodName())),
 						serviceType(serviceByPodNameMap.get(app.getPodName())),
 						app.getSchedule(),

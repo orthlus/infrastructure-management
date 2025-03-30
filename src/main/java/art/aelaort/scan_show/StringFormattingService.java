@@ -93,6 +93,7 @@ public class StringFormattingService {
 				"image",
 				"name",
 				"kind",
+				"pull",
 				"ports",
 				"service",
 				"strategy",
@@ -112,6 +113,7 @@ public class StringFormattingService {
 				"image",
 				"name",
 				"kind",
+				"pull",
 				"schedule"
 		};
 
@@ -130,10 +132,11 @@ public class StringFormattingService {
 			result[i][2] = nullable(app.image());
 			result[i][3] = nullable(app.name());
 			result[i][4] = app.kind();
-			result[i][5] = nullable(app.ports());
-			result[i][6] = nullable(app.service());
-			result[i][7] = nullable(app.strategy());
-			result[i][8] = nullable(app.anotherPorts());
+			result[i][5] = nullable(app.imagePullPolicy());
+			result[i][6] = nullable(app.ports());
+			result[i][7] = nullable(app.service());
+			result[i][8] = nullable(app.strategy());
+			result[i][9] = nullable(app.anotherPorts());
 		}
 
 		appendSpaceToRight(result);
@@ -150,7 +153,8 @@ public class StringFormattingService {
 			result[i][2] = nullable(app.image());
 			result[i][3] = nullable(app.name());
 			result[i][4] = app.kind();
-			result[i][5] = nullable(app.schedule());
+			result[i][5] = nullable(app.imagePullPolicy());
+			result[i][6] = nullable(app.schedule());
 		}
 
 		appendSpaceToRight(result);
