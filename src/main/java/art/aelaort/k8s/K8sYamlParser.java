@@ -4,6 +4,7 @@ import art.aelaort.models.servers.K8sApp;
 import art.aelaort.models.servers.K8sService;
 import art.aelaort.utils.Utils;
 import io.fabric8.kubernetes.api.model.*;
+import io.fabric8.kubernetes.api.model.apps.DaemonSet;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentStrategy;
 import io.fabric8.kubernetes.api.model.batch.v1.CronJob;
@@ -87,6 +88,8 @@ public class K8sYamlParser {
 				obj = convert(o);
 			} else if (k8sObject instanceof Deployment o) {
 				obj = convert(o);
+			} else if (k8sObject instanceof DaemonSet o) {
+				obj = convert(o);
 			} else if (k8sObject instanceof CronJob o) {
 				obj = convert(o);
 			} else {
@@ -119,6 +122,17 @@ public class K8sYamlParser {
 				.namespace(namespace(deployment.getMetadata()))
 				.kind(deployment.getKind())
 				.strategyType(strategy == null ? null : strategy.getType())
+				.build();
+	}
+
+	private K8sApp convert(DaemonSet daemonSet) {
+		return K8sApp.builder()
+				.image(daemonSet.getSpec().getTemplate().getSpec().getContainers().get(0).getImage())
+				.containerName(daemonSet.getSpec().getTemplate().getSpec().getContainers().get(0).getName())
+				.podName(daemonSet.getSpec().getTemplate().getMetadata().getLabels().get("app"))
+				.name(daemonSet.getMetadata().getName())
+				.namespace(namespace(daemonSet.getMetadata()))
+				.kind(daemonSet.getKind())
 				.build();
 	}
 
