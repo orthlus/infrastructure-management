@@ -63,7 +63,8 @@ public class StringFormattingService {
 				service.getDockerName() + " - " + service.getService();
 	}
 
-	record AppRow(String server, String image, String type, String app, String file) {}
+	record AppRow(String server, String image, String type, String app, String file) {
+	}
 
 	/*
 	 * ======================================================
@@ -71,6 +72,21 @@ public class StringFormattingService {
 	 */
 
 	public String getK8sTableString(List<K8sCluster> clusters) {
+		List<ClusterAppRow> clusterAppRows = mapToClusterAppRows(clusters);
+		Collections.sort(clusterAppRows);
+		return """
+				k8s clusters and apps:
+				apps (no schedule):
+				%s
+				with schedule:
+				%s"""
+				.formatted(
+						getK8sTableStringNoSchedule(clusterAppRows),
+						getK8sTableStringWithSchedule(clusterAppRows)
+				);
+	}
+
+	private String getK8sTableStringNoSchedule(List<ClusterAppRow> clusterAppRows) {
 		String[] columnNames = {
 				"cluster",
 				"namespace",
@@ -79,20 +95,33 @@ public class StringFormattingService {
 				"kind",
 				"ports",
 				"service",
-				"schedule",
 				"strategy",
 				"another-ports",
 		};
 
-		List<ClusterAppRow> clusterAppRows = mapToClusterAppRows(clusters);
-		Collections.sort(clusterAppRows);
-		Object[][] data = convertClustersToArrays(clusterAppRows, columnNames);
+		Object[][] data = convertClustersToArraysDeployments(filterK8sApps(clusterAppRows, false), columnNames);
 		TextTable tt = new TextTable(columnNames, data);
 		tt.setAddRowNumbering(true);
-		return "k8s clusters and apps:\n" + getTableString(tt);
+		return getTableString(tt);
 	}
 
-	private Object[][] convertClustersToArrays(List<ClusterAppRow> clusters, String[] columnNames) {
+	private String getK8sTableStringWithSchedule(List<ClusterAppRow> clusterAppRows) {
+		String[] columnNames = {
+				"cluster",
+				"namespace",
+				"image",
+				"name",
+				"kind",
+				"schedule"
+		};
+
+		Object[][] data = convertClustersToArraysJobs(filterK8sApps(clusterAppRows, true), columnNames);
+		TextTable tt = new TextTable(columnNames, data);
+		tt.setAddRowNumbering(true);
+		return getTableString(tt);
+	}
+
+	private Object[][] convertClustersToArraysDeployments(List<ClusterAppRow> clusters, String[] columnNames) {
 		Object[][] result = new Object[clusters.size()][columnNames.length];
 		for (int i = 0; i < clusters.size(); i++) {
 			ClusterAppRow app = clusters.get(i);
@@ -103,14 +132,42 @@ public class StringFormattingService {
 			result[i][4] = app.kind();
 			result[i][5] = nullable(app.ports());
 			result[i][6] = nullable(app.service());
-			result[i][7] = nullable(app.schedule());
-			result[i][8] = nullable(app.strategy());
-			result[i][9] = nullable(app.anotherPorts());
+			result[i][7] = nullable(app.strategy());
+			result[i][8] = nullable(app.anotherPorts());
 		}
 
 		appendSpaceToRight(result);
 
 		return result;
+	}
+
+	private Object[][] convertClustersToArraysJobs(List<ClusterAppRow> clusters, String[] columnNames) {
+		Object[][] result = new Object[clusters.size()][columnNames.length];
+		for (int i = 0; i < clusters.size(); i++) {
+			ClusterAppRow app = clusters.get(i);
+			result[i][0] = app.cluster();
+			result[i][1] = app.namespace();
+			result[i][2] = nullable(app.image());
+			result[i][3] = nullable(app.name());
+			result[i][4] = app.kind();
+			result[i][5] = nullable(app.schedule());
+		}
+
+		appendSpaceToRight(result);
+
+		return result;
+	}
+
+	private List<ClusterAppRow> filterK8sApps(List<ClusterAppRow> clusterAppRows, boolean withSchedule) {
+		return clusterAppRows.stream()
+				.filter(app -> {
+					if (withSchedule) {
+						return app.schedule() != null;
+					} else {
+						return app.schedule() == null;
+					}
+				})
+				.toList();
 	}
 
 	/*
