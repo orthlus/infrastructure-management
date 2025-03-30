@@ -29,6 +29,8 @@ public class ServersManagementService {
 	public void saveIps(List<Server> servers) {
 		String text = servers.stream()
 							  .filter(Server::isMonitoring)
+							  .filter(server -> server.getIp() != null)
+							  .filter(server -> server.getPort() != null)
 							  .map(server -> server.getName() + ":" + server.getIp() + ":" + server.getPort())
 							  .collect(Collectors.joining("\n"))
 					  + "\n";
