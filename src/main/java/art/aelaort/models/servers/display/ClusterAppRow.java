@@ -4,6 +4,7 @@ import java.util.Comparator;
 
 public record ClusterAppRow(
 		String cluster,
+		String namespace,
 		String image,
 		String name,
 		String kind,

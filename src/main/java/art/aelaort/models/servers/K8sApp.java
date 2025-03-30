@@ -13,6 +13,8 @@ public class K8sApp {
 	@JsonProperty
 	private String name;
 	@JsonProperty
+	private String namespace;
+	@JsonProperty
 	private String podName;
 	@JsonProperty
 	@With

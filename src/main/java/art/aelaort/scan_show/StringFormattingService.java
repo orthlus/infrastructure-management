@@ -73,6 +73,7 @@ public class StringFormattingService {
 	public String getK8sTableString(List<K8sCluster> clusters) {
 		String[] columnNames = {
 				"cluster",
+				"namespace",
 				"image",
 				"name",
 				"kind",
@@ -96,14 +97,15 @@ public class StringFormattingService {
 		for (int i = 0; i < clusters.size(); i++) {
 			ClusterAppRow app = clusters.get(i);
 			result[i][0] = app.cluster();
-			result[i][1] = nullable(app.image());
-			result[i][2] = nullable(app.name());
-			result[i][3] = app.kind();
-			result[i][4] = nullable(app.ports());
-			result[i][5] = nullable(app.service());
-			result[i][6] = nullable(app.schedule());
-			result[i][7] = nullable(app.strategy());
-			result[i][8] = nullable(app.anotherPorts());
+			result[i][1] = app.namespace();
+			result[i][2] = nullable(app.image());
+			result[i][3] = nullable(app.name());
+			result[i][4] = app.kind();
+			result[i][5] = nullable(app.ports());
+			result[i][6] = nullable(app.service());
+			result[i][7] = nullable(app.schedule());
+			result[i][8] = nullable(app.strategy());
+			result[i][9] = nullable(app.anotherPorts());
 		}
 
 		appendSpaceToRight(result);

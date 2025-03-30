@@ -32,6 +32,7 @@ public class K8sUtils {
 			Map<String, K8sService> serviceByPodNameMap = makeServiceByPodNameMap(cluster);
 			for (K8sApp app : cluster.apps()) {
 				ClusterAppRow clusterAppRow = new ClusterAppRow(cluster.name(),
+						app.getNamespace(),
 						app.getImage(),
 						app.getName(),
 						app.getKind(),
@@ -51,7 +52,7 @@ public class K8sUtils {
 		for (K8sApp app : cluster.apps()) {
 			if (hasText(app.getPodName())) {
 				for (K8sService service : cluster.services()) {
-					if (service.getAppSelector().equals(app.getPodName())) {
+					if (service.getAppSelector().equals(app.getPodName()) && service.getNamespace().equals(app.getNamespace())) {
 						res.put(app.getPodName(), service);
 					}
 				}

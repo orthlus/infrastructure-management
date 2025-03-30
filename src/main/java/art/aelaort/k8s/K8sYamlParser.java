@@ -3,10 +3,7 @@ package art.aelaort.k8s;
 import art.aelaort.models.servers.K8sApp;
 import art.aelaort.models.servers.K8sService;
 import art.aelaort.utils.Utils;
-import io.fabric8.kubernetes.api.model.HasMetadata;
-import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.Service;
-import io.fabric8.kubernetes.api.model.ServicePort;
+import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentStrategy;
 import io.fabric8.kubernetes.api.model.batch.v1.CronJob;
@@ -48,6 +45,7 @@ public class K8sYamlParser {
 	private K8sService convert(Service service) {
 		K8sService.K8sServiceBuilder builder = K8sService.builder()
 				.name(service.getMetadata().getName())
+				.namespace(namespace(service.getMetadata()))
 				.kind(service.getKind())
 				.type(service.getSpec().getType())
 				.appSelector(service.getSpec().getSelector().get("app"));
@@ -105,6 +103,7 @@ public class K8sYamlParser {
 				.image(cronJob.getSpec().getJobTemplate().getSpec().getTemplate().getSpec().getContainers().get(0).getImage())
 				.containerName(cronJob.getSpec().getJobTemplate().getSpec().getTemplate().getSpec().getContainers().get(0).getName())
 				.name(cronJob.getMetadata().getName())
+				.namespace(namespace(cronJob.getMetadata()))
 				.kind(cronJob.getKind())
 				.schedule(cronJob.getSpec().getSchedule())
 				.build();
@@ -117,6 +116,7 @@ public class K8sYamlParser {
 				.containerName(deployment.getSpec().getTemplate().getSpec().getContainers().get(0).getName())
 				.podName(deployment.getSpec().getTemplate().getMetadata().getLabels().get("app"))
 				.name(deployment.getMetadata().getName())
+				.namespace(namespace(deployment.getMetadata()))
 				.kind(deployment.getKind())
 				.strategyType(strategy == null ? null : strategy.getType())
 				.build();
@@ -127,9 +127,14 @@ public class K8sYamlParser {
 				.image(pod.getSpec().getContainers().get(0).getImage())
 				.containerName(pod.getSpec().getContainers().get(0).getName())
 				.name(pod.getMetadata().getName())
+				.namespace(namespace(pod.getMetadata()))
 				.podName(pod.getMetadata().getName())
 				.kind(pod.getKind())
 				.build();
+	}
+
+	private String namespace(ObjectMeta objectMeta) {
+		return objectMeta.getNamespace() == null ? "-" : objectMeta.getNamespace();
 	}
 
 	private K8sApp clean(K8sApp k8sApp) {

@@ -12,6 +12,8 @@ public class K8sService {
 	@JsonProperty
 	private String name;
 	@JsonProperty
+	private String namespace;
+	@JsonProperty
 	private String kind;
 	@JsonProperty
 	private String type;
