@@ -60,11 +60,11 @@ public class K8sUtils {
 		return res;
 	}
 
-	private static String serviceAnotherPorts(K8sService service) {
+	private static Boolean serviceAnotherPorts(K8sService service) {
 		if (service == null) {
 			return null;
 		}
-		return String.valueOf(service.getHasAnotherPorts());
+		return service.getHasAnotherPorts();
 	}
 
 	private static String serviceType(K8sService service) {
