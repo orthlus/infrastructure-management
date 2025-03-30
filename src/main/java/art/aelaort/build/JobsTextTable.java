@@ -35,7 +35,7 @@ public class JobsTextTable {
 			Job job = sorted.get(i);
 			result[i][0] = job.getId();
 			result[i][1] = job.getName();
-			result[i][2] = job.getBuildType().toString();
+			result[i][2] = job.getBuildType();
 			result[i][3] = job.getSubDirectory();
 			result[i][4] = nullable(job.getProjectDir());
 			result[i][5] = nullable(job.getSecretsDirectory());

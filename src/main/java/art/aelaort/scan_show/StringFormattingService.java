@@ -32,7 +32,7 @@ public class StringFormattingService {
 			for (ServiceDto service : server.getServices()) {
 				String image = service.getDockerImageName();
 				Job job = image != null ? jobs.get(image.split(":")[0]) : null;
-				String type = job != null ? job.getBuildType().toString() : null;
+				String type = job != null ? job.getBuildType() : null;
 				String appName = getAppName(service);
 				AppRow appRow = new AppRow(server.getName(), image, type, appName, service.getYmlName());
 				res.add(appRow);

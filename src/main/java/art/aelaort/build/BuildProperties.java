@@ -13,6 +13,10 @@ import java.nio.file.Path;
 public class BuildProperties {
 	@Value("${build.data.config.path}")
 	private Path buildConfigPath;
+	@Value("${build.data.config.build-commands}")
+	private Path buildCommandsFile;
+	@Value("${build.data.config.build-commands.docker-value}")
+	private String buildCommandsFileDockerValue;
 	@Value("${build.main.dir.secrets_dir}")
 	private Path secretsRootDir;
 	@Value("${build.main.src.dir}")

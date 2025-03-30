@@ -4,7 +4,6 @@ import art.aelaort.build.JobsProvider;
 import art.aelaort.exceptions.AppNotFoundException;
 import art.aelaort.exceptions.InvalidAppParamsException;
 import art.aelaort.exceptions.ProjectAlreadyExistsException;
-import art.aelaort.models.build.BuildType;
 import art.aelaort.models.build.Job;
 import art.aelaort.models.make.Project;
 import art.aelaort.properties.FillerMakeJavaProperties;
@@ -78,7 +77,7 @@ public class ProjectsMakerService {
 			throw new AppNotFoundException(project);
 		}
 
-		Set<BuildType> javaTypes = Set.of(BuildType.java_local, BuildType.java_docker);
+		Set<String> javaTypes = Set.of("java_local", "java_docker");
 		if (job.getSubDirectory().startsWith("java") && javaTypes.contains(job.getBuildType())) {
 			Project.ProjectBuilder newProjectBuilder = Project.builder()
 					.name(job.getName())
@@ -86,7 +85,7 @@ public class ProjectsMakerService {
 					.hasGit(project.isHasGit())
 					.dir(job.getSubDirectory());
 
-			if (job.getBuildType() == BuildType.java_local) {
+			if (job.getBuildType().equals("java_local")) {
 				newProjectBuilder.isMavenBuildForLocal(true);
 			}
 

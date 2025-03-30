@@ -25,7 +25,7 @@ public class Job {
 	@JsonProperty
 	private String name;
 	@JsonProperty("build_type")
-	private BuildType buildType;
+	private String buildType;
 	@JsonProperty("sub_directory")
 	private String subDirectory;
 	@Nullable
@@ -68,7 +68,7 @@ public class Job {
 	}
 
 	private static Comparator<Job> getJobComparator() {
-		return Comparator.comparing(job -> job.buildType.ordinal() + "%" + job.name);
+		return Comparator.comparing(job -> job.buildType + "%" + job.name);
 	}
 
 	private static Function<Job, Job> getJobMapFunction(AtomicInteger inc1) {

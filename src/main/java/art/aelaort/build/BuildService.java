@@ -10,7 +10,10 @@ import art.aelaort.properties.S3Properties;
 import art.aelaort.s3.BuildFunctionsS3;
 import art.aelaort.utils.Utils;
 import art.aelaort.utils.system.SystemProcess;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
@@ -28,10 +31,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static art.aelaort.models.build.BuildType.java_docker;
 import static art.aelaort.utils.ColoredConsoleTextUtils.wrapRed;
 import static art.aelaort.utils.Utils.log;
 import static java.util.stream.Collectors.joining;
@@ -52,6 +56,18 @@ public class BuildService {
 	private final IOFileFilter dockerLookupFilter =
 			FileFilterUtils.suffixFileFilter("dockerfile", IOCase.INSENSITIVE);
 	private final LocalDb localDb;
+	private final YAMLMapper yamlMapper;
+	private Map<String, List<String>> buildCommands;
+
+	@PostConstruct
+	private void init() throws IOException {
+		buildCommands = yamlMapper.readValue(buildProperties.buildCommandsFile().toFile(), getType());
+	}
+
+	private TypeReference<Map<String, List<String>>> getType() {
+		return new TypeReference<>() {
+		};
+	}
 
 	public void run(Job job, boolean isBuildDockerNoCache) {
 		try {
@@ -71,10 +87,14 @@ public class BuildService {
 	}
 
 	private void cleanSrcDir(Job job) {
-		switch (job.getBuildType()) {
-			case java_docker,
-				 java_local,
-				 java_graal_local -> run("mvn clean", getSrcDir(job));
+		try {
+			switch (job.getBuildType()) {
+				case "java_docker",
+					 "java_local",
+					 "java_graal_local" -> run("mvn clean", getSrcDir(job));
+			}
+		} catch (Exception e) {
+			log(wrapRed("src dir clean error :("));
 		}
 	}
 
@@ -90,24 +110,31 @@ public class BuildService {
 
 	private void build(Job job, Path tmpDir, boolean isBuildDockerNoCache) {
 		switch (job.getBuildType()) {
-			case docker -> dockerBuildPush(job, tmpDir, isBuildDockerNoCache);
-			case java_docker -> {
-				run("mvn clean package", tmpDir);
-				dockerBuildPush(job, tmpDir, isBuildDockerNoCache);
-			}
-			case java_local -> run("mvn clean source:jar install", tmpDir);
-			case frontend_vue -> {
-				run("yarn install", tmpDir);
-				run("yarn run build", tmpDir);
-				dockerBuildPush(job, tmpDir, isBuildDockerNoCache);
-			}
-			case java_graal_local -> {
+			case "docker" -> dockerBuildPush(job, tmpDir, isBuildDockerNoCache);
+			case "java_graal_local" -> {
 				run("mvn clean test", tmpDir);
 				copyGraalvmConfig(tmpDir);
 				run("mvn native:compile -P native -DskipTests", tmpDir);
 				copyArtifactToBinDirectory(job, tmpDir);
 			}
-			case ya_func -> srcZipToS3(job, tmpDir);
+			case "ya_func" -> srcZipToS3(job, tmpDir);
+			default -> buildByUnknownType(job, tmpDir, isBuildDockerNoCache);
+		}
+	}
+
+	private void buildByUnknownType(Job job, Path tmpDir, boolean isBuildDockerNoCache) {
+		List<String> commands = buildCommands.get(job.getBuildType());
+		if (commands == null || commands.isEmpty()) {
+			log(wrapRed("not found build type %s :(".formatted(job.getBuildType())));
+			throw new RuntimeException();
+		}
+
+		for (String command : commands) {
+			if (command.equals(buildProperties.buildCommandsFileDockerValue())) {
+				dockerBuildPush(job, tmpDir, isBuildDockerNoCache);
+			} else {
+				run(command, tmpDir);
+			}
 		}
 	}
 
@@ -206,7 +233,7 @@ public class BuildService {
 
 	private void copyDefaultDockerfile(Job job, Path tmpDir) {
 		try {
-			if (job.getBuildType() == java_docker) {
+			if (job.getBuildType().equals("java_docker")) {
 				if (notExistsAnyDockerfile(tmpDir)) {
 					Path defaultFile = buildProperties.defaultFilesDir().resolve(getDefaultJavaDockerfilePath(tmpDir));
 					Path dest = tmpDir.resolve(defaultFile.getFileName());
@@ -294,11 +321,21 @@ public class BuildService {
 	public void printConfig(String typeAlias) {
 		List<Job> jobs = jobsProvider.readBuildConfig();
 		jobs = jobs.stream()
-				.filter(job -> job.getBuildType().alias.equals(typeAlias))
+				.filter(job -> buildTypeAlias(job.getBuildType()).equals(typeAlias))
 				.filter(job -> !job.isDeprecated())
 				.toList();
 		log(jobsTextTable.getJobsTableString(jobs));
 	}
+
+	private String buildTypeAlias(String input) {
+        if (input == null || input.isEmpty()) {
+            return "";
+        }
+        return Arrays.stream(input.split("_"))
+                .filter(part -> !part.isEmpty())
+                .map(part -> part.substring(0, 1))
+                .collect(Collectors.joining());
+    }
 
 	public void printConfigWithDeprecated() {
 		log(jobsTextTable.getJobsTableString(jobsProvider.readBuildConfig()));
