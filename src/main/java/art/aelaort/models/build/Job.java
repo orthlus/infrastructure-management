@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
@@ -36,6 +37,16 @@ public class Job {
 	private boolean db;
 	@JsonProperty
 	private boolean deprecated;
+
+	private final static Map<String, Integer> typesIds = Map.of(
+			"java_docker", 1,
+			"docker", 2,
+			"java_local", 3,
+			"java_graal_local", 4,
+			"ya_func", 5,
+			"frontend_vue", 6
+	);
+
 
 	@JsonProperty("project_dir")
 	public void setProjectDir(String projectDir) {
@@ -68,7 +79,7 @@ public class Job {
 	}
 
 	private static Comparator<Job> getJobComparator() {
-		return Comparator.comparing(job -> job.buildType + "%" + job.name);
+		return Comparator.comparing(job -> typesIds.getOrDefault(job.buildType, 100) + "%" + job.name);
 	}
 
 	private static Function<Job, Job> getJobMapFunction(AtomicInteger inc1) {
