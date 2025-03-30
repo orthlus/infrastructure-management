@@ -80,6 +80,7 @@ public class StringFormattingService {
 				"service",
 				"schedule",
 				"strategy",
+				"another-ports",
 		};
 
 		List<ClusterAppRow> clusterAppRows = mapToClusterAppRows(clusters);
@@ -102,6 +103,7 @@ public class StringFormattingService {
 			result[i][5] = nullable(app.service());
 			result[i][6] = nullable(app.schedule());
 			result[i][7] = nullable(app.strategy());
+			result[i][8] = nullable(app.anotherPorts());
 		}
 
 		appendSpaceToRight(result);

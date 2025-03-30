@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static art.aelaort.k8s.K8sUtils.unwrap;
-import static art.aelaort.utils.ColoredConsoleTextUtils.wrapRed;
-import static art.aelaort.utils.Utils.log;
 
 @Component
 @RequiredArgsConstructor
@@ -65,7 +63,7 @@ public class K8sYamlParser {
 		}
 
 		if (ports.size() > 1) {
-			log(wrapRed("several ports find in service %s, not supported".formatted(service.getMetadata().getName())));
+			builder.hasAnotherPorts(true);
 		}
 
 		ServicePort port = ports.get(0);

@@ -10,7 +10,8 @@ public record ClusterAppRow(
 		String ports,
 		String service,
 		String schedule,
-		String strategy
+		String strategy,
+		String anotherPorts
 ) implements Comparable<ClusterAppRow> {
 
 	@Override

@@ -23,4 +23,6 @@ public class K8sService {
 	private String targetPort;
 	@JsonProperty
 	private Integer nodePort;
+	@JsonProperty
+	private Boolean hasAnotherPorts;
 }
