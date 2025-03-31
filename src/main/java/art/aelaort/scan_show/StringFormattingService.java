@@ -96,28 +96,12 @@ public class StringFormattingService {
 				"pull",
 				"ports",
 				"service",
+				"mem-limit",
 				"strategy",
 				"another-ports",
 		};
 
 		Object[][] data = convertClustersToArraysDeployments(filterK8sApps(clusterAppRows, false), columnNames);
-		TextTable tt = new TextTable(columnNames, data);
-		tt.setAddRowNumbering(true);
-		return getTableString(tt);
-	}
-
-	private String getK8sTableStringWithSchedule(List<ClusterAppRow> clusterAppRows) {
-		String[] columnNames = {
-				"cluster",
-				"namespace",
-				"image",
-				"name",
-				"kind",
-				"pull",
-				"schedule"
-		};
-
-		Object[][] data = convertClustersToArraysJobs(filterK8sApps(clusterAppRows, true), columnNames);
 		TextTable tt = new TextTable(columnNames, data);
 		tt.setAddRowNumbering(true);
 		return getTableString(tt);
@@ -135,13 +119,32 @@ public class StringFormattingService {
 			result[i][5] = nullable(app.imagePullPolicy());
 			result[i][6] = nullable(app.ports());
 			result[i][7] = nullable(app.service());
-			result[i][8] = nullable(app.strategy());
-			result[i][9] = nullable(app.anotherPorts());
+			result[i][8] = nullable(app.memoryLimit());
+			result[i][9] = nullable(app.strategy());
+			result[i][10] = nullable(app.anotherPorts());
 		}
 
 		appendSpaceToRight(result);
 
 		return result;
+	}
+
+	private String getK8sTableStringWithSchedule(List<ClusterAppRow> clusterAppRows) {
+		String[] columnNames = {
+				"cluster",
+				"namespace",
+				"image",
+				"name",
+				"kind",
+				"pull",
+				"schedule",
+				"mem-limit"
+		};
+
+		Object[][] data = convertClustersToArraysJobs(filterK8sApps(clusterAppRows, true), columnNames);
+		TextTable tt = new TextTable(columnNames, data);
+		tt.setAddRowNumbering(true);
+		return getTableString(tt);
 	}
 
 	private Object[][] convertClustersToArraysJobs(List<ClusterAppRow> clusters, String[] columnNames) {
@@ -155,6 +158,7 @@ public class StringFormattingService {
 			result[i][4] = app.kind();
 			result[i][5] = nullable(app.imagePullPolicy());
 			result[i][6] = nullable(app.schedule());
+			result[i][7] = nullable(app.memoryLimit());
 		}
 
 		appendSpaceToRight(result);

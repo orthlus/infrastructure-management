@@ -40,6 +40,7 @@ public class K8sUtils {
 						servicePortsString(serviceByPodNameMap.get(app.getPodName())),
 						serviceType(serviceByPodNameMap.get(app.getPodName())),
 						app.getSchedule(),
+						app.getMemoryLimit(),
 						app.getStrategyType(),
 						serviceAnotherPorts(serviceByPodNameMap.get(app.getPodName())));
 				res.add(clusterAppRow);

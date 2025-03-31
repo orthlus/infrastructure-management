@@ -12,6 +12,7 @@ public record ClusterAppRow(
 		String ports,
 		String service,
 		String schedule,
+		String memoryLimit,
 		String strategy,
 		Boolean anotherPorts
 ) implements Comparable<ClusterAppRow> {

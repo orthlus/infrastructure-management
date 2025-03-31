@@ -106,6 +106,7 @@ public class K8sYamlParser {
 				.image(cronJob.getSpec().getJobTemplate().getSpec().getTemplate().getSpec().getContainers().get(0).getImage())
 				.containerName(cronJob.getSpec().getJobTemplate().getSpec().getTemplate().getSpec().getContainers().get(0).getName())
 				.imagePullPolicy(cronJob.getSpec().getJobTemplate().getSpec().getTemplate().getSpec().getContainers().get(0).getImagePullPolicy())
+				.memoryLimit(memoryLimit(cronJob.getSpec().getJobTemplate().getSpec().getTemplate().getSpec().getContainers().get(0).getResources()))
 				.name(cronJob.getMetadata().getName())
 				.namespace(namespace(cronJob.getMetadata()))
 				.kind(cronJob.getKind())
@@ -119,6 +120,7 @@ public class K8sYamlParser {
 				.image(deployment.getSpec().getTemplate().getSpec().getContainers().get(0).getImage())
 				.containerName(deployment.getSpec().getTemplate().getSpec().getContainers().get(0).getName())
 				.imagePullPolicy(deployment.getSpec().getTemplate().getSpec().getContainers().get(0).getImagePullPolicy())
+				.memoryLimit(memoryLimit(deployment.getSpec().getTemplate().getSpec().getContainers().get(0).getResources()))
 				.podName(deployment.getSpec().getTemplate().getMetadata().getLabels().get("app"))
 				.name(deployment.getMetadata().getName())
 				.namespace(namespace(deployment.getMetadata()))
@@ -132,6 +134,7 @@ public class K8sYamlParser {
 				.image(daemonSet.getSpec().getTemplate().getSpec().getContainers().get(0).getImage())
 				.containerName(daemonSet.getSpec().getTemplate().getSpec().getContainers().get(0).getName())
 				.imagePullPolicy(daemonSet.getSpec().getTemplate().getSpec().getContainers().get(0).getImagePullPolicy())
+				.memoryLimit(memoryLimit(daemonSet.getSpec().getTemplate().getSpec().getContainers().get(0).getResources()))
 				.podName(daemonSet.getSpec().getTemplate().getMetadata().getLabels().get("app"))
 				.name(daemonSet.getMetadata().getName())
 				.namespace(namespace(daemonSet.getMetadata()))
@@ -144,11 +147,20 @@ public class K8sYamlParser {
 				.image(pod.getSpec().getContainers().get(0).getImage())
 				.containerName(pod.getSpec().getContainers().get(0).getName())
 				.imagePullPolicy(pod.getSpec().getContainers().get(0).getImagePullPolicy())
+				.memoryLimit(memoryLimit(pod.getSpec().getContainers().get(0).getResources()))
 				.name(pod.getMetadata().getName())
 				.namespace(namespace(pod.getMetadata()))
 				.podName(pod.getMetadata().getName())
 				.kind(pod.getKind())
 				.build();
+	}
+
+	private String memoryLimit(ResourceRequirements resources) {
+		try {
+			return resources.getLimits().get("memory").toString();
+		} catch (NullPointerException e) {
+			return "-";
+		}
 	}
 
 	private String namespace(ObjectMeta objectMeta) {

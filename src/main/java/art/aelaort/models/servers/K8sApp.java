@@ -29,4 +29,6 @@ public class K8sApp {
 	private String containerName;
 	@JsonProperty
 	private String imagePullPolicy;
+	@JsonProperty
+	private String memoryLimit;
 }
