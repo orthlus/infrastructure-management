@@ -31,7 +31,6 @@ import static java.lang.Integer.parseInt;
 public class Entrypoint implements CommandLineRunner {
 	private final DockerService dockerService;
 	private final BuildService buildService;
-	private final GitStatService gitStatService;
 	private final ScanShowServersService scanShow;
 	private final ProjectsMakerService projectsMakerService;
 	private final HostStatsService hostStatsService;
@@ -68,7 +67,6 @@ public class Entrypoint implements CommandLineRunner {
 				case "dbp-run", "dbpr" -> 	 remoteDb.remoteRun(args);
 				case "kub", "k" -> 			 k8SApplyService.apply(slice(args, 1));
 				case "k8s-docker-login" ->   k8SApplyService.printDockerConfigJson(slice(args, 1));
-				case "git-stat" -> 			 gitStat(args);
 				case "host-stat", "hs" ->	 hostStats(args);
 				case "make" -> 				 makeProject(args);
 				case "upld-ssh" -> 			 uploadSshKey(args);
@@ -118,8 +116,6 @@ public class Entrypoint implements CommandLineRunner {
 					                      args: registry, login, password
 					                      or string in docker login format
 					\s
-					git-stat    - print git stat for all local repo
-					                optional args: day, week, month
 					host-stat   - remote system stats (docker and host)
 					hs              by server id/name
 					                or all servers if no arguments
@@ -191,14 +187,6 @@ public class Entrypoint implements CommandLineRunner {
 			} catch (ProjectAlreadyExistsException e) {
 				log("project create failed - dir %s already exists\n", e.getDir());
 			}
-		}
-	}
-
-	private void gitStat(String[] args) {
-		if (args.length < 2) {
-			log(gitStatService.readStatForDay());
-		} else {
-			log(gitStatService.readStatWithInterval(args[1]));
 		}
 	}
 
