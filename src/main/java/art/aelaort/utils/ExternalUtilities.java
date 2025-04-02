@@ -21,10 +21,6 @@ public class ExternalUtilities {
 	@Value("${build.data.config.converter.path}")
 	private String buildConfigConverterPath;
 
-	public void dockerPs() {
-		systemProcess.callProcessInheritIO("docker ps -a");
-	}
-
 	public String readBuildConfig() {
 		Response response = systemProcess.callProcess(buildConfigBin, buildConfigConverterPath);
 		if (response.exitCode() == 0) {

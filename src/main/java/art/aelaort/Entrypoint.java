@@ -69,7 +69,6 @@ public class Entrypoint implements CommandLineRunner {
 					 "dblrrj" -> 			 localDb.localRerunAndGenJooq(args);
 				case "dbp-status", "dbps" -> remoteDb.remoteStatus(args);
 				case "dbp-run", "dbpr" -> 	 remoteDb.remoteRun(args);
-				case "dps" -> 				 externalUtilities.dockerPs();
 				case "kub", "k" -> 			 k8SApplyService.apply(slice(args, 1));
 				case "k8s-docker-login" ->   k8SApplyService.printDockerConfigJson(slice(args, 1));
 				case "git-stat" -> 			 gitStat(args);
@@ -126,7 +125,6 @@ public class Entrypoint implements CommandLineRunner {
 					                      args: registry, login, password
 					                      or string in docker login format
 					\s
-					dps         - alias for 'docker ps -a'
 					git-stat    - print git stat for all local repo
 					                optional args: day, week, month
 					host-stat   - remote system stats (docker and host)
