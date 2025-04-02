@@ -17,7 +17,6 @@ import art.aelaort.ssh.SshKeyCloudUploader;
 import art.aelaort.ssh.SshKeyGenerator;
 import art.aelaort.ssh.SshKeyUploader;
 import art.aelaort.ssh.SshKeysCleanupService;
-import art.aelaort.utils.ExternalUtilities;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -30,7 +29,6 @@ import static java.lang.Integer.parseInt;
 @Component
 @RequiredArgsConstructor
 public class Entrypoint implements CommandLineRunner {
-	private final ExternalUtilities externalUtilities;
 	private final DockerService dockerService;
 	private final BuildService buildService;
 	private final GitStatService gitStatService;
@@ -41,7 +39,6 @@ public class Entrypoint implements CommandLineRunner {
 	private final RandomPortService randomPortService;
 	private final SshServerProvider sshServerProvider;
 	private final JobsProvider jobsProvider;
-	private final VirtualBoxService virtualBoxService;
 	private final LocalDb localDb;
 	private final RemoteDb remoteDb;
 	private final SshKeysCleanupService sshKeysCleanupService;
@@ -81,10 +78,6 @@ public class Entrypoint implements CommandLineRunner {
 					 "gsu" ->                genSshUpload(args);
 				case "port" -> 				 log(randomPortService.getRandomPort());
 				case "portk" ->				 log(randomPortService.getRandomPortK8s());
-				case "vm" -> 				 virtualBoxService.up(args);
-				case "vm-pause", "vmp" -> 	 virtualBoxService.pause(args);
-				case "vm-stop", "vms" -> 	 virtualBoxService.stop(args);
-				case "vml" -> 				 virtualBoxService.vml();
 				default -> log("unknown args\n" + usage());
 			}
 		} else {
@@ -151,13 +144,7 @@ public class Entrypoint implements CommandLineRunner {
 					                 1 arg - name
 					                 2 arg (optional) - comment
 					port         - generate random, not used, port for tcp. 5 digits
-					portk        - generate port for k8s (30001, 32767), not used.
-					\s
-					VirtualBox:
-					vm              - start virtualbox
-					vm-pause, vmp   - save state virtualbox
-					vm-stop, vms    - shutdown virtualbox
-					vml             - list all machines and running machines"""
+					portk        - generate port for k8s (30001, 32767), not used."""
 				.formatted(dockerDefaultRemoteDir);
 	}
 
