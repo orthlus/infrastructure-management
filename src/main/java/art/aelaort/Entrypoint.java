@@ -91,13 +91,7 @@ public class Entrypoint implements CommandLineRunner {
 					hs              by server id/name
 					                or all servers if no arguments
 					make         - create project folder
-					                 one arg required
-					                 `name` for make project by name (could be with sub directories)
-					                     or
-					                 `id` for make project with name from config by id
-					                 optional:
-					                     `no-git` - not init git
-					                     `jooq` - add jooq config and plugin
+					               required: `id` for make project with name from config by id
 					upld-ssh     - upload ssh key to server
 					                 by server id/name
 					                 required key file path (2 arg)
@@ -148,9 +142,7 @@ public class Entrypoint implements CommandLineRunner {
 		} else {
 			String nameOrId = args[1];
 			try {
-				boolean hasGit = projectsMakerService.hasGit(args);
-				boolean hasJooq = projectsMakerService.hasJooq(args);
-				projectsMakerService.makeJavaProject(nameOrId, hasGit, hasJooq);
+				projectsMakerService.makeJavaProject(nameOrId);
 			} catch (InvalidAppParamsException e) {
 				log("make project by id - app found, but params not correct");
 			} catch (AppNotFoundException e) {

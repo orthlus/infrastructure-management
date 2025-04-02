@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Set;
 
 import static art.aelaort.utils.Utils.log;
@@ -32,16 +31,8 @@ public class ProjectsMakerService {
 	@Value("${build.main.default_files.dir}")
 	private Path defaultFilesDir;
 
-	public boolean hasGit(String[] args) {
-		return Arrays.stream(args).noneMatch(arg -> arg.equals("no-git"));
-	}
-
-	public boolean hasJooq(String[] args) {
-		return Arrays.asList(args).contains("jooq");
-	}
-
-	public void makeJavaProject(String nameOrId, boolean hasGit, boolean hasJooq) {
-		Project project = buildProject(nameOrId, hasGit, hasJooq);
+	public void makeJavaProject(String nameOrId) {
+		Project project = buildProject(nameOrId);
 		Path dir = mkdirForJava(project);
 
 		generateMavenFile(dir, project);
@@ -52,23 +43,17 @@ public class ProjectsMakerService {
 
 		generateClassFile(getClassDir(dir), project);
 		generatePropertiesFile(getResourcesDir(dir), project);
-		generateGit(dir, project);
+		generateGit(dir);
 	}
 
-	private Project buildProject(String nameOrId, boolean hasGit, boolean hasJooq) {
-		Project.ProjectBuilder projectBuilder = Project.builder()
-				.hasGit(hasGit)
-				.hasJooq(hasJooq);
-		try {
-			int id = Integer.parseInt(nameOrId);
-			return enrich(projectBuilder.id(id).build());
-		} catch (NumberFormatException e) {
-			return projectBuilder.name(nameOrId).build();
-		}
+	private Project buildProject(String nameOrId) {
+		Project.ProjectBuilder projectBuilder = Project.builder();
+		int id = Integer.parseInt(nameOrId);
+		return enrich(projectBuilder.id(id).build());
 	}
 
 	private Project enrich(Project project) {
-		if (project.getId() == null || project.getName() != null) {
+		if (project.getId() == null) {
 			return project;
 		}
 
@@ -82,7 +67,6 @@ public class ProjectsMakerService {
 			Project.ProjectBuilder newProjectBuilder = Project.builder()
 					.name(job.getName())
 					.hasJooq(job.isDb())
-					.hasGit(project.isHasGit())
 					.dir(job.getSubDirectory());
 
 			if (job.getBuildType().equals("java_local")) {
@@ -95,16 +79,14 @@ public class ProjectsMakerService {
 		}
 	}
 
-	private void generateGit(Path dir, Project project) {
-		if (project.isHasGit()) {
-			try {
-				systemProcess.callProcessThrows(dir, "git init");
-				systemProcess.callProcessThrows(dir, "git add .");
-				systemProcess.callProcessThrows(dir, "git commit -m init");
-			} catch (RuntimeException e) {
-				log("generate git error");
-				throw new RuntimeException(e);
-			}
+	private void generateGit(Path dir) {
+		try {
+			systemProcess.callProcessThrows(dir, "git init");
+			systemProcess.callProcessThrows(dir, "git add .");
+			systemProcess.callProcessThrows(dir, "git commit -m init");
+		} catch (RuntimeException e) {
+			log("generate git error");
+			throw new RuntimeException(e);
 		}
 	}
 
