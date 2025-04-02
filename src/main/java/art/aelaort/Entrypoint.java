@@ -1,15 +1,10 @@
 package art.aelaort;
 
-import art.aelaort.build.BuildService;
-import art.aelaort.build.JobsProvider;
-import art.aelaort.db.LocalDb;
-import art.aelaort.db.RemoteDb;
 import art.aelaort.docker.DockerService;
 import art.aelaort.docker.HostStatsService;
 import art.aelaort.exceptions.*;
 import art.aelaort.k8s.K8sApplyService;
 import art.aelaort.make.ProjectsMakerService;
-import art.aelaort.models.build.Job;
 import art.aelaort.models.ssh.SshServer;
 import art.aelaort.scan_show.ScanShowServersService;
 import art.aelaort.servers.providers.SshServerProvider;
@@ -24,22 +19,17 @@ import org.springframework.stereotype.Component;
 
 import static art.aelaort.utils.Utils.log;
 import static art.aelaort.utils.Utils.slice;
-import static java.lang.Integer.parseInt;
 
 @Component
 @RequiredArgsConstructor
 public class Entrypoint implements CommandLineRunner {
 	private final DockerService dockerService;
-	private final BuildService buildService;
 	private final ScanShowServersService scanShow;
 	private final ProjectsMakerService projectsMakerService;
 	private final HostStatsService hostStatsService;
 	private final SshKeyUploader sshKeyUploader;
 	private final RandomPortService randomPortService;
 	private final SshServerProvider sshServerProvider;
-	private final JobsProvider jobsProvider;
-	private final LocalDb localDb;
-	private final RemoteDb remoteDb;
 	private final SshKeysCleanupService sshKeysCleanupService;
 	private final SshKeyGenerator sshKeyGenerator;
 	private final SshKeyCloudUploader sshKeyCloudUploader;
@@ -58,13 +48,6 @@ public class Entrypoint implements CommandLineRunner {
 				case "sync", "s" -> 		 scanShow.sync();
 				case "sync-all", "sa" -> 	 scanShow.syncAll();
 				case "docker" -> 			 dockerUpload(args);
-				case "build" -> 			 build(slice(args, 1));
-				case "dbl" -> 				 localDb.localUpFromEntry(args);
-				case "dbl-down", "dbld" -> 	 localDb.localDown();
-				case "dbl-rerun-jooq",
-					 "dblrrj" -> 			 localDb.localRerunAndGenJooq(args);
-				case "dbp-status", "dbps" -> remoteDb.remoteStatus(args);
-				case "dbp-run", "dbpr" -> 	 remoteDb.remoteRun(args);
 				case "kub", "k" -> 			 k8SApplyService.apply(slice(args, 1));
 				case "k8s-docker-login" ->   k8SApplyService.printDockerConfigJson(slice(args, 1));
 				case "host-stat", "hs" ->	 hostStats(args);
@@ -96,18 +79,6 @@ public class Entrypoint implements CommandLineRunner {
 					\s
 					docker - upload docker-compose file to server (in %s)
 					            by server id/name (required)
-					\s
-					build - build and deploy apps
-					            number of app (required for run)
-					                without args - printing apps list
-					\s
-					Databases (optional 1 arg - db name):
-					dbl                 - start local postgres and run migrations
-					dbl-down, dbld      - down local postgres
-					dbl-rerun-jooq,     - local down and up, if passed app id - run jooq
-					dblrrj
-					dbp-status, dbps    - prod migrations status
-					dbp-run, dbpr       - execute prod migrations
 					\s
 					kub, k              - apply yaml for cluster.
 					                      1. yaml file name is optional (by default apply all files)
@@ -186,32 +157,6 @@ public class Entrypoint implements CommandLineRunner {
 				log("app by id %d not found\n", e.getProject().getId());
 			} catch (ProjectAlreadyExistsException e) {
 				log("project create failed - dir %s already exists\n", e.getDir());
-			}
-		}
-	}
-
-	private void build(String[] args) {
-		if (args.length == 0) {
-			buildService.printConfigWithDeprecated();
-		} else {
-			int id;
-
-			try {
-				id = parseInt(args[0]);
-			} catch (NumberFormatException ignored) {
-				String type = args[0];
-				buildService.printConfig(type);
-				return;
-			}
-
-			try {
-				Job job = jobsProvider.getJobById(id);
-				boolean isBuildDockerNoCache = buildService.isBuildDockerNoCache(args);
-				buildService.run(job, isBuildDockerNoCache);
-			} catch (TooManyDockerFilesException e) {
-				log("too many docker-files");
-			} catch (BuildJobNotFoundException e) {
-				log("job %s not found\n", args[1]);
 			}
 		}
 	}

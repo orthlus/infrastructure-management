@@ -14,7 +14,6 @@ public class S3Properties {
 	String region;
 	Tabby tabby;
 	ServersManagement serversManagement;
-	Build build;
 
 	@Getter
 	@Setter
@@ -28,14 +27,6 @@ public class S3Properties {
 	@Getter
 	@Setter
 	public static class ServersManagement {
-		String id;
-		String key;
-		String bucket;
-	}
-
-	@Getter
-	@Setter
-	public static class Build {
 		String id;
 		String key;
 		String bucket;

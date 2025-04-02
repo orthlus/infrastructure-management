@@ -1,6 +1,5 @@
 package art.aelaort.build;
 
-import art.aelaort.exceptions.BuildJobNotFoundException;
 import art.aelaort.models.build.Job;
 import art.aelaort.utils.ExternalUtilities;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -19,14 +18,6 @@ import java.util.stream.Collectors;
 public class JobsProvider {
     private final ExternalUtilities externalUtilities;
     private final JsonMapper jsonMapper;
-
-    public Job getJobById(int id) {
-		return readBuildConfig()
-				.stream()
-				.filter(job -> job.getId() == id)
-				.findFirst()
-				.orElseThrow(BuildJobNotFoundException::new);
-	}
 
     public Map<Integer, Job> getJobsMapById() {
         return readBuildConfig()

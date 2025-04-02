@@ -58,15 +58,6 @@ public class Config {
 	}
 
 	@Bean
-	public S3Params buildS3Params() {
-		return new DefaultS3Params(
-				properties.getBuild().getId(),
-				properties.getBuild().getKey(),
-				properties.getEndpoint(),
-				properties.getRegion());
-	}
-
-	@Bean
 	public RestTemplate tabbyDecoder(RestTemplateBuilder restTemplateBuilder,
 									 @Value("${tabby.decode.service.url}") String url) {
 		return restTemplateBuilder
