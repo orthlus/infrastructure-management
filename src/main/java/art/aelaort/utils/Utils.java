@@ -1,6 +1,5 @@
 package art.aelaort.utils;
 
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -17,14 +16,6 @@ import static java.util.stream.Collectors.joining;
 public class Utils {
 	@Value("${tmp.root.dir}")
 	private Path tmpRootDir;
-	@Value("${servers.management.docker.image.pattern}")
-	private String dockerImagePattern;
-	private String[] dockerImagePatternSplit;
-
-	@PostConstruct
-	private void init() {
-		dockerImagePatternSplit = dockerImagePattern.split("%%");
-	}
 
 	public Path createTmpDir() {
 		return createTmpDir(tmpRootDir);
@@ -73,11 +64,5 @@ public class Utils {
 
 	public static String[] slice(String[] arr, int start, int end) {
 		return Arrays.copyOfRange(arr, start, end);
-	}
-
-	public String dockerImageClean(String dockerImage) {
-		return dockerImage
-				.replace(dockerImagePatternSplit[0], "")
-				.replace(dockerImagePatternSplit[1], "");
 	}
 }

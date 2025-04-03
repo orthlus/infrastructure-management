@@ -42,7 +42,7 @@ public class HostStatsService {
 
 	public String statAllServers() {
 		String splitRow = "\n\n" + "=".repeat(100) + "\n";
-		return serverProvider.scanOnlyLocalData()
+		return serverProvider.readLocalJsonData()
 				.stream()
 				.filter(this::hasDockerService)
 				.map(serverMapper::map)

@@ -45,8 +45,6 @@ public class Entrypoint implements CommandLineRunner {
 				case "tbl" ->				 scanShow.showTable();
 				case "yml", "svc" ->		 scanShow.showYml();
 				case "k8s-list", "kl" ->	 scanShow.showK8s();
-				case "sync", "s" -> 		 scanShow.sync();
-				case "sync-all", "sa" -> 	 scanShow.syncAll();
 				case "docker" -> 			 dockerUpload(args);
 				case "kub", "k" -> 			 k8SApplyService.apply(slice(args, 1));
 				case "k8s-docker-login" ->   k8SApplyService.printDockerConfigJson(slice(args, 1));
@@ -71,8 +69,6 @@ public class Entrypoint implements CommandLineRunner {
 	private String usage() {
 		return """
 				usage:
-					sync, s        - quick sync
-					sync-all, sa   - long sync all data
 					show           - show all (tbl and yml)
 					tbl            - show table with servers
 					yml, svc       - show list of services from yml files

@@ -4,7 +4,6 @@ import art.aelaort.models.servers.K8sApp;
 import art.aelaort.models.servers.K8sCluster;
 import art.aelaort.models.servers.K8sService;
 import art.aelaort.models.servers.display.ClusterAppRow;
-import io.fabric8.kubernetes.api.model.IntOrString;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,18 +13,6 @@ import java.util.Map;
 import static org.springframework.util.StringUtils.hasText;
 
 public class K8sUtils {
-	public static String unwrap(IntOrString intOrString) {
-		if (intOrString == null) {
-			return null;
-		}
-
-		if (intOrString.getStrVal() != null) {
-			return intOrString.getStrVal();
-		} else {
-			return String.valueOf(intOrString.getIntVal());
-		}
-	}
-
 	public static List<ClusterAppRow> mapToClusterAppRows(List<K8sCluster> clusters) {
 		List<ClusterAppRow> res = new ArrayList<>();
 		for (K8sCluster cluster : clusters) {
