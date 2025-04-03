@@ -20,6 +20,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.stream.Stream;
 
 import static art.aelaort.utils.Utils.linuxResolve;
 import static art.aelaort.utils.Utils.log;
@@ -106,15 +107,17 @@ public class DockerService {
 
 	@SneakyThrows
 	private Path lookupYmlFile(Path dir) {
-		List<Path> dockerFiles = Files.walk(dir, 1)
-				.filter(path -> path.toFile().isFile())
-				.filter(path -> path.getFileName().toString().toLowerCase().endsWith(".yml"))
-				.filter(path -> path.getFileName().toString().toLowerCase().contains("docker"))
-				.toList();
-		if (dockerFiles.size() == 1) {
-			return dockerFiles.get(0);
-		} else {
-			throw new TooManyDockerFilesException();
+		try (Stream<Path> walk = Files.walk(dir, 1)) {
+			List<Path> dockerFiles = walk
+					.filter(path -> path.toFile().isFile())
+					.filter(path -> path.getFileName().toString().toLowerCase().endsWith(".yml"))
+					.filter(path -> path.getFileName().toString().toLowerCase().contains("docker"))
+					.toList();
+			if (dockerFiles.size() == 1) {
+				return dockerFiles.get(0);
+			} else {
+				throw new TooManyDockerFilesException();
+			}
 		}
 	}
 }
