@@ -18,22 +18,33 @@ public class K8sUtils {
 		for (K8sCluster cluster : clusters) {
 			Map<String, K8sService> serviceByPodNameMap = makeServiceByPodNameMap(cluster);
 			for (K8sApp app : cluster.apps()) {
+				K8sService service = serviceByPodNameMap.get(app.getPodName());
 				ClusterAppRow clusterAppRow = new ClusterAppRow(cluster.name(),
 						app.getNamespace(),
 						app.getImage(),
 						app.getName(),
-						app.getKind(),
+						renameKind(app.getKind()),
 						app.getImagePullPolicy(),
-						servicePortsString(serviceByPodNameMap.get(app.getPodName())),
-						serviceType(serviceByPodNameMap.get(app.getPodName())),
+						servicePortsString(service),
+						serviceType(service),
 						app.getSchedule(),
 						app.getMemoryLimit(),
 						app.getStrategyType(),
-						serviceAnotherPorts(serviceByPodNameMap.get(app.getPodName())));
+						serviceRoute(service)
+				);
 				res.add(clusterAppRow);
 			}
 		}
 		return res;
+	}
+
+	private static String renameKind(String kind) {
+		return switch (kind) {
+			case "Deployment": yield "D";
+			case "DaemonSet": yield "DS";
+			case "CronJob": yield "CJ";
+			default: yield kind;
+		};
 	}
 
 	private static Map<String, K8sService> makeServiceByPodNameMap(K8sCluster cluster) {
@@ -50,11 +61,11 @@ public class K8sUtils {
 		return res;
 	}
 
-	private static Boolean serviceAnotherPorts(K8sService service) {
+	private static String serviceRoute(K8sService service) {
 		if (service == null) {
 			return null;
 		}
-		return service.getHasAnotherPorts();
+		return service.getRoute();
 	}
 
 	private static String serviceType(K8sService service) {
@@ -64,23 +75,32 @@ public class K8sUtils {
 		return service.getType();
 	}
 
+	private static String enrichPorts(String port, Boolean hasAnotherPorts) {
+		if (hasAnotherPorts != null && hasAnotherPorts) {
+			return port + " (+)";
+		}
+		return port;
+	}
+
 	private static String servicePortsString(K8sService service) {
 		if (service == null || service.getPort() == null) {
 			return null;
 		}
 
+		String result;
 		if (service.getNodePort() == null) {
 			if (hasText(service.getTargetPort())) {
-				return "%s:%s".formatted(service.getPort(), service.getTargetPort());
+				result = "%s %s".formatted(service.getPort(), service.getTargetPort());
 			} else {
-				return "%s:%s".formatted(service.getPort(), service.getPort());
+				result = "%s %s".formatted(service.getPort(), service.getPort());
 			}
 		} else {
 			if (hasText(service.getTargetPort())) {
-				return "%s:%s:%s".formatted(service.getNodePort(), service.getPort(), service.getTargetPort());
+				result = "%s %s %s".formatted(service.getNodePort(), service.getPort(), service.getTargetPort());
 			} else {
-				return "%s:%s:%s".formatted(service.getNodePort(), service.getPort(), service.getPort());
+				result = "%s %s %s".formatted(service.getNodePort(), service.getPort(), service.getPort());
 			}
 		}
+		return enrichPorts(result, service.getHasAnotherPorts());
 	}
 }

@@ -89,16 +89,16 @@ public class StringFormattingService {
 	private String getK8sTableStringNoSchedule(List<ClusterAppRow> clusterAppRows) {
 		String[] columnNames = {
 				"cluster",
-				"namespace",
+				"ns",
 				"image",
 				"name",
 				"kind",
 				"pull",
 				"ports",
 				"service",
-				"mem-limit",
+				"route",
+				"mem-lim",
 				"strategy",
-				"another-ports",
 		};
 
 		Object[][] data = convertClustersToArraysDeployments(filterK8sApps(clusterAppRows, false), columnNames);
@@ -119,9 +119,9 @@ public class StringFormattingService {
 			result[i][5] = nullable(app.imagePullPolicy());
 			result[i][6] = nullable(app.ports());
 			result[i][7] = nullable(app.service());
-			result[i][8] = nullable(app.memoryLimit());
-			result[i][9] = nullable(app.strategy());
-			result[i][10] = nullable(app.anotherPorts());
+			result[i][8] = nullable(app.route());
+			result[i][9] = nullable(app.memoryLimit());
+			result[i][10] = nullable(app.strategy());
 		}
 
 		appendSpaceToRight(result);
@@ -132,13 +132,13 @@ public class StringFormattingService {
 	private String getK8sTableStringWithSchedule(List<ClusterAppRow> clusterAppRows) {
 		String[] columnNames = {
 				"cluster",
-				"namespace",
+				"ns",
 				"image",
 				"name",
 				"kind",
 				"pull",
 				"schedule",
-				"mem-limit"
+				"mem-lim"
 		};
 
 		Object[][] data = convertClustersToArraysJobs(filterK8sApps(clusterAppRows, true), columnNames);
