@@ -28,7 +28,6 @@ public class Entrypoint implements CommandLineRunner {
 	private final ProjectsMakerService projectsMakerService;
 	private final HostStatsService hostStatsService;
 	private final SshKeyUploader sshKeyUploader;
-	private final RandomPortService randomPortService;
 	private final SshServerProvider sshServerProvider;
 	private final SshKeysCleanupService sshKeysCleanupService;
 	private final SshKeyGenerator sshKeyGenerator;
@@ -55,8 +54,6 @@ public class Entrypoint implements CommandLineRunner {
 				case "gen-ssh", "gen" ->     sshKeyGenerator.generateKey(slice(args, 1));
 				case "gen-ssh-upload",
 					 "gsu" ->                genSshUpload(args);
-				case "port" -> 				 log(randomPortService.getRandomPort());
-				case "portk" ->				 log(randomPortService.getRandomPortK8s());
 				default -> log("unknown args\n" + usage());
 			}
 		} else {
@@ -99,9 +96,7 @@ public class Entrypoint implements CommandLineRunner {
 					gen-ssh-upload, gsu
 					             - generate ssh key and upload
 					                 1 arg - name
-					                 2 arg (optional) - comment
-					port         - generate random, not used, port for tcp. 5 digits
-					portk        - generate port for k8s (30001, 32767), not used."""
+					                 2 arg (optional) - comment"""
 				.formatted(dockerDefaultRemoteDir);
 	}
 

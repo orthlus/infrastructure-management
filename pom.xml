@@ -83,11 +83,6 @@
             <artifactId>guava</artifactId>
             <version>33.3.0-jre</version>
         </dependency>
-        <dependency>
-            <groupId>org.unix4j</groupId>
-            <artifactId>unix4j-command</artifactId>
-            <version>0.4</version>
-        </dependency>
 
         <dependency>
             <groupId>io.fabric8</groupId>
