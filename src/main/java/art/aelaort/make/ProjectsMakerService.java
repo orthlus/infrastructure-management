@@ -43,7 +43,7 @@ public class ProjectsMakerService {
 
 		generateClassFile(getClassDir(dir), project);
 		generatePropertiesFile(getResourcesDir(dir), project);
-		generateGit(dir);
+		generateGit(dir, project);
 	}
 
 	private Project buildProject(String nameOrId) {
@@ -73,20 +73,26 @@ public class ProjectsMakerService {
 				newProjectBuilder.isMavenBuildForLocal(true);
 			}
 
+			if (job.isGit()) {
+				newProjectBuilder.hasGit(true);
+			}
+
 			return newProjectBuilder.build();
 		} else {
 			throw new InvalidAppParamsException();
 		}
 	}
 
-	private void generateGit(Path dir) {
-		try {
-			systemProcess.callProcessThrows(dir, "git init");
-			systemProcess.callProcessThrows(dir, "git add .");
-			systemProcess.callProcessThrows(dir, "git commit -m init");
-		} catch (RuntimeException e) {
-			log("generate git error");
-			throw new RuntimeException(e);
+	private void generateGit(Path dir, Project project) {
+		if (project.isHasGit()) {
+			try {
+				systemProcess.callProcessThrows(dir, "git init");
+				systemProcess.callProcessThrows(dir, "git add .");
+				systemProcess.callProcessThrows(dir, "git commit -m init");
+			} catch (RuntimeException e) {
+				log("generate git error");
+				throw new RuntimeException(e);
+			}
 		}
 	}
 
