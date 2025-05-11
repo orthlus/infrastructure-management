@@ -46,7 +46,6 @@ public class Entrypoint implements CommandLineRunner {
 				case "k8s-list", "kl" ->	 scanShow.showK8s();
 				case "docker" -> 			 dockerUpload(args);
 				case "kub", "k" -> 			 k8SApplyService.apply(slice(args, 1));
-				case "k8s-docker-login" ->   k8SApplyService.printDockerConfigJson(slice(args, 1));
 				case "host-stat", "hs" ->	 hostStats(args);
 				case "make" -> 				 makeProject(args);
 				case "upld-ssh" -> 			 uploadSshKey(args);
@@ -76,9 +75,6 @@ public class Entrypoint implements CommandLineRunner {
 					kub, k              - apply yaml for cluster.
 					                      1. yaml file name is optional (by default apply all files)
 					                      2. cluster name is optional (default name in file)
-					k8s-docker-login    - generate base64 secret with docker login info for k8s
-					                      args: registry, login, password
-					                      or string in docker login format
 					\s
 					host-stat   - remote system stats (docker and host)
 					hs              by server id/name
