@@ -40,10 +40,10 @@ public class K8sUtils {
 
 	private static String renameKind(String kind) {
 		return switch (kind) {
-			case "Deployment": yield "D";
-			case "DaemonSet": yield "DS";
-			case "CronJob": yield "CJ";
-			default: yield kind;
+			case "Deployment" -> "D";
+			case "DaemonSet" -> "DS";
+			case "CronJob" -> "CJ";
+			default -> kind;
 		};
 	}
 

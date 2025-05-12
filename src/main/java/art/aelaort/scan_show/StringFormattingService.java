@@ -78,11 +78,11 @@ public class StringFormattingService {
 				k8s clusters and apps:
 				apps (no schedule):
 				%s
-				with schedule:
+				cronjobs:
 				%s"""
 				.formatted(
 						getK8sTableStringNoSchedule(clusterAppRows),
-						getK8sTableStringWithSchedule(clusterAppRows)
+						getK8sTableStringCronJobs(clusterAppRows)
 				);
 	}
 
@@ -129,7 +129,7 @@ public class StringFormattingService {
 		return result;
 	}
 
-	private String getK8sTableStringWithSchedule(List<ClusterAppRow> clusterAppRows) {
+	private String getK8sTableStringCronJobs(List<ClusterAppRow> clusterAppRows) {
 		String[] columnNames = {
 				"cluster",
 				"ns",
