@@ -1,6 +1,6 @@
 package art.aelaort.k8s;
 
-import art.aelaort.models.servers.K8sCluster;
+import art.aelaort.models.servers.k8s.K8sCluster;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;

@@ -1,7 +1,7 @@
 package art.aelaort.scan_show;
 
 import art.aelaort.models.build.Job;
-import art.aelaort.models.servers.K8sCluster;
+import art.aelaort.models.servers.k8s.K8sCluster;
 import art.aelaort.models.servers.Server;
 import art.aelaort.models.servers.ServiceDto;
 import art.aelaort.models.servers.display.ClusterAppRow;
