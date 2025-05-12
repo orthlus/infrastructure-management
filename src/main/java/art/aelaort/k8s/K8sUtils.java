@@ -2,6 +2,7 @@ package art.aelaort.k8s;
 
 import art.aelaort.models.servers.K8sApp;
 import art.aelaort.models.servers.K8sCluster;
+import art.aelaort.models.servers.K8sHelmChart;
 import art.aelaort.models.servers.K8sService;
 import art.aelaort.models.servers.display.ClusterAppRow;
 
@@ -31,6 +32,18 @@ public class K8sUtils {
 						app.getMemoryLimit(),
 						app.getStrategyType(),
 						serviceRoute(service)
+				);
+				res.add(clusterAppRow);
+			}
+
+			for (K8sHelmChart helmChart : cluster.helmCharts()) {
+				ClusterAppRow clusterAppRow = new ClusterAppRow(
+						cluster.name(),
+						helmChart.getTargetNamespace(),
+						helmChart.getRepo(),
+						helmChart.getChart(),
+						"HC",
+						null, null, null, null, null, null, null
 				);
 				res.add(clusterAppRow);
 			}
