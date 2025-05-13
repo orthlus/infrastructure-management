@@ -13,8 +13,9 @@ import java.nio.file.Path;
 @Setter
 public class K8sProps {
 	private Path dir;
-	private Path defaultFile;
+	private Path clustersListFile;
 	private String pathFiles;
 	private Path syncFile;
 	private String nodesFile;
+	private String configPath;
 }

@@ -38,25 +38,29 @@ public class Entrypoint implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
-		if (args.length >= 1) {
-			switch (args[0]) {
-				case "show" -> 				 scanShow.show();
-				case "tbl" ->				 scanShow.showTable();
-				case "yml", "svc" ->		 scanShow.showYml();
-				case "k8s-list", "kl" ->	 scanShow.showK8s();
-				case "docker" -> 			 dockerUpload(args);
-				case "kub", "k" -> 			 k8SApplyService.apply(slice(args, 1));
-				case "host-stat", "hs" ->	 hostStats(args);
-				case "make" -> 				 makeProject(args);
-				case "upld-ssh" -> 			 uploadSshKey(args);
-				case "clean-ssh" -> 		 sshKeysCleanupService.cleanAll();
-				case "gen-ssh", "gen" ->     sshKeyGenerator.generateKey(slice(args, 1));
-				case "gen-ssh-upload",
-					 "gsu" ->                genSshUpload(args);
-				default -> log("unknown args\n" + usage());
+		try {
+			if (args.length >= 1) {
+				switch (args[0]) {
+					case "show" -> 				 scanShow.show();
+					case "tbl" ->				 scanShow.showTable();
+					case "yml", "svc" ->		 scanShow.showYml();
+					case "docker" -> 			 dockerUpload(args);
+					case "kub", "k" -> 			 k8SApplyService.apply(slice(args, 1));
+					case "host-stat", "hs" ->	 hostStats(args);
+					case "make" -> 				 makeProject(args);
+					case "upld-ssh" -> 			 uploadSshKey(args);
+					case "clean-ssh" -> 		 sshKeysCleanupService.cleanAll();
+					case "gen-ssh", "gen" ->     sshKeyGenerator.generateKey(slice(args, 1));
+					case "gen-ssh-upload",
+						 "gsu" ->                genSshUpload(args);
+					default -> log("unknown args\n" + usage());
+				}
+			} else {
+				log("at least one arg required");
+				log(usage());
+				System.exit(1);
 			}
-		} else {
-			log("at least one arg required");
+		} catch (ExitWithUsageException e) {
 			log(usage());
 			System.exit(1);
 		}
@@ -72,9 +76,10 @@ public class Entrypoint implements CommandLineRunner {
 					docker - upload docker-compose file to server (in %s)
 					            by server id/name (required)
 					\s
-					kub, k              - apply yaml for cluster.
-					                      1. yaml file name is optional (by default apply all files)
-					                      2. cluster name is optional (default name in file)
+					kub, k  - apply yaml files for cluster.
+						      1. cluster id
+						      2. `dry` for dry-run, `run` for actual apply
+						      3. `del` for prune (optional)
 					\s
 					host-stat   - remote system stats (docker and host)
 					hs              by server id/name
