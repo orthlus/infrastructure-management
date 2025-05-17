@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Configuration;
 		art.aelaort.models.servers.k8s.K8sApp.class,
 		art.aelaort.models.servers.k8s.K8sService.class,
 		art.aelaort.models.servers.k8s.K8sHelmChart.class,
+		art.aelaort.models.servers.k8s.K8sIngressRoute.class,
 		art.aelaort.models.servers.DirServer.class,
 		art.aelaort.models.servers.TabbyServer.class,
 		art.aelaort.models.servers.display.ClusterAppRow.class,
