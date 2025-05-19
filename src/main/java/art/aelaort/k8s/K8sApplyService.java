@@ -22,9 +22,10 @@ public class K8sApplyService {
 	private final SystemProcess systemProcess;
 	private final String unchanged = " unchanged";
 	private final String configured = " configured";
+	private final String secretPrefix = "secret/";
 
 	private Boolean filterOutput(String stdout) {
-		return !stdout.contains(unchanged) && !stdout.contains(configured);
+		return !stdout.contains(unchanged) && !stdout.startsWith(secretPrefix);
 	}
 
 	public void apply(String[] args) {
